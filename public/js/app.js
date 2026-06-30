@@ -40,7 +40,7 @@ if (mobileMenuBtn && navMenu) {
 let cars = [];
 let compareList = [];
 let selectedCarForFinance = null;
-let currentFilter = 'Tất cả';
+let currentFilter = 'Động cơ điện';
 let currentSearch = '';
 
 // Dữ liệu mẫu Trạm sạc & Showroom

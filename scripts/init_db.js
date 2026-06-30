@@ -29,6 +29,13 @@ async function initDB() {
     // Switch to database
     await connection.query(`USE \`${dbName}\`;`);
 
+    // Drop tables if they exist to refresh schema
+    console.log('Dropping existing tables to refresh schema...');
+    await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
+    await connection.query('DROP TABLE IF EXISTS test_drives;');
+    await connection.query('DROP TABLE IF EXISTS cars;');
+    await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
+
     // Create admins table
     console.log('Creating "admins" table...');
     await connection.query(`
@@ -54,7 +61,7 @@ async function initDB() {
       ) ENGINE=InnoDB;
     `);
 
-    // Create cars table
+    // Create cars table with category column
     console.log('Creating "cars" table...');
     await connection.query(`
       CREATE TABLE IF NOT EXISTS cars (
@@ -62,6 +69,7 @@ async function initDB() {
         name VARCHAR(100) NOT NULL,
         type VARCHAR(50) NOT NULL,
         segment VARCHAR(10) NOT NULL,
+        category VARCHAR(50) NOT NULL,
         price DECIMAL(15, 2) NOT NULL,
         range_km INT NOT NULL,
         power_hp INT NOT NULL,
@@ -104,17 +112,15 @@ async function initDB() {
       console.log('Admin account already exists.');
     }
 
-    // Drop and re-insert sample cars to include the specifications with color options and detailed specifications
+    // Refresh sample cars
     console.log('Refreshing sample cars...');
-    await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
-    await connection.query('TRUNCATE TABLE cars;');
-    await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
-
     const sampleCars = [
+      // === ĐỘNG CƠ ĐIỆN ===
       {
         name: 'VinFast VF 3',
         type: 'Mini SUV',
         segment: 'Mini',
+        category: 'Động cơ điện',
         price: 240000000.00,
         range_km: 210,
         power_hp: 43,
@@ -141,6 +147,7 @@ async function initDB() {
         name: 'VinFast VF 5 Plus',
         type: 'A-SUV',
         segment: 'A',
+        category: 'Động cơ điện',
         price: 468000000.00,
         range_km: 326,
         power_hp: 134,
@@ -165,6 +172,7 @@ async function initDB() {
         name: 'VinFast VF 6',
         type: 'B-SUV',
         segment: 'B',
+        category: 'Động cơ điện',
         price: 675000000.00,
         range_km: 399,
         power_hp: 174,
@@ -186,9 +194,35 @@ async function initDB() {
         })
       },
       {
+        name: 'VinFast VF MPV 7',
+        type: 'MPV',
+        segment: 'C',
+        category: 'Động cơ điện',
+        price: 730000000.00,
+        range_km: 380,
+        power_hp: 150,
+        torque_nm: 240,
+        battery_kwh: 55.40,
+        seats: 7,
+        image_url: '/uploads/vf9.jpg',
+        description: 'VinFast VF MPV 7 là dòng xe đa dụng gia đình 7 chỗ thời thượng sử dụng động cơ điện thông minh, mang lại không gian rộng rãi cho cả gia đình lớn.',
+        specifications: JSON.stringify({
+          dimensions: '4450 x 1820 x 1650 mm',
+          wheelbase: '2750 mm',
+          ground_clearance: '175 mm',
+          drive_type: 'Cầu trước (FWD)',
+          charging_time: '28 phút (10% lên 70%)',
+          safety: 'ABS, EBD, Cân bằng điện tử, Hỗ trợ khởi hành ngang dốc, 6 túi khí',
+          colors: [
+            { name: 'Xanh Navy (Mặc định)', hex: '#0a3d62', image_url: '/uploads/vf9.jpg' }
+          ]
+        })
+      },
+      {
         name: 'VinFast VF 7',
         type: 'C-SUV',
         segment: 'C',
+        category: 'Động cơ điện',
         price: 850000000.00,
         range_km: 431,
         power_hp: 349,
@@ -215,6 +249,7 @@ async function initDB() {
         name: 'VinFast VF 8 Eco',
         type: 'D-SUV',
         segment: 'D',
+        category: 'Động cơ điện',
         price: 1090000000.00,
         range_km: 471,
         power_hp: 349,
@@ -238,9 +273,35 @@ async function initDB() {
         })
       },
       {
+        name: 'VinFast VF 8 The All New',
+        type: 'D-SUV',
+        segment: 'D',
+        category: 'Động cơ điện',
+        price: 1160000000.00,
+        range_km: 490,
+        power_hp: 402,
+        torque_nm: 620,
+        battery_kwh: 90.00,
+        seats: 5,
+        image_url: '/uploads/vf8_black.jpg',
+        description: 'Phiên bản cải tiến vượt bậc VinFast VF 8 The All New được trang bị những tính năng an toàn hiện đại nhất cùng kiểu dáng thể thao đỉnh cao.',
+        specifications: JSON.stringify({
+          dimensions: '4750 x 1934 x 1667 mm',
+          wheelbase: '2950 mm',
+          ground_clearance: '180 mm',
+          drive_type: 'Hai cầu toàn thời gian (AWD)',
+          charging_time: '26 phút (10% lên 70%)',
+          safety: 'ADAS cấp độ 2+, 11 túi khí, Tránh va chạm sớm, Phanh khẩn cấp trước sau',
+          colors: [
+            { name: 'Đen Thượng Lưu (Mặc định)', hex: '#1e272e', image_url: '/uploads/vf8_black.jpg' }
+          ]
+        })
+      },
+      {
         name: 'VinFast VF 9 Plus',
         type: 'E-SUV',
         segment: 'E',
+        category: 'Động cơ điện',
         price: 1566000000.00,
         range_km: 626,
         power_hp: 402,
@@ -262,14 +323,218 @@ async function initDB() {
             { name: 'Trắng Ngọc Trai', hex: '#ffffff', image_url: '/uploads/vf9_white.jpg' }
           ]
         })
+      },
+
+      // === ĐỘNG CƠ XĂNG ===
+      {
+        name: 'VinFast Lux A2.0',
+        type: 'Sedan',
+        segment: 'D',
+        category: 'Động cơ xăng',
+        price: 881000000.00,
+        range_km: 0,
+        power_hp: 228,
+        torque_nm: 350,
+        battery_kwh: 0,
+        seats: 5,
+        image_url: '/uploads/default-car.jpg',
+        description: 'VinFast Lux A2.0 là dòng xe sedan hạng sang mang thiết kế Ý quyến rũ kết hợp khung gầm và động cơ tăng áp 2.0L hiệu suất cao của Đức.',
+        specifications: JSON.stringify({
+          dimensions: '4973 x 1900 x 1464 mm',
+          wheelbase: '2968 mm',
+          ground_clearance: '150 mm',
+          drive_type: 'Cầu sau (RWD)',
+          charging_time: 'Không có (Chạy Xăng)',
+          safety: '6 túi khí, ABS, EBD, Cân bằng điện tử, Hỗ trợ khởi hành ngang dốc, Cảnh báo điểm mù',
+          colors: [
+            { name: 'Đen Lịch Lãm (Mặc định)', hex: '#1e272e', image_url: '/uploads/default-car.jpg' }
+          ]
+        })
+      },
+      {
+        name: 'VinFast Lux SA2.0',
+        type: 'SUV',
+        segment: 'E',
+        category: 'Động cơ xăng',
+        price: 1200000000.00,
+        range_km: 0,
+        power_hp: 228,
+        torque_nm: 350,
+        battery_kwh: 0,
+        seats: 7,
+        image_url: '/uploads/default-car.jpg',
+        description: 'VinFast Lux SA2.0 là mẫu xe SUV 7 chỗ đa dụng cao cấp sở hữu phong cách thiết kế mạnh mẽ đột phá đầy cuốn hút mang bản sắc Việt.',
+        specifications: JSON.stringify({
+          dimensions: '4940 x 1960 x 1773 mm',
+          wheelbase: '2933 mm',
+          ground_clearance: '192 mm',
+          drive_type: 'Hai cầu chủ động (AWD/RWD)',
+          charging_time: 'Không có (Chạy Xăng)',
+          safety: '6 túi khí, ABS, EBD, Cân bằng điện tử, Hỗ trợ đổ đèo, Cảnh báo điểm mù, Camera 360',
+          colors: [
+            { name: 'Đỏ Đậm (Mặc định)', hex: '#c0392b', image_url: '/uploads/default-car.jpg' }
+          ]
+        })
+      },
+
+      // === DÒNG XE DỊCH VỤ ===
+      {
+        name: 'Minio Green',
+        type: 'Mini Car',
+        segment: 'Mini',
+        category: 'Dòng xe dịch vụ',
+        price: 180000000.00,
+        range_km: 150,
+        power_hp: 30,
+        torque_nm: 85,
+        battery_kwh: 15.00,
+        seats: 4,
+        image_url: '/uploads/minio_green.png',
+        description: 'Dòng xe điện dịch vụ mini nhỏ gọn, màu sắc năng động, cực kỳ thích hợp cho di chuyển đô thị ngắn và kinh doanh dịch vụ giao nhận.',
+        specifications: JSON.stringify({
+          dimensions: '2920 x 1493 x 1621 mm',
+          wheelbase: '1940 mm',
+          ground_clearance: '125 mm',
+          drive_type: 'Cầu sau (RWD)',
+          charging_time: '5.5 tiếng sạc đầy chậm',
+          safety: 'Phanh đĩa trước, ABS, Cảnh báo va chạm tốc độ thấp',
+          colors: [
+            { name: 'Xanh Lục Bảo', hex: '#00ced1', image_url: '/uploads/minio_green.png' }
+          ]
+        })
+      },
+      {
+        name: 'Herio Green',
+        type: 'Hatchback',
+        segment: 'A',
+        category: 'Dòng xe dịch vụ',
+        price: 280000000.00,
+        range_km: 250,
+        power_hp: 60,
+        torque_nm: 120,
+        battery_kwh: 30.00,
+        seats: 5,
+        image_url: '/uploads/herio_green.png',
+        description: 'Dòng xe Hatchback dịch vụ di chuyển vô cùng linh hoạt, tiết kiệm nhiên liệu tối đa và giá thành đầu tư cực kỳ kinh tế.',
+        specifications: JSON.stringify({
+          dimensions: '3765 x 1660 x 1520 mm',
+          wheelbase: '2400 mm',
+          ground_clearance: '140 mm',
+          drive_type: 'Cầu trước (FWD)',
+          charging_time: '40 phút (10% lên 70%)',
+          safety: '2 túi khí, ABS, EBD, Cảm biến hỗ trợ đỗ xe',
+          colors: [
+            { name: 'Trắng Sữa', hex: '#f5f6f8', image_url: '/uploads/herio_green.png' }
+          ]
+        })
+      },
+      {
+        name: 'Nerio Green',
+        type: 'B-SUV',
+        segment: 'B',
+        category: 'Dòng xe dịch vụ',
+        price: 350000000.00,
+        range_km: 300,
+        power_hp: 100,
+        torque_nm: 180,
+        battery_kwh: 40.00,
+        seats: 5,
+        image_url: '/uploads/nerio_green.png',
+        description: 'SUV đô thị chuyên dụng cho dịch vụ vận tải hành khách công nghệ cao, đem lại độ tin cậy và không gian cabin thoải mái.',
+        specifications: JSON.stringify({
+          dimensions: '4050 x 1760 x 1580 mm',
+          wheelbase: '2560 mm',
+          ground_clearance: '165 mm',
+          drive_type: 'Cầu trước (FWD)',
+          charging_time: '35 phút (10% lên 70%)',
+          safety: '4 túi khí, Cân bằng điện tử ESC, Hỗ trợ khởi hành ngang dốc',
+          colors: [
+            { name: 'Đen Bóng', hex: '#1e272e', image_url: '/uploads/nerio_green.png' }
+          ]
+        })
+      },
+      {
+        name: 'Limo Green',
+        type: 'C-SUV',
+        segment: 'C',
+        category: 'Dòng xe dịch vụ',
+        price: 490000000.00,
+        range_km: 380,
+        power_hp: 150,
+        torque_nm: 250,
+        battery_kwh: 60.00,
+        seats: 7,
+        image_url: '/uploads/limo_green.png',
+        description: 'Dòng xe dịch vụ Limousine 7 chỗ cao cấp, tạo cảm giác thư giãn cho hành khách trên các chặng hành trình dài liên tỉnh.',
+        specifications: JSON.stringify({
+          dimensions: '4620 x 1850 x 1720 mm',
+          wheelbase: '2800 mm',
+          ground_clearance: '185 mm',
+          drive_type: 'Cầu trước (FWD)',
+          charging_time: '30 phút (10% lên 70%)',
+          safety: '6 túi khí, ABS, EBD, ESC, Hỗ trợ đổ đèo, Camera 360',
+          colors: [
+            { name: 'Bạc Quý Phái', hex: '#bdc3c7', image_url: '/uploads/limo_green.png' }
+          ]
+        })
+      },
+      {
+        name: 'EC Van',
+        type: 'Cargo Van',
+        segment: 'Commercial',
+        category: 'Dòng xe dịch vụ',
+        price: 320000000.00,
+        range_km: 220,
+        power_hp: 80,
+        torque_nm: 150,
+        battery_kwh: 35.00,
+        seats: 2,
+        image_url: '/uploads/ec_van.png',
+        description: 'Xe bán tải điện dịch vụ chở hàng hóa thông minh trong đô thị giờ cấm, năng lực chuyên chở vượt trội và không khí thải.',
+        specifications: JSON.stringify({
+          dimensions: '4500 x 1680 x 1980 mm',
+          wheelbase: '2925 mm',
+          ground_clearance: '160 mm',
+          drive_type: 'Cầu sau (RWD)',
+          charging_time: '45 phút (10% lên 70%)',
+          safety: 'ABS, EBD, Cảm biến lùi, Vách ngăn cabin an toàn',
+          colors: [
+            { name: 'Đỏ Năng Động', hex: '#c0392b', image_url: '/uploads/ec_van.png' }
+          ]
+        })
+      },
+      {
+        name: 'EBus',
+        type: 'Transit Bus',
+        segment: 'Commercial',
+        category: 'Dòng xe dịch vụ',
+        price: 1200000000.00,
+        range_km: 250,
+        power_hp: 250,
+        torque_nm: 600,
+        battery_kwh: 150.00,
+        seats: 29,
+        image_url: '/uploads/ebus.png',
+        description: 'Dòng xe buýt điện thông minh công cộng, giúp đô thị hiện đại giảm thiểu khói bụi và tạo môi trường sống xanh.',
+        specifications: JSON.stringify({
+          dimensions: '7500 x 2200 x 3000 mm',
+          wheelbase: '4200 mm',
+          ground_clearance: '200 mm',
+          drive_type: 'Cầu sau (RWD)',
+          charging_time: '1.2 giờ sạc siêu nhanh',
+          safety: 'Hệ thống phanh khí nén ABS, Cân bằng điện tử, Camera an ninh cabin, Hệ thống dập lửa tự động',
+          colors: [
+            { name: 'Xanh Lá và Trắng', hex: '#2ecc71', image_url: '/uploads/ebus.png' }
+          ]
+        })
       }
     ];
 
     for (const car of sampleCars) {
       await connection.query(
-        `INSERT INTO cars (name, type, segment, price, range_km, power_hp, torque_nm, battery_kwh, seats, image_url, description, specifications) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [car.name, car.type, car.segment, car.price, car.range_km, car.power_hp, car.torque_nm, car.battery_kwh, car.seats, car.image_url, car.description, car.specifications]
+        `INSERT INTO cars (name, type, segment, category, price, range_km, power_hp, torque_nm, battery_kwh, seats, image_url, description, specifications) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [car.name, car.type, car.segment, car.category, car.price, car.range_km, car.power_hp, car.torque_nm, car.battery_kwh, car.seats, car.image_url, car.description, car.specifications]
       );
     }
     console.log('Sample cars inserted with color configurations.');

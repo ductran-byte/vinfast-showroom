@@ -15,8 +15,8 @@ exports.getAllCars = async (req, res) => {
     }
 
     if (type && type !== 'Tất cả') {
-      query += ' AND (type = ? OR segment = ?)';
-      queryParams.push(type, type);
+      query += ' AND (category = ?)';
+      queryParams.push(type);
     }
 
     query += ' ORDER BY created_at DESC';
@@ -76,6 +76,7 @@ exports.createCar = async (req, res) => {
       name,
       type,
       segment,
+      category,
       price,
       range_km,
       power_hp,
@@ -103,12 +104,13 @@ exports.createCar = async (req, res) => {
     }
 
     const [result] = await db.query(
-      `INSERT INTO cars (name, type, segment, price, range_km, power_hp, torque_nm, battery_kwh, seats, image_url, description, specifications)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO cars (name, type, segment, category, price, range_km, power_hp, torque_nm, battery_kwh, seats, image_url, description, specifications)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         name,
         type,
         segment || 'Khác',
+        category || 'Động cơ điện',
         parseFloat(price),
         parseInt(range_km) || 0,
         parseInt(power_hp) || 0,
@@ -151,6 +153,7 @@ exports.updateCar = async (req, res) => {
       name,
       type,
       segment,
+      category,
       price,
       range_km,
       power_hp,
@@ -168,6 +171,9 @@ exports.updateCar = async (req, res) => {
       // Xóa ảnh cũ nếu nó không phải là ảnh mặc định và ảnh mẫu ban đầu (chỉ xóa các ảnh được upload sau này)
       if (currentCar.image_url && 
           !currentCar.image_url.startsWith('/uploads/vf') && 
+          !currentCar.image_url.includes('green') && 
+          !currentCar.image_url.includes('van') && 
+          !currentCar.image_url.includes('bus') && 
           currentCar.image_url !== '/uploads/default-car.jpg') {
         const oldImagePath = path.join(__dirname, '../public', currentCar.image_url);
         if (fs.existsSync(oldImagePath)) {
@@ -187,12 +193,13 @@ exports.updateCar = async (req, res) => {
 
     await db.query(
       `UPDATE cars 
-       SET name = ?, type = ?, segment = ?, price = ?, range_km = ?, power_hp = ?, torque_nm = ?, battery_kwh = ?, seats = ?, image_url = ?, description = ?, specifications = ?
+       SET name = ?, type = ?, segment = ?, category = ?, price = ?, range_km = ?, power_hp = ?, torque_nm = ?, battery_kwh = ?, seats = ?, image_url = ?, description = ?, specifications = ?
        WHERE id = ?`,
       [
         name || currentCar.name,
         type || currentCar.type,
         segment || currentCar.segment,
+        category || currentCar.category,
         price ? parseFloat(price) : currentCar.price,
         range_km ? parseInt(range_km) : currentCar.range_km,
         power_hp ? parseInt(power_hp) : currentCar.power_hp,
@@ -231,6 +238,9 @@ exports.deleteCar = async (req, res) => {
     // Xóa file ảnh trên disk nếu không phải là ảnh mẫu ban đầu
     if (car.image_url && 
         !car.image_url.startsWith('/uploads/vf') && 
+        !car.image_url.includes('green') && 
+        !car.image_url.includes('van') && 
+        !car.image_url.includes('bus') && 
         car.image_url !== '/uploads/default-car.jpg') {
       const imagePath = path.join(__dirname, '../public', car.image_url);
       if (fs.existsSync(imagePath)) {

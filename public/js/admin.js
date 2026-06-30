@@ -282,6 +282,7 @@ async function editCar(id) {
     document.getElementById('car-name').value = car.name;
     document.getElementById('car-type').value = car.type;
     document.getElementById('car-segment').value = car.segment;
+    document.getElementById('car-category').value = car.category || 'Động cơ điện';
     document.getElementById('car-price').value = parseInt(car.price);
     document.getElementById('car-range').value = car.range_km;
     document.getElementById('car-power').value = car.power_hp;
@@ -322,6 +323,7 @@ carForm.addEventListener('submit', async (e) => {
   formData.append('name', document.getElementById('car-name').value.trim());
   formData.append('type', document.getElementById('car-type').value.trim());
   formData.append('segment', document.getElementById('car-segment').value);
+  formData.append('category', document.getElementById('car-category').value);
   formData.append('price', document.getElementById('car-price').value);
   formData.append('range_km', document.getElementById('car-range').value);
   formData.append('power_hp', document.getElementById('car-power').value);

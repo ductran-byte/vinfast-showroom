@@ -24,7 +24,7 @@
           <li><a href="#" class="active" id="nav-home">Trang Chủ</a></li>
           <li><a href="#showcase" id="nav-showroom">Showroom</a></li>
           <li><a href="#test-drive" id="nav-drive">Đăng Ký Lái Thử</a></li>
-          <li><a href="#stations" id="nav-stations">Trạm Sạc</a></li>
+          <li><a href="#stations" id="nav-stations">Liên Hệ</a></li>
         </ul>
       </nav>
       <div class="header-actions">
@@ -431,30 +431,79 @@
     </div>
   </section>
 
-  <!-- Bản Đồ Trạm Sạc & Showroom Section -->
+  <!-- Showroom Location Section -->
   <section id="stations" class="container" style="padding-top: 60px; padding-bottom: 100px; border-top: 1px solid var(--panel-border);">
     <div style="text-align: center; margin-bottom: 40px;">
-      <span class="hero-subtitle">Mạng lưới bao phủ rộng khắp</span>
-      <h2 style="font-size: 32px; font-weight: 800;">Trạm Sạc Pin & Showroom</h2>
-      <p style="color: var(--text-secondary); margin-top: 8px;">Dễ dàng tra cứu các vị trí trụ sạc nhanh xe điện và showroom hỗ trợ mua xe trên cả nước.</p>
+      <span class="hero-subtitle">Liên hệ & Ghé thăm</span>
+      <h2 style="font-size: 32px; font-weight: 800;">Vị Trí Showroom</h2>
+      <p style="color: var(--text-secondary); margin-top: 8px;">Ghé thăm showroom VinFast HTA Văn Phú để được tư vấn trực tiếp và trải nghiệm lái thử các dòng xe mới nhất.</p>
     </div>
     
-    <div class="control-bar glass-panel" style="margin-bottom: 30px;">
-      <div class="filter-group" id="station-province-filter">
-        <button class="filter-btn active" data-province="Tất cả">Tất cả</button>
-        <button class="filter-btn" data-province="Hà Nội">Hà Nội</button>
-        <button class="filter-btn" data-province="TP. Hồ Chí Minh">TP. Hồ Chí Minh</button>
-        <button class="filter-btn" data-province="Đà Nẵng">Đà Nẵng</button>
-        <button class="filter-btn" data-province="Hải Phòng">Hải Phòng</button>
-      </div>
-      <div style="color: var(--text-secondary); font-size: 14px; font-weight: 500;">
-        <i class="fa-solid fa-charging-station" style="color: var(--accent-color); margin-right: 6px;"></i> Đang hiển thị <span id="station-count" style="font-weight: 700; color: var(--text-primary);">0</span> địa điểm
-      </div>
-    </div>
+    <div class="showroom-wrapper glass-panel" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; padding: 30px; align-items: stretch; min-height: 450px;">
+      <!-- Showroom Info -->
+      <div style="display: flex; flex-direction: column; justify-content: center; gap: 24px;">
+        <div>
+          <span style="background: rgba(15, 83, 197, 0.1); color: var(--accent-color); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 12px;">Showroom Chính Thức</span>
+          <h3 style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">VinFast HTA Văn Phú</h3>
+          <p style="color: var(--text-secondary); line-height: 1.6;">
+            Chào mừng Quý khách đến với Showroom VinFast HTA Văn Phú. Chúng tôi cung cấp đầy đủ các dịch vụ: Trưng bày xe mới, Đăng ký lái thử, Tư vấn trả góp tài chính và Hỗ trợ thủ tục đăng ký xe chuyên nghiệp.
+          </p>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; align-items: flex-start; gap: 14px;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(15, 83, 197, 0.08); display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-size: 18px; flex-shrink: 0;">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div>
+              <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Địa chỉ showroom</h4>
+              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.4;">Toà K3, KĐT The K Park, Kiến Hưng, Hà Đông, Hà Nội</p>
+            </div>
+          </div>
+          
+          <div style="display: flex; align-items: flex-start; gap: 14px;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(15, 83, 197, 0.08); display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-size: 18px; flex-shrink: 0;">
+              <i class="fa-solid fa-phone"></i>
+            </div>
+            <div>
+              <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Hotline tư vấn</h4>
+              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.4;"><a href="tel:1900232389" style="color: var(--accent-color); font-weight: 700; text-decoration: none;">1900 232389</a> (Phím 1)</p>
+            </div>
+          </div>
 
-    <!-- Danh sách trạm sạc & Showroom -->
-    <div class="station-grid" id="station-grid">
-      <!-- Tải động bằng JS -->
+          <div style="display: flex; align-items: flex-start; gap: 14px;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(15, 83, 197, 0.08); display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-size: 18px; flex-shrink: 0;">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div>
+              <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Giờ mở cửa</h4>
+              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.4;">08:00 - 21:00 (Hàng ngày, kể cả thứ 7 & Chủ Nhật)</p>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 10px; display: flex; gap: 12px;">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Vinfast+HTA+V%C3%A3n+Ph%C3%BA%2C+To%C3%A0+K3%2C+K%C4%90T+The+K+Park%2C+Ki%E1%BA%BFn+H%C6%B0ng%2C+H%C3%A0+C%C3%B4ng%2C+H%C3%A0+%C4%90%C3%B4ng%2C+H%C3%A0+N%E1%BB%99i" target="_blank" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-route"></i> Chỉ đường
+          </a>
+          <a href="tel:1900232389" class="btn btn-outline" style="padding: 10px 20px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--panel-border); background: transparent;">
+            <i class="fa-solid fa-phone"></i> Gọi điện ngay
+          </a>
+        </div>
+      </div>
+      
+      <!-- Showroom Map -->
+      <div style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--panel-border); min-height: 350px;">
+        <iframe 
+          src="https://maps.google.com/maps?q=Vinfast%20HTA%20V%C4%83n%20Ph%C3%BA%2C%20To%C3%A0%20K3%2C%20K%C4%90T%20The%20K%20Park%2C%20Ki%E1%BA%BFn%20H%C6%B0ng%2C%20H%C3%A0%20%C4%90%C3%B4ng%2C%20H%C3%A0%20N%E1%BB%99i&t=&z=16&ie=UTF8&iwloc=&output=embed" 
+          width="100%" 
+          height="100%" 
+          style="border:0; min-height: 350px; display: block;" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
     </div>
   </section>
 

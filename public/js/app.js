@@ -653,7 +653,9 @@ testDriveForm.addEventListener('submit', async (e) => {
 
 
 // --- Logic Bản Đồ Trạm Sạc / Showroom ---
+// --- Logic Bản Đồ Trạm Sạc / Showroom ---
 function renderStations(provinceFilter = 'Tất cả') {
+  if (!stationGrid || !stationCountEl) return;
   const filtered = provinceFilter === 'Tất cả' 
     ? stationsData 
     : stationsData.filter(s => s.province === provinceFilter);
@@ -690,15 +692,17 @@ function renderStations(provinceFilter = 'Tất cả') {
 }
 
 // Lắng nghe sự kiện lọc Trạm Sạc
-stationProvinceFilter.addEventListener('click', (e) => {
-  if (e.target.classList.contains('filter-btn')) {
-    document.querySelectorAll('#station-province-filter .filter-btn').forEach(btn => btn.classList.remove('active'));
-    e.target.classList.add('active');
-    
-    const prov = e.target.getAttribute('data-province');
-    renderStations(prov);
-  }
-});
+if (stationProvinceFilter) {
+  stationProvinceFilter.addEventListener('click', (e) => {
+    if (e.target.classList.contains('filter-btn')) {
+      document.querySelectorAll('#station-province-filter .filter-btn').forEach(btn => btn.classList.remove('active'));
+      e.target.classList.add('active');
+      
+      const prov = e.target.getAttribute('data-province');
+      renderStations(prov);
+    }
+  });
+}
 
 
 // --- Các Sự Kiện Đầu Vào Cho Showroom ---

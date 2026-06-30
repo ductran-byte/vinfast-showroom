@@ -1614,10 +1614,9 @@ footer a {
 }
 
 .slider-car-image {
-  max-width: 100%;
+  width: 100%;
   height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+  object-fit: cover;
   transition: transform 0.5s ease, opacity 0.5s ease;
 }
 

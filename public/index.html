@@ -22,7 +22,7 @@
       <nav id="nav-menu">
         <ul>
           <li><a href="#" class="active" id="nav-home">Trang Chủ</a></li>
-          <li><a href="#showcase" id="nav-showroom">Sản Phẩm</a></li>
+          <li><a href="#showroom" id="nav-showroom">Sản Phẩm</a></li>
           <li><a href="#accessories" id="nav-acc">Phụ Kiện</a></li>
           <li><a href="#services" id="nav-srv">Dịch Vụ</a></li>
           <li><a href="#test-drive" id="nav-drive">Đăng Ký Lái Thử</a></li>
@@ -87,19 +87,12 @@
     </div>
   </section>
 
-  <!-- Showcase Section (Premium Slider) -->
-  <section id="showcase" class="showcase container" style="padding-top: 60px;">
-    <!-- Filter and Search Bar -->
-    <div class="control-bar glass-panel" style="margin-bottom: 30px;">
-      <div class="filter-group" id="filter-container">
-        <button class="filter-btn active" data-filter="Động cơ điện">Động cơ điện</button>
-        <button class="filter-btn" data-filter="Động cơ xăng">Động cơ xăng</button>
-        <button class="filter-btn" data-filter="Dòng xe dịch vụ">Dòng xe dịch vụ</button>
-      </div>
-      <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm dòng xe (VD: VF 3, Lux A2.0)...">
-      </div>
+  <!-- Hot Models Slider Section -->
+  <section id="hot-models" class="showcase container" style="padding-top: 60px;">
+    <div style="text-align: center; margin-bottom: 30px;">
+      <span class="hero-subtitle">Mẫu xe nổi bật</span>
+      <h2 style="font-size: 32px; font-weight: 800;">Xe Mới & Nổi Bật</h2>
+      <p style="color: var(--text-secondary); margin-top: 8px;">Khám phá các mẫu xe mới ra mắt và được quan tâm nhiều nhất hiện nay.</p>
     </div>
 
     <!-- Premium Interactive Slider -->
@@ -131,6 +124,37 @@
       <!-- Slide indicators -->
       <div class="slider-nav-dots" id="slider-dots">
         <!-- Tải động bằng JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Showroom Products Section (Full Grid) -->
+  <section id="showroom" class="showcase container" style="padding-top: 60px; padding-bottom: 60px; border-top: 1px solid var(--panel-border);">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <span class="hero-subtitle">Danh mục sản phẩm</span>
+      <h2 style="font-size: 32px; font-weight: 800;">Khám Phá Các Dòng Xe</h2>
+      <p style="color: var(--text-secondary); margin-top: 8px;">Tìm kiếm và so sánh đầy đủ tất cả các dòng xe ô tô điện và xe xăng VinFast.</p>
+    </div>
+
+    <!-- Filter and Search Bar -->
+    <div class="control-bar glass-panel" style="margin-bottom: 40px;">
+      <div class="filter-group" id="filter-container">
+        <button class="filter-btn active" data-filter="Động cơ điện">Động cơ điện</button>
+        <button class="filter-btn" data-filter="Động cơ xăng">Động cơ xăng</button>
+        <button class="filter-btn" data-filter="Dòng xe dịch vụ">Dòng xe dịch vụ</button>
+      </div>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm dòng xe (VD: VF 3, Lux A2.0)...">
+      </div>
+    </div>
+
+    <!-- Cars Grid -->
+    <div class="car-grid" id="car-grid">
+      <!-- Xe sẽ được tải động tại đây bằng JS -->
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 32px; color: var(--accent-color); margin-bottom: 12px;"></i>
+        <p>Đang tải dữ liệu xe...</p>
       </div>
     </div>
   </section>

@@ -37,7 +37,8 @@ if (mobileMenuBtn && navMenu) {
 }
 
 // Trạng thái ứng dụng (App State)
-let cars = [];
+let cars = []; // Dòng xe hiển thị trong Danh mục (Showroom grid)
+let hotCars = []; // Dòng xe hiển thị trong Slider Xe Mới/Hot
 let compareList = [];
 let selectedCarForFinance = null;
 let currentFilter = 'Động cơ điện';
@@ -84,6 +85,7 @@ const locationsData = {
 
 // Các phần tử DOM
 const sliderContent = document.getElementById('slider-main-content');
+const carGrid = document.getElementById('car-grid');
 const searchInput = document.getElementById('search-input');
 const filterContainer = document.getElementById('filter-container');
 const carModal = document.getElementById('car-modal');
@@ -120,22 +122,43 @@ const lblPrepay = document.getElementById('lbl-prepay-percent');
 const lblMonths = document.getElementById('lbl-loan-months');
 const lblInterest = document.getElementById('lbl-interest-rate');
 
-// Tải danh sách xe ban đầu
-async function fetchCars() {
+// Tải danh sách xe nổi bật (Mới & Hot) cho Slider
+async function fetchHotCars() {
+  try {
+    const response = await fetch('/api/cars');
+    if (!response.ok) throw new Error('Không thể tải xe nổi bật.');
+    const allCars = await response.json();
+    // Lấy 6 xe mới nhất đưa vào Slider
+    hotCars = allCars.slice(0, 6);
+    renderHotCarsSlider();
+  } catch (error) {
+    console.error('Lỗi khi tải xe nổi bật:', error);
+    if (sliderContent) {
+      sliderContent.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #ff3b30;">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; margin-bottom: 12px;"></i>
+          <p>Không thể tải danh sách xe nổi bật.</p>
+        </div>
+      `;
+    }
+  }
+}
+
+// Tải danh sách xe cho Danh mục sản phẩm (Showroom grid)
+async function fetchShowroomCars() {
   try {
     let url = `/api/cars?search=${encodeURIComponent(currentSearch)}&type=${encodeURIComponent(currentFilter)}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error('Không thể lấy danh sách xe.');
     cars = await response.json();
-    renderCars();
+    renderShowroomGrid();
   } catch (error) {
-    console.error(error);
-    const sliderContentEl = document.getElementById('slider-main-content');
-    if (sliderContentEl) {
-      sliderContentEl.innerHTML = `
-        <div style="text-align: center; padding: 40px; color: #ff3b30;">
+    console.error('Lỗi khi tải danh sách xe showroom:', error);
+    if (carGrid) {
+      carGrid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff3b30;">
           <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; margin-bottom: 12px;"></i>
-          <p>Đã xảy ra lỗi khi tải dữ liệu xe. Vui lòng thử lại.</p>
+          <p>Đã xảy ra lỗi khi tải danh sách xe. Vui lòng thử lại.</p>
         </div>
       `;
     }
@@ -168,18 +191,18 @@ function formatVND(value) {
 // Hiển thị dòng xe ra Slider (thay vì Grid)
 let activeCarIndex = 0;
 
-function renderCars() {
-  const sliderContentEl = document.getElementById('slider-main-content');
+// Hiển thị dòng xe ra Slider nổi bật
+function renderHotCarsSlider() {
   const sliderBgName = document.getElementById('slider-bg-name');
   const sliderDots = document.getElementById('slider-dots');
   
-  if (!sliderContentEl) return;
+  if (!sliderContent) return;
 
-  if (cars.length === 0) {
-    sliderContentEl.innerHTML = `
+  if (hotCars.length === 0) {
+    sliderContent.innerHTML = `
       <div style="text-align: center; padding: 60px; color: var(--text-muted);">
         <i class="fa-solid fa-car-rear" style="font-size: 48px; margin-bottom: 16px;"></i>
-        <p>Không tìm thấy mẫu xe nào phù hợp với yêu cầu.</p>
+        <p>Không có mẫu xe nổi bật nào.</p>
       </div>
     `;
     if (sliderBgName) sliderBgName.innerText = "";
@@ -188,10 +211,10 @@ function renderCars() {
   }
 
   // Đảm bảo chỉ số activeCarIndex hợp lệ
-  if (activeCarIndex >= cars.length) activeCarIndex = 0;
-  if (activeCarIndex < 0) activeCarIndex = cars.length - 1;
+  if (activeCarIndex >= hotCars.length) activeCarIndex = 0;
+  if (activeCarIndex < 0) activeCarIndex = hotCars.length - 1;
 
-  const car = cars[activeCarIndex];
+  const car = hotCars[activeCarIndex];
   
   // Cập nhật tên nền chữ lớn phía sau
   if (sliderBgName) {
@@ -202,7 +225,7 @@ function renderCars() {
   const isAddedToCompare = compareList.includes(car.id);
   
   // Điền dữ liệu xe đang chọn vào slider
-  sliderContentEl.innerHTML = `
+  sliderContent.innerHTML = `
     <div class="slider-car-display">
       <img src="${car.image_url}" alt="${car.name}" class="slider-car-image" id="slider-img" onerror="this.src='/uploads/default-car.jpg'">
     </div>
@@ -242,18 +265,72 @@ function renderCars() {
 
   // Tạo các chấm tròn chỉ số slide (pagination dots)
   if (sliderDots) {
-    sliderDots.innerHTML = cars.map((_, idx) => `
+    sliderDots.innerHTML = hotCars.map((_, idx) => `
       <div class="slider-dot ${idx === activeCarIndex ? 'active' : ''}" onclick="goToCarSlide(${idx})"></div>
     `).join('');
   }
 }
 
-// Di chuyển slide
+// Di chuyển slide xe nổi bật
 function goToCarSlide(index) {
   activeCarIndex = index;
-  renderCars();
+  renderHotCarsSlider();
 }
 window.goToCarSlide = goToCarSlide;
+
+// Hiển thị tất cả dòng xe ra dạng lưới Card
+function renderShowroomGrid() {
+  if (!carGrid) return;
+
+  if (cars.length === 0) {
+    carGrid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-muted);">
+        <i class="fa-solid fa-car-rear" style="font-size: 48px; margin-bottom: 16px;"></i>
+        <p>Không tìm thấy mẫu xe nào phù hợp với yêu cầu.</p>
+      </div>
+    `;
+    return;
+  }
+
+  carGrid.innerHTML = cars.map(car => {
+    const isAddedToCompare = compareList.includes(car.id);
+    return `
+      <div class="car-card glass-panel" onclick="showCarDetails(${car.id})">
+        <div class="car-card-image">
+          <span class="car-badge">${car.type}</span>
+          <img src="${car.image_url}" alt="${car.name}" onerror="this.src='/uploads/default-car.jpg'">
+        </div>
+        <div class="car-card-body">
+          <h3 class="car-card-title">${car.name}</h3>
+          <p class="car-card-price">Giá từ: ${formatVND(car.price)}</p>
+          <div class="car-features-mini">
+            <div class="feature-mini-item">
+              <span class="feature-mini-val">${car.range_km > 0 ? car.range_km + ' km' : 'Xăng'}</span>
+              <span class="feature-mini-lbl">Quãng đường</span>
+            </div>
+            <div class="feature-mini-item">
+              <span class="feature-mini-val">${car.power_hp > 0 ? car.power_hp + ' Hp' : 'Đang cập nhật'}</span>
+              <span class="feature-mini-lbl">Công suất</span>
+            </div>
+            <div class="feature-mini-item">
+              <span class="feature-mini-val">${car.seats} chỗ</span>
+              <span class="feature-mini-lbl">Số ghế</span>
+            </div>
+          </div>
+          <div class="car-card-actions">
+            <button class="btn btn-primary" onclick="event.stopPropagation(); showCarDetails(${car.id})">
+              Xem Chi Tiết
+            </button>
+            <button class="btn btn-outline-compare ${isAddedToCompare ? 'added' : ''}" 
+                    onclick="event.stopPropagation(); toggleCompare(${car.id})">
+              ${isAddedToCompare ? '<i class="fa-solid fa-check"></i> Đã thêm' : '<i class="fa-solid fa-plus"></i> So sánh'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
 // Xem chi tiết xe & Tính toán trả góp
 async function showCarDetails(id) {
@@ -752,7 +829,7 @@ searchInput.addEventListener('input', (e) => {
   clearTimeout(searchTimeout);
   currentSearch = e.target.value;
   searchTimeout = setTimeout(() => {
-    fetchCars();
+    fetchShowroomCars();
   }, 300);
 });
 
@@ -762,13 +839,14 @@ filterContainer.addEventListener('click', (e) => {
     e.target.classList.add('active');
     
     currentFilter = e.target.getAttribute('data-filter');
-    fetchCars();
+    fetchShowroomCars();
   }
 });
 
 
 // --- Khởi tạo ---
-fetchCars();
+fetchHotCars();
+fetchShowroomCars();
 renderStations();
 checkUserSession();
 loadProvinces();
@@ -1092,20 +1170,12 @@ const btnCarNext = document.getElementById('car-slider-next');
 if (btnCarPrev) {
   btnCarPrev.addEventListener('click', () => {
     activeCarIndex--;
-    renderCars();
+    renderHotCarsSlider();
   });
 }
 if (btnCarNext) {
   btnCarNext.addEventListener('click', () => {
     activeCarIndex++;
-    renderCars();
+    renderHotCarsSlider();
   });
 }
-
-// Reset index khi đổi tab lọc
-const filterBtns = document.querySelectorAll('#filter-container .filter-btn');
-filterBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    activeCarIndex = 0;
-  });
-});

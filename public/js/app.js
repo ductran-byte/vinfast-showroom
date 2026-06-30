@@ -614,9 +614,10 @@ testDriveForm.addEventListener('submit', async (e) => {
   const province = tdProvince.options[tdProvince.selectedIndex].text;
   const district = tdDistrict.options[tdDistrict.selectedIndex].text;
   const ward = tdWard.options[tdWard.selectedIndex].text;
+  const detailAddr = document.getElementById('td-address-detail').value.trim();
   
-  // Ghép Quận/Huyện và Phường/Xã để gửi lên trường showroom trong CSDL
-  const showroom = `${district}, ${ward}`;
+  // Ghép chi tiết, Quận/Huyện và Phường/Xã để gửi lên trường showroom trong CSDL
+  const showroom = detailAddr ? `${detailAddr}, ${district}, ${ward}` : `${district}, ${ward}`;
   
   const preferred_date = document.getElementById('td-date').value;
 

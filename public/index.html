@@ -397,11 +397,11 @@
           <input type="email" id="td-email" class="form-input" placeholder="VD: name@domain.com">
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
           <div class="form-group">
             <label class="form-label" for="td-province">Tỉnh / Thành phố *</label>
             <select id="td-province" class="form-input" required>
-              <option value="">-- Chọn Tỉnh/Thành --</option>
+              <option value="">Chọn Tỉnh/Thành...</option>
               <option value="Hà Nội">Hà Nội</option>
               <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
               <option value="Đà Nẵng">Đà Nẵng</option>
@@ -409,9 +409,15 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label" for="td-showroom">Địa điểm Showroom *</label>
-            <select id="td-showroom" class="form-input" required disabled>
-              <option value="">Chọn showroom...</option>
+            <label class="form-label" for="td-district">Quận / Huyện *</label>
+            <select id="td-district" class="form-input" required disabled>
+              <option value="">Chọn Quận/Huyện...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="td-ward">Phường / Xã *</label>
+            <select id="td-ward" class="form-input" required disabled>
+              <option value="">Chọn Phường/Xã...</option>
             </select>
           </div>
         </div>

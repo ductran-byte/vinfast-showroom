@@ -56,28 +56,30 @@ const stationsData = [
   { name: 'Trạm sạc VinFast Lê Thánh Tông', type: 'charger', province: 'Hải Phòng', address: 'TTTM Vincom Plaza Lê Thánh Tông, 1 Lê Thánh Tông, Ngô Quyền', detail: '6 trụ sạc nhanh DC 60kW, 4 trụ sạc AC 11kW' }
 ];
 
-// Danh sách Showroom theo tỉnh thành phục vụ Form đăng ký lái thử
-const showroomsByProvince = {
-  'Hà Nội': [
-    'Showroom VinFast Royal City (Thanh Xuân)',
-    'Showroom VinFast Ocean Park (Gia Lâm)',
-    'Showroom VinFast Mỹ Đình (Nam Từ Liêm)',
-    'Showroom VinFast Long Biên (Long Biên)'
-  ],
-  'TP. Hồ Chí Minh': [
-    'Showroom VinFast Landmark 81 (Bình Thạnh)',
-    'Showroom VinFast Thảo Điền (Quận 2)',
-    'Showroom VinFast Trần Hưng Đạo (Quận 1)',
-    'Showroom VinFast Cộng Hòa (Tân Bình)'
-  ],
-  'Đà Nẵng': [
-    'Showroom VinFast Ngô Quyền (Sơn Trà)',
-    'Showroom VinFast Liên Chiểu (Liên Chiểu)'
-  ],
-  'Hải Phòng': [
-    'Showroom VinFast Cát Hải (Nhà máy)',
-    'Showroom VinFast Lê Thánh Tông (Ngô Quyền)'
-  ]
+// Dữ liệu Tỉnh/Thành, Quận/Huyện, Phường/Xã phục vụ Form đăng ký lái thử
+const locationsData = {
+  'Hà Nội': {
+    'Quận Ba Đình': ['Phường Trúc Bạch', 'Phường Vĩnh Phúc', 'Phường Cống Vị', 'Phường Liễu Giai'],
+    'Quận Hoàn Kiếm': ['Phường Hàng Bạc', 'Phường Tràng Tiền', 'Phường Đồng Xuân', 'Phường Lý Thái Tổ'],
+    'Quận Tây Hồ': ['Phường Quảng An', 'Phường Xuân La', 'Phường Bưởi', 'Phường Phú Thượng'],
+    'Quận Cầu Giấy': ['Phường Dịch Vọng', 'Phường Nghĩa Tân', 'Phường Mai Dịch', 'Phường Trung Hòa']
+  },
+  'TP. Hồ Chí Minh': {
+    'Quận 1': ['Phường Bến Nghé', 'Phường Đa Kao', 'Phường Tân Định', 'Phường Phạm Ngũ Lão'],
+    'Quận 3': ['Phường Võ Thị Sáu', 'Phường 12', 'Phường 14', 'Phường 5'],
+    'Quận Bình Thạnh': ['Phường 15', 'Phường 25', 'Phường Hàng Xanh', 'Phường 27'],
+    'Quận Thủ Đức': ['Phường Linh Trung', 'Phường Bình Thọ', 'Phường Thảo Điền', 'Phường Hiệp Bình Chánh']
+  },
+  'Đà Nẵng': {
+    'Quận Hải Châu': ['Phường Thạch Thang', 'Phường Hòa Thuận Đông', 'Phường Phước Ninh'],
+    'Quận Sơn Trà': ['Phường An Hải Tây', 'Phường Thọ Quang', 'Phường Mân Thái'],
+    'Quận Ngũ Hành Sơn': ['Phường Mỹ An', 'Phường Khuê Mỹ', 'Phường Hòa Quý']
+  },
+  'Hải Phòng': {
+    'Quận Hồng Bàng': ['Phường Hoàng Văn Thụ', 'Phường Minh Khai', 'Phường Phan Bội Châu'],
+    'Quận Ngô Quyền': ['Phường Lạch Tray', 'Phường Máy Tơ', 'Phường Gia Viên'],
+    'Quận Lê Chân': ['Phường Cát Dài', 'Phường An Biên', 'Phường Dư Hàng Kênh']
+  }
 };
 
 // Các phần tử DOM
@@ -100,7 +102,8 @@ const compareTable = document.getElementById('compare-table');
 // DOM cho Lái Thử
 const tdCarSelect = document.getElementById('td-car-select');
 const tdProvince = document.getElementById('td-province');
-const tdShowroom = document.getElementById('td-showroom');
+const tdDistrict = document.getElementById('td-district');
+const tdWard = document.getElementById('td-ward');
 const testDriveForm = document.getElementById('test-drive-form');
 
 // DOM cho Trạm sạc
@@ -526,21 +529,42 @@ compareModal.addEventListener('click', (e) => {
 
 
 // --- Logic Đăng Ký Lái Thử ---
-// Lọc showroom tự động theo Tỉnh/Thành
+// Thay đổi Tỉnh/Thành -> Lọc Quận/Huyện tự động
 tdProvince.addEventListener('change', function() {
   const val = this.value;
-  tdShowroom.innerHTML = '<option value="">Chọn showroom...</option>';
+  tdDistrict.innerHTML = '<option value="">Chọn Quận/Huyện...</option>';
+  tdWard.innerHTML = '<option value="">Chọn Phường/Xã...</option>';
+  tdWard.disabled = true;
   
-  if (val && showroomsByProvince[val]) {
-    tdShowroom.disabled = false;
-    showroomsByProvince[val].forEach(room => {
+  if (val && locationsData[val]) {
+    tdDistrict.disabled = false;
+    Object.keys(locationsData[val]).forEach(dist => {
       const opt = document.createElement('option');
-      opt.value = room;
-      opt.innerText = room;
-      tdShowroom.appendChild(opt);
+      opt.value = dist;
+      opt.innerText = dist;
+      tdDistrict.appendChild(opt);
     });
   } else {
-    tdShowroom.disabled = true;
+    tdDistrict.disabled = true;
+  }
+});
+
+// Thay đổi Quận/Huyện -> Lọc Phường/Xã tự động
+tdDistrict.addEventListener('change', function() {
+  const prov = tdProvince.value;
+  const dist = this.value;
+  tdWard.innerHTML = '<option value="">Chọn Phường/Xã...</option>';
+  
+  if (prov && dist && locationsData[prov] && locationsData[prov][dist]) {
+    tdWard.disabled = false;
+    locationsData[prov][dist].forEach(ward => {
+      const opt = document.createElement('option');
+      opt.value = ward;
+      opt.innerText = ward;
+      tdWard.appendChild(opt);
+    });
+  } else {
+    tdWard.disabled = true;
   }
 });
 
@@ -553,7 +577,12 @@ testDriveForm.addEventListener('submit', async (e) => {
   const phone = document.getElementById('td-phone').value.trim();
   const email = document.getElementById('td-email').value.trim();
   const province = document.getElementById('td-province').value;
-  const showroom = document.getElementById('td-showroom').value;
+  
+  // Ghép Quận/Huyện và Phường/Xã để gửi lên trường showroom trong CSDL
+  const district = document.getElementById('td-district').value;
+  const ward = document.getElementById('td-ward').value;
+  const showroom = `${district}, ${ward}`;
+  
   const preferred_date = document.getElementById('td-date').value;
 
   try {
@@ -570,7 +599,8 @@ testDriveForm.addEventListener('submit', async (e) => {
 
     alert(data.message);
     testDriveForm.reset();
-    tdShowroom.disabled = true;
+    tdDistrict.disabled = true;
+    tdWard.disabled = true;
   } catch (error) {
     alert(error.message);
   }

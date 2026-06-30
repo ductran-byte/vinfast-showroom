@@ -1,5 +1,4 @@
 const mysql = require('mysql2/promise');
-const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 async function initDB() {
@@ -116,15 +115,16 @@ async function initDB() {
       ) ENGINE=InnoDB;
     `);
 
-    // Check if admin exists, if not insert default admin
+    // Check if admin exists, if not insert default admin, otherwise update password to plaintext
     const [admins] = await connection.query('SELECT * FROM admins WHERE username = ?', ['admin']);
     if (admins.length === 0) {
       console.log('Inserting default admin account...');
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      await connection.query('INSERT INTO admins (username, password) VALUES (?, ?)', ['admin', hashedPassword]);
+      await connection.query('INSERT INTO admins (username, password) VALUES (?, ?)', ['admin', 'admin123']);
       console.log('Default admin created: admin / admin123');
     } else {
-      console.log('Admin account already exists.');
+      console.log('Updating existing admin password to plaintext...');
+      await connection.query('UPDATE admins SET password = ? WHERE username = ?', ['admin123', 'admin']);
+      console.log('Admin account updated to plaintext: admin / admin123');
     }
 
     // Refresh sample banners
@@ -163,14 +163,14 @@ async function initDB() {
         type: 'Mini SUV',
         segment: 'Mini',
         category: 'Động cơ điện',
-        price: 240000000.00,
+        price: 299000000.00,
         range_km: 210,
         power_hp: 43,
         torque_nm: 110,
         battery_kwh: 18.64,
         seats: 4,
         image_url: '/uploads/vf3.jpg',
-        description: 'VinFast VF 3 là mẫu xe điện cỡ nhỏ thông minh được thiết kế đặc biệt dành riêng cho giao thông đô thị. Với kiểu dáng hình hộp cá tính, năng động và khoảng sáng gầm xe lớn, VF 3 mang lại khả năng di chuyển linh hoạt trên mọi nẻo đường đô thị đông đúc.',
+        description: 'VinFast VF 3 sở hữu thiết kế hình hộp cá tính, năng động và khoảng sáng gầm xe lớn. Đây là mẫu xe điện đô thị lý tưởng cực kỳ linh hoạt và phong cách.',
         specifications: JSON.stringify({
           dimensions: '3190 x 1679 x 1622 mm',
           wheelbase: '2075 mm',
@@ -190,23 +190,48 @@ async function initDB() {
         type: 'A-SUV',
         segment: 'A',
         category: 'Động cơ điện',
-        price: 468000000.00,
+        price: 529000000.00,
         range_km: 326,
         power_hp: 134,
         torque_nm: 135,
         battery_kwh: 37.23,
         seats: 5,
         image_url: '/uploads/vf5.jpg',
-        description: 'VinFast VF 5 Plus sở hữu thiết kế hiện đại, trẻ trung, cá tính với các tùy chọn phối màu sơn độc đáo. Xe được trang bị các tính năng an toàn vượt trội cùng công nghệ thông minh hàng đầu phân khúc A-SUV, mang lại trải nghiệm lái thú vị và kinh tế.',
+        description: 'VinFast VF 5 Plus có thiết kế hiện đại, trẻ trung, cá tính cùng các công nghệ thông minh hàng đầu phân khúc A-SUV mang lại trải nghiệm lái tối ưu.',
         specifications: JSON.stringify({
-          dimensions: '3965 x 1720 x 1580 mm',
-          wheelbase: '2513 mm',
+          dimensions: '3967 x 1723 x 1579 mm',
+          wheelbase: '2514 mm',
           ground_clearance: '182 mm',
           drive_type: 'Cầu trước (FWD)',
           charging_time: '30 phút (10% lên 70%)',
           safety: '6 túi khí, ABS, EBD, BA, ESC, TCS, HAS, Cảnh báo điểm mù, Cảnh báo phương tiện cắt ngang phía sau',
           colors: [
-            { name: 'Xanh Turquoise (Mặc định)', hex: '#00ced1', image_url: '/uploads/vf5.jpg' }
+            { name: 'Xanh Turquoise (Mặc định)', hex: '#00CED1', image_url: '/uploads/vf5.jpg' }
+          ]
+        })
+      },
+      {
+        name: 'VinFast VF e34',
+        type: 'C-SUV',
+        segment: 'C',
+        category: 'Động cơ điện',
+        price: 690000000.00,
+        range_km: 300,
+        power_hp: 150,
+        torque_nm: 242,
+        battery_kwh: 42.00,
+        seats: 5,
+        image_url: '/uploads/vfe34.png',
+        description: 'VinFast VF e34 là mẫu SUV điện phân khúc C đầu tiên tại Việt Nam, sở hữu các tính năng thông minh vượt trội, điều khiển bằng giọng nói và độ an toàn cao.',
+        specifications: JSON.stringify({
+          dimensions: '4300 x 1793 x 1613 mm',
+          wheelbase: '2611 mm',
+          ground_clearance: '180 mm',
+          drive_type: 'Cầu trước (FWD)',
+          charging_time: '27 phút (10% lên 70%)',
+          safety: '6 túi khí, Cảnh báo chệch làn, Cảnh báo điểm mù, Cảnh báo phương tiện cắt ngang khi lùi, Camera 360 độ',
+          colors: [
+            { name: 'Xanh Dương (Mặc định)', hex: '#0B3D62', image_url: '/uploads/vfe34.png' }
           ]
         })
       },
@@ -222,41 +247,16 @@ async function initDB() {
         battery_kwh: 59.60,
         seats: 5,
         image_url: '/uploads/vf6.jpg',
-        description: 'VinFast VF 6 là sự kết hợp hoàn hảo giữa thiết kế thời thượng của studio danh tiếng Torino Design và công nghệ tiên tiến. Đây là mẫu xe lý tưởng cho các gia đình trẻ hiện đại mong muốn sở hữu một chiếc xe xanh, thông minh và đầy phong cách.',
+        description: 'VinFast VF 6 kết hợp hoàn hảo giữa thiết kế thời thượng của Torino Design và công nghệ tiên tiến, lý tưởng cho những gia dịch trẻ hiện đại.',
         specifications: JSON.stringify({
           dimensions: '4238 x 1820 x 1594 mm',
           wheelbase: '2730 mm',
           ground_clearance: '170 mm',
           drive_type: 'Cầu trước (FWD)',
           charging_time: '30 phút (10% lên 70%)',
-          safety: 'Hệ thống trợ lái nâng cao ADAS cấp độ 2, 8 túi khí, Cảnh báo chệch làn, Hỗ trợ giữ làn, Giám sát hành trình thích ứng',
+          safety: 'Hệ thống trợ lái ADAS cấp độ 2, 8 túi khí, Cảnh báo chệch làn, Hỗ trợ giữ làn, Giám sát hành trình thích ứng',
           colors: [
-            { name: 'Cam Hoàng Hôn (Mặc định)', hex: '#e67e22', image_url: '/uploads/vf6.jpg' }
-          ]
-        })
-      },
-      {
-        name: 'VinFast VF MPV 7',
-        type: 'MPV',
-        segment: 'C',
-        category: 'Động cơ điện',
-        price: 730000000.00,
-        range_km: 380,
-        power_hp: 150,
-        torque_nm: 240,
-        battery_kwh: 55.40,
-        seats: 7,
-        image_url: '/uploads/vf9.jpg',
-        description: 'VinFast VF MPV 7 là dòng xe đa dụng gia đình 7 chỗ thời thượng sử dụng động cơ điện thông minh, mang lại không gian rộng rãi cho cả gia đình lớn.',
-        specifications: JSON.stringify({
-          dimensions: '4450 x 1820 x 1650 mm',
-          wheelbase: '2750 mm',
-          ground_clearance: '175 mm',
-          drive_type: 'Cầu trước (FWD)',
-          charging_time: '28 phút (10% lên 70%)',
-          safety: 'ABS, EBD, Cân bằng điện tử, Hỗ trợ khởi hành ngang dốc, 6 túi khí',
-          colors: [
-            { name: 'Xanh Navy (Mặc định)', hex: '#0a3d62', image_url: '/uploads/vf9.jpg' }
+            { name: 'Cam Hoàng Hôn (Mặc định)', hex: '#E67E22', image_url: '/uploads/vf6.jpg' }
           ]
         })
       },
@@ -272,7 +272,7 @@ async function initDB() {
         battery_kwh: 75.30,
         seats: 5,
         image_url: '/uploads/vf7.jpg',
-        description: 'VinFast VF 7 sở hữu ngôn ngữ thiết kế "Vũ trụ phi đối xứng" đầy táo bạo và đậm chất tương lai được chắp bút bởi Torino Design. Với công suất cực khủng lên tới 349 mã lực và hệ dẫn động 2 cầu toàn thời gian AWD, VF 7 mang đến cảm giác lái thể thao phấn khích tột độ.',
+        description: 'VinFast VF 7 mang ngôn ngữ thiết kế "Vũ trụ phi đối xứng" đầy táo bạo, công suất cực lớn lên tới 349 mã lực và hệ dẫn động AWD mạnh mẽ.',
         specifications: JSON.stringify({
           dimensions: '4545 x 1890 x 1635 mm',
           wheelbase: '2840 mm',
@@ -281,14 +281,14 @@ async function initDB() {
           charging_time: '24.6 phút (10% lên 70%)',
           safety: 'Trợ lái ADAS nâng cao, 8 túi khí, Camera 360 độ, Tự động phanh khẩn cấp, Cảnh báo va chạm phía trước',
           colors: [
-            { name: 'Xám Kim Loại (Mặc định)', hex: '#7f8c8d', image_url: '/uploads/vf7.jpg' },
-            { name: 'Xanh Neon', hex: '#00f0ff', image_url: '/uploads/vf7_blue.jpg' },
-            { name: 'Đỏ Hoàng Hôn', hex: '#c0392b', image_url: '/uploads/vf7_red.jpg' }
+            { name: 'Xám Kim Loại (Mặc định)', hex: '#7F8C8D', image_url: '/uploads/vf7.jpg' },
+            { name: 'Xanh Neon', hex: '#00F0FF', image_url: '/uploads/vf7_blue.jpg' },
+            { name: 'Đỏ Hoàng Hôn', hex: '#C0392B', image_url: '/uploads/vf7_red.jpg' }
           ]
         })
       },
       {
-        name: 'VinFast VF 8 Eco',
+        name: 'VinFast VF 8',
         type: 'D-SUV',
         segment: 'D',
         category: 'Động cơ điện',
@@ -299,7 +299,7 @@ async function initDB() {
         battery_kwh: 88.80,
         seats: 5,
         image_url: '/uploads/vf8.jpg',
-        description: 'VinFast VF 8 là dòng xe điện phân khúc D-SUV toàn cầu kết hợp tính sang trọng, công nghệ hiện đại và khả năng vận hành mạnh mẽ. Thiết kế cân đối mang hơi hướng SUV Coupe năng động cùng không gian nội thất rộng rãi cao cấp.',
+        description: 'VinFast VF 8 kết hợp tính sang trọng, công nghệ hiện đại toàn cầu và khả năng vận hành vượt trội nhờ 2 motor điện AWD mạnh mẽ.',
         specifications: JSON.stringify({
           dimensions: '4750 x 1934 x 1667 mm',
           wheelbase: '2950 mm',
@@ -308,34 +308,9 @@ async function initDB() {
           charging_time: '31 phút (10% lên 70%)',
           safety: 'Hệ thống trợ lái ADAS cao cấp, 11 túi khí, Nhận diện biển báo giao thông, Hỗ trợ đỗ xe thông minh, Camera 360',
           colors: [
-            { name: 'Đỏ Crimson (Mặc định)', hex: '#c0392b', image_url: '/uploads/vf8.jpg' },
-            { name: 'Xanh Đại Dương', hex: '#0a3d62', image_url: '/uploads/vf8_blue.jpg' },
-            { name: 'Đen Sang Trọng', hex: '#1e272e', image_url: '/uploads/vf8_black.jpg' }
-          ]
-        })
-      },
-      {
-        name: 'VinFast VF 8 The All New',
-        type: 'D-SUV',
-        segment: 'D',
-        category: 'Động cơ điện',
-        price: 1160000000.00,
-        range_km: 490,
-        power_hp: 402,
-        torque_nm: 620,
-        battery_kwh: 90.00,
-        seats: 5,
-        image_url: '/uploads/vf8_black.jpg',
-        description: 'Phiên bản cải tiến vượt bậc VinFast VF 8 The All New được trang bị những tính năng an toàn hiện đại nhất cùng kiểu dáng thể thao đỉnh cao.',
-        specifications: JSON.stringify({
-          dimensions: '4750 x 1934 x 1667 mm',
-          wheelbase: '2950 mm',
-          ground_clearance: '180 mm',
-          drive_type: 'Hai cầu toàn thời gian (AWD)',
-          charging_time: '26 phút (10% lên 70%)',
-          safety: 'ADAS cấp độ 2+, 11 túi khí, Tránh va chạm sớm, Phanh khẩn cấp trước sau',
-          colors: [
-            { name: 'Đen Thượng Lưu (Mặc định)', hex: '#1e272e', image_url: '/uploads/vf8_black.jpg' }
+            { name: 'Đỏ Crimson (Mặc định)', hex: '#C0392B', image_url: '/uploads/vf8.jpg' },
+            { name: 'Đen Sang Trọng', hex: '#1E272E', image_url: '/uploads/vf8_black.jpg' },
+            { name: 'Xanh Đại Dương', hex: '#0A3D62', image_url: '/uploads/vf8_blue.jpg' }
           ]
         })
       },
@@ -351,7 +326,7 @@ async function initDB() {
         battery_kwh: 123.00,
         seats: 7,
         image_url: '/uploads/vf9.jpg',
-        description: 'VinFast VF 9 là mẫu SUV điện 7 chỗ cỡ lớn hạng sang hàng đầu của VinFast. Sở hữu vóc dáng bề thế, sang trọng đẳng cấp cùng khoang cabin rộng rãi như chuyên cơ mặt đất, VF 9 khẳng định vị thế dẫn đầu và phong cách thượng lưu của chủ nhân.',
+        description: 'VinFast VF 9 là mẫu SUV điện cỡ lớn hạng sang đầu bảng, sở hữu vóc dáng bề thế đẳng cấp cùng không gian nội thất chuyên cơ rộng rãi.',
         specifications: JSON.stringify({
           dimensions: '5118 x 2254 x 1696 mm',
           wheelbase: '3150 mm',
@@ -360,15 +335,12 @@ async function initDB() {
           charging_time: '35 phút (10% lên 70%)',
           safety: '11 túi khí, Hệ thống tự lái cấp độ 2, Ghế massage sưởi/thông gió, Cửa sổ trời toàn cảnh, Đèn Matrix LED thông minh',
           colors: [
-            { name: 'Xanh Hàng Hải (Mặc định)', hex: '#002b5c', image_url: '/uploads/vf9.jpg' },
-            { name: 'Bạc Quý Phái', hex: '#bdc3c7', image_url: '/uploads/vf9_silver.jpg' },
-            { name: 'Trắng Ngọc Trai', hex: '#ffffff', image_url: '/uploads/vf9_white.jpg' }
+            { name: 'Xanh Hàng Hải (Mặc định)', hex: '#002B5C', image_url: '/uploads/vf9.jpg' },
+            { name: 'Bạc Quý Phái', hex: '#BDC3C7', image_url: '/uploads/vf9_silver.jpg' },
+            { name: 'Trắng Ngọc Trai', hex: '#FFFFFF', image_url: '/uploads/vf9_white.jpg' }
           ]
         })
       },
-
-
-
       // === DÒNG XE DỊCH VỤ ===
       {
         name: 'Minio Green',

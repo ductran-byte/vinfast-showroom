@@ -24,6 +24,11 @@ app.use('/api/cars', carRoutes);
 app.use('/api/test-drives', testDriveRoutes);
 app.use('/api/banners', bannerRoutes);
 
+// Route phục vụ trang chi tiết xe riêng biệt
+app.get('/car/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'car.html'));
+});
+
 // Xử lý lỗi toàn cục (ví dụ lỗi Multer upload)
 app.use((err, req, res, next) => {
   if (err instanceof Error) {

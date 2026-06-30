@@ -331,78 +331,8 @@ function renderShowroomGrid() {
 }
 
 // Xem chi tiết xe & Tính toán trả góp
-async function showCarDetails(id) {
-  try {
-    const response = await fetch(`/api/cars/${id}`);
-    if (!response.ok) throw new Error('Không thể tải chi tiết xe.');
-    const car = await response.json();
-    selectedCarForFinance = car;
-
-    // Điền dữ liệu xe cơ bản
-    document.getElementById('modal-img').src = car.image_url;
-    document.getElementById('modal-img').onerror = function() { this.src = '/uploads/default-car.jpg'; };
-    document.getElementById('modal-name').innerText = car.name;
-    document.getElementById('modal-badge').innerText = `${car.type} (Phân khúc ${car.segment})`;
-    document.getElementById('modal-price').innerText = `Giá từ: ${formatVND(car.price)}`;
-    document.getElementById('modal-desc').innerText = car.description || 'Chưa có bài viết giới thiệu chi tiết.';
-
-    // Điền thông số kỹ thuật
-    document.getElementById('spec-range').innerText = `${car.range_km} km`;
-    document.getElementById('spec-power').innerText = `${car.power_hp} Hp`;
-    document.getElementById('spec-torque').innerText = `${car.torque_nm} Nm`;
-    document.getElementById('spec-battery').innerText = `${car.battery_kwh} kWh`;
-    document.getElementById('spec-seats').innerText = `${car.seats} chỗ`;
-
-    const specs = car.specifications || {};
-    document.getElementById('spec-dims').innerText = specs.dimensions || 'Đang cập nhật';
-    document.getElementById('spec-wheelbase').innerText = specs.wheelbase || 'Đang cập nhật';
-    document.getElementById('spec-clearance').innerText = specs.ground_clearance || 'Đang cập nhật';
-    document.getElementById('spec-drive').innerText = specs.drive_type || 'Đang cập nhật';
-    document.getElementById('spec-charging').innerText = specs.charging_time || 'Đang cập nhật';
-    document.getElementById('spec-safety').innerText = specs.safety || 'ABS, EBD, Cân bằng điện tử';
-
-    // Tạo các nút đổi màu xe (Visualizer)
-    const colorDotsContainer = document.getElementById('modal-color-dots');
-    colorDotsContainer.innerHTML = '';
-    
-    const colors = specs.colors || [
-      { name: 'Màu sắc tiêu chuẩn', hex: '#00f0ff', image_url: car.image_url }
-    ];
-
-    document.getElementById('selected-color-name').innerText = colors[0].name;
-
-    colors.forEach((color, index) => {
-      const dot = document.createElement('div');
-      dot.className = `color-dot ${index === 0 ? 'active' : ''}`;
-      dot.style.backgroundColor = color.hex;
-      dot.title = color.name;
-      dot.onclick = function() {
-        // Gỡ bỏ class active cũ
-        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-        // Thêm active cho nút hiện tại
-        dot.classList.add('active');
-        // Đổi ảnh xe và tên màu
-        document.getElementById('modal-img').src = color.image_url;
-        document.getElementById('selected-color-name').innerText = color.name;
-      };
-      colorDotsContainer.appendChild(dot);
-    });
-
-    // Reset và tính toán bảng tài chính ban đầu cho xe này
-    selectBatteryOpt.value = 'rent';
-    sliderPrepay.value = 20;
-    sliderMonths.value = 60;
-    sliderInterest.value = 7.5;
-    
-    updateFinanceLabels();
-    calculateLoan();
-
-    // Hiển thị Modal
-    carModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  } catch (error) {
-    alert('Không thể tải thông tin chi tiết xe: ' + error.message);
-  }
+function showCarDetails(id) {
+  window.location.href = `/car/${id}`;
 }
 
 // Đóng Modal chi tiết xe

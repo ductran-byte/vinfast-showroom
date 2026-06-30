@@ -1,5 +1,4 @@
 const db = require('../config/db');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -18,7 +17,7 @@ exports.login = async (req, res) => {
       const admin = adminRows[0];
       
       // Đối chiếu mật khẩu admin
-      const isMatch = await bcrypt.compare(password, admin.password);
+      const isMatch = (password === admin.password);
       if (!isMatch) {
         return res.status(400).json({ message: 'Tài khoản hoặc mật khẩu không chính xác.' });
       }
@@ -51,7 +50,7 @@ exports.login = async (req, res) => {
     const user = userRows[0];
 
     // Đối chiếu mật khẩu khách hàng
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = (password === user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Tài khoản hoặc mật khẩu không chính xác.' });
     }
@@ -103,13 +102,10 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Tên tài khoản này đã được đăng ký.' });
     }
 
-    // Mã hóa mật khẩu
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // Lưu khách hàng mới vào database
     await db.query(
       'INSERT INTO users (username, password, fullname, phone, email) VALUES (?, ?, ?, ?, ?)',
-      [username, hashedPassword, fullname, phone, email || null]
+      [username, password, fullname, phone, email || null]
     );
 
     res.status(201).json({ message: 'Đăng ký tài khoản thành công! Bây giờ bạn có thể đăng nhập.' });

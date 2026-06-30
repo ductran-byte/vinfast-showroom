@@ -1553,38 +1553,39 @@ footer a {
 /* Premium Car Slider */
 .showcase-slider-section {
   position: relative;
-  padding: 80px 0;
+  padding: 40px 0;
   overflow: hidden;
 }
 
 .slider-container-box {
   position: relative;
   width: 100%;
-  min-height: 450px;
+  min-height: 480px;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .slider-bg-text-wrapper {
   position: absolute;
-  top: 50%;
+  top: 32%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
   text-align: center;
   pointer-events: none;
   z-index: 1;
-  overflow: hidden;
+  overflow: visible;
   white-space: nowrap;
 }
 
 .slider-bg-text {
-  font-size: 160px;
+  font-size: 180px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 5px;
   margin: 0;
-  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.05);
+  -webkit-text-stroke: 2px rgba(0, 0, 0, 0.08);
   color: transparent;
   opacity: 0.8;
   line-height: 1;
@@ -1597,7 +1598,7 @@ footer a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 20px;
 }
 
 .slider-car-display {
@@ -1605,86 +1606,118 @@ footer a {
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 850px;
+  max-width: 1000px;
   height: 380px;
   position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--panel-border);
-  background: #ffffff;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  background: transparent;
+  overflow: visible;
 }
 
 .slider-car-image {
-  width: 100%;
+  max-width: 100%;
   height: 100%;
   object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
   transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
 .slider-car-image:hover {
-  transform: scale(1.03) translateY(-5px);
+  transform: scale(1.02) translateY(-3px);
 }
 
 .slider-car-details {
   width: 100%;
-  max-width: 800px;
+  max-width: 1000px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-}
-
-.slider-car-title {
-  font-size: 28px;
-  font-weight: 850;
-  color: var(--text-primary);
-  margin: 0;
+  gap: 24px;
 }
 
 .slider-spec-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   width: 100%;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 20px 0;
+  border-top: 1px solid var(--panel-border);
+  border-bottom: none;
+  padding: 24px 0 0 0;
   gap: 10px;
-  background: rgba(10, 15, 30, 0.2);
-  backdrop-filter: blur(4px);
-  border-radius: var(--radius-md);
+  background: transparent;
+  backdrop-filter: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .slider-spec-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: none;
 }
 
-.slider-spec-item:last-child {
-  border-right: none;
+.slider-spec-lbl {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .slider-spec-val {
   font-size: 18px;
   font-weight: 750;
-  color: var(--accent-color);
-}
-
-.slider-spec-lbl {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: var(--text-primary);
 }
 
 .slider-actions {
   display: flex;
   gap: 16px;
   margin-top: 10px;
+}
+
+.btn-slider-order {
+  background: #1553c5;
+  color: #ffffff !important;
+  border-radius: 4px;
+  padding: 12px 48px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.btn-slider-order:hover {
+  background: #0f3ba3;
+  box-shadow: 0 5px 15px rgba(21, 83, 197, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-slider-details {
+  border: 1px solid #1553c5;
+  color: #1553c5 !important;
+  background: transparent;
+  border-radius: 4px;
+  padding: 12px 48px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-slider-details:hover {
+  background: #1553c5;
+  color: #ffffff !important;
+  box-shadow: 0 5px 15px rgba(21, 83, 197, 0.2);
+  transform: translateY(-2px);
 }
 
 /* Slider Controls */

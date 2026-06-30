@@ -231,33 +231,31 @@ function renderHotCarsSlider() {
     </div>
     
     <div class="slider-car-details">
-      <h3 class="slider-car-title">${car.name}</h3>
-      
       <div class="slider-spec-grid">
         <div class="slider-spec-item">
-          <span class="slider-spec-val">${car.range_km > 0 ? car.range_km + ' km' : 'Xăng'}</span>
-          <span class="slider-spec-lbl">Quãng đường</span>
+          <span class="slider-spec-lbl">Dòng xe</span>
+          <span class="slider-spec-val">${car.segment || 'SUV'}</span>
         </div>
         <div class="slider-spec-item">
-          <span class="slider-spec-val">${car.power_hp > 0 ? car.power_hp + ' Hp' : 'Đang cập nhật'}</span>
-          <span class="slider-spec-lbl">Công suất</span>
-        </div>
-        <div class="slider-spec-item">
+          <span class="slider-spec-lbl">Số chỗ ngồi</span>
           <span class="slider-spec-val">${car.seats} chỗ</span>
-          <span class="slider-spec-lbl">Số ghế</span>
         </div>
         <div class="slider-spec-item">
-          <span class="slider-spec-val" style="color: #fff; font-size: 16px;">${formatVND(car.price)}</span>
+          <span class="slider-spec-lbl">Quãng đường lên tới</span>
+          <span class="slider-spec-val">${car.range_km > 0 ? car.range_km + ' km' : 'Động cơ Xăng'}</span>
+        </div>
+        <div class="slider-spec-item">
           <span class="slider-spec-lbl">Giá bán từ</span>
+          <span class="slider-spec-val">${formatVND(car.price)}</span>
         </div>
       </div>
       
       <div class="slider-actions">
-        <button class="btn btn-primary" onclick="showCarDetails(${car.id})">
-          <i class="fa-solid fa-circle-info"></i> Xem Chi Tiết
-        </button>
-        <button class="btn btn-outline" style="border-color: rgba(255,255,255,0.15); color: #fff;" onclick="toggleCompare(${car.id})">
-          ${isAddedToCompare ? '<i class="fa-solid fa-check"></i> Đã thêm' : '<i class="fa-solid fa-plus"></i> So sánh'}
+        <a href="#test-drive" class="btn btn-slider-order" onclick="document.getElementById('td-car-select').value='${car.id}';">
+          ĐẶT CỌC
+        </a>
+        <button class="btn btn-slider-details" onclick="showCarDetails(${car.id})">
+          XEM CHI TIẾT
         </button>
       </div>
     </div>

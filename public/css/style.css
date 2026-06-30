@@ -848,6 +848,19 @@ footer a {
   color: var(--text-secondary);
 }
 
+.btn-outline {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary);
+  transition: var(--transition-smooth);
+}
+
+.btn-outline:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  background: rgba(0, 240, 255, 0.02);
+}
+
 .btn-outline-compare:hover {
   border-color: var(--accent-color);
   color: var(--accent-color);

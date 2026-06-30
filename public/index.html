@@ -25,7 +25,7 @@
           <li><a href="#showroom" id="nav-showroom">Sản Phẩm</a></li>
           <li><a href="#accessories" id="nav-acc">Phụ Kiện</a></li>
           <li><a href="#services" id="nav-srv">Dịch Vụ</a></li>
-          <li><a href="#test-drive" id="nav-drive">Đăng Ký Lái Thử</a></li>
+          <li><a href="javascript:void(0)" onclick="openTestDriveModal()" id="nav-drive">Đăng Ký Lái Thử</a></li>
           <li><a href="#stations" id="nav-stations">Liên Hệ</a></li>
         </ul>
       </nav>
@@ -119,19 +119,19 @@
     <div style="text-align: center; margin-bottom: 40px;">
       <span class="hero-subtitle">Danh mục sản phẩm</span>
       <h2 style="font-size: 32px; font-weight: 800;">Khám Phá Các Dòng Xe</h2>
-      <p style="color: var(--text-secondary); margin-top: 8px;">Tìm kiếm và so sánh đầy đủ tất cả các dòng xe ô tô điện và xe xăng VinFast.</p>
+      <p style="color: var(--text-secondary); margin-top: 8px;">Tìm kiếm và so sánh đầy đủ tất cả các dòng xe ô tô điện và xe dịch vụ VinFast.</p>
     </div>
 
     <!-- Filter and Search Bar -->
     <div class="control-bar glass-panel" style="margin-bottom: 40px;">
       <div class="filter-group" id="filter-container">
-        <button class="filter-btn active" data-filter="Động cơ điện">Động cơ điện</button>
-        <button class="filter-btn" data-filter="Động cơ xăng">Động cơ xăng</button>
+        <button class="filter-btn active" data-filter="Tất cả">Tất cả</button>
+        <button class="filter-btn" data-filter="Động cơ điện">Động cơ điện</button>
         <button class="filter-btn" data-filter="Dòng xe dịch vụ">Dòng xe dịch vụ</button>
       </div>
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm dòng xe (VD: VF 3, Lux A2.0)...">
+        <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm dòng xe (VD: VF 3, VF 9)...">
       </div>
     </div>
 
@@ -473,7 +473,7 @@
   </div>
 
   <!-- So Sánh Xe Floating Drawer -->
-  <div class="compare-drawer" id="compare-drawer">
+  <div class="compare-drawer" id="compare-drawer" style="display: none !important;">
     <div class="container compare-drawer-content">
       <div class="compare-info">
         <span class="compare-title">So Sánh Xe Điện (<span id="compare-count" style="color: var(--accent-color); font-weight: 700;">0</span>/3)</span>
@@ -490,7 +490,7 @@
   </div>
 
   <!-- So Sánh Xe Chi Tiết Modal -->
-  <div class="modal-overlay" id="compare-modal">
+  <div class="modal-overlay" id="compare-modal" style="display: none !important;">
     <div class="modal-content glass-panel" style="max-width: 1000px;">
       <button class="modal-close-btn" id="compare-modal-close"><i class="fa-solid fa-xmark"></i></button>
       
@@ -505,84 +505,90 @@
     </div>
   </div>
 
-  <!-- Đăng Ký Lái Thử Section -->
-  <section id="test-drive" class="container" style="padding: 100px 0 60px 0;">
-    <div class="glass-panel" style="padding: 40px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center;">
-      <div>
-        <span class="hero-subtitle" style="font-size: 12px; letter-spacing: 2px;">Trải nghiệm vô lăng</span>
-        <h2 style="font-size: 36px; font-weight: 800; margin-bottom: 16px;">Đăng Ký Lái Thử Xe Điện</h2>
-        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 15px; margin-bottom: 24px;">
-          Hãy là người tiếp theo cảm nhận khả năng tăng tốc tức thì, vận hành êm ái và hệ thống hỗ trợ lái thông minh ADAS trên các dòng xe ô tô điện VinFast. Chọn ngày hẹn và showroom gần nhất để chúng tôi chuẩn bị xe sẵn sàng đón tiếp bạn.
-        </p>
-        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14px; color: var(--text-secondary);">
-          <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Lái thử hoàn toàn miễn phí tại tất cả Showroom VinFast</div>
-          <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Chuyên viên hướng dẫn các tính năng lái thông minh ADAS</div>
-          <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Nhận ngay các phần quà lưu niệm ý nghĩa khi lái thử xe</div>
+  <!-- Đăng Ký Lái Thử Modal -->
+  <div class="modal-overlay" id="test-drive-modal">
+    <div class="modal-content glass-panel" style="max-width: 900px;">
+      <button class="modal-close-btn" id="test-drive-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 36px;">
+        <div class="test-drive-modal-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; align-items: center;">
+          <div>
+            <span class="hero-subtitle" style="font-size: 12px; letter-spacing: 2px;">Trải nghiệm vô lăng</span>
+            <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 16px; color: var(--text-primary);">Đăng Ký Lái Thử Xe Điện</h2>
+            <p style="color: var(--text-secondary); line-height: 1.6; font-size: 15px; margin-bottom: 24px;">
+              Hãy là người tiếp theo cảm nhận khả năng tăng tốc tức thì, vận hành êm ái và hệ thống hỗ trợ lái thông minh ADAS trên các dòng xe ô tô điện VinFast. Chọn ngày hẹn và showroom gần nhất để chúng tôi chuẩn bị xe sẵn sàng đón tiếp bạn.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14px; color: var(--text-secondary);">
+              <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Lái thử hoàn toàn miễn phí tại tất cả Showroom VinFast</div>
+              <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Chuyên viên hướng dẫn các tính năng lái thông minh ADAS</div>
+              <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Nhận ngay các phần quà lưu niệm ý nghĩa khi lái thử xe</div>
+            </div>
+          </div>
+          
+          <form id="test-drive-form" style="background: var(--bg-secondary); padding: 28px; border-radius: var(--radius-lg); border: 1px solid var(--panel-border);">
+            <div class="form-group">
+              <label class="form-label" for="td-car-select">Mẫu xe bạn quan tâm *</label>
+              <select id="td-car-select" class="form-input" required>
+                <option value="">-- Chọn dòng xe --</option>
+                <!-- Tải động bằng JS -->
+              </select>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label class="form-label" for="td-name">Họ và tên *</label>
+                <input type="text" id="td-name" class="form-input" placeholder="Nhập họ tên..." required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="td-phone">Số điện thoại *</label>
+                <input type="tel" id="td-phone" class="form-input" placeholder="Nhập số điện thoại..." required>
+              </div>
+            </div>
+    
+            <div class="form-group">
+              <label class="form-label" for="td-email">Địa chỉ Email</label>
+              <input type="email" id="td-email" class="form-input" placeholder="VD: name@domain.com">
+            </div>
+    
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+              <div class="form-group">
+                <label class="form-label" for="td-province">Tỉnh / Thành *</label>
+                <select id="td-province" class="form-input" required>
+                  <option value="">Chọn Tỉnh/Thành...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="td-district">Quận / Huyện *</label>
+                <select id="td-district" class="form-input" required disabled>
+                  <option value="">Chọn Quận/Huyện...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="td-ward">Phường / Xã *</label>
+                <select id="td-ward" class="form-input" required disabled>
+                  <option value="">Chọn Phường/Xã...</option>
+                </select>
+              </div>
+            </div>
+    
+            <div class="form-group" style="margin-top: 12px;">
+              <label class="form-label" for="td-address-detail">Địa chỉ chi tiết (Không bắt buộc)</label>
+              <input type="text" id="td-address-detail" class="form-input" placeholder="VD: Số 123, đường Nguyễn Trãi...">
+            </div>
+    
+            <div class="form-group">
+              <label class="form-label" for="td-date">Chọn ngày hẹn *</label>
+              <input type="date" id="td-date" class="form-input" required>
+            </div>
+    
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 15px;">
+              Gửi Yêu Cầu Đăng Ký
+            </button>
+          </form>
         </div>
       </div>
-      
-      <form id="test-drive-form" style="background: rgba(255, 255, 255, 0.65); padding: 28px; border-radius: var(--radius-lg); border: 1px solid var(--panel-border);">
-        <div class="form-group">
-          <label class="form-label" for="td-car-select">Mẫu xe bạn quan tâm *</label>
-          <select id="td-car-select" class="form-input" required>
-            <option value="">-- Chọn dòng xe --</option>
-            <!-- Tải động bằng JS -->
-          </select>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="form-group">
-            <label class="form-label" for="td-name">Họ và tên *</label>
-            <input type="text" id="td-name" class="form-input" placeholder="Nhập họ tên..." required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="td-phone">Số điện thoại *</label>
-            <input type="tel" id="td-phone" class="form-input" placeholder="Nhập số điện thoại..." required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="td-email">Địa chỉ Email</label>
-          <input type="email" id="td-email" class="form-input" placeholder="VD: name@domain.com">
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
-          <div class="form-group">
-            <label class="form-label" for="td-province">Tỉnh / Thành phố *</label>
-            <select id="td-province" class="form-input" required>
-              <option value="">Chọn Tỉnh/Thành...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="td-district">Quận / Huyện *</label>
-            <select id="td-district" class="form-input" required disabled>
-              <option value="">Chọn Quận/Huyện...</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="td-ward">Phường / Xã *</label>
-            <select id="td-ward" class="form-input" required disabled>
-              <option value="">Chọn Phường/Xã...</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group" style="margin-top: 12px;">
-          <label class="form-label" for="td-address-detail">Địa chỉ chi tiết (Số nhà, tên đường... - Không bắt buộc)</label>
-          <input type="text" id="td-address-detail" class="form-input" placeholder="VD: Số 123, đường Nguyễn Trãi...">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="td-date">Chọn ngày hẹn *</label>
-          <input type="date" id="td-date" class="form-input" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 15px;">
-          Gửi Yêu Cầu Đăng Ký
-        </button>
-      </form>
     </div>
-  </section>
+  </div>
 
   <!-- Showroom Location Section -->
   <section id="stations" class="container" style="padding-top: 60px; padding-bottom: 100px; border-top: 1px solid var(--panel-border);">

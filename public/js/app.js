@@ -41,7 +41,7 @@ let cars = []; // Dòng xe hiển thị trong Danh mục (Showroom grid)
 let hotCars = []; // Dòng xe hiển thị trong Slider Xe Mới/Hot
 let compareList = [];
 let selectedCarForFinance = null;
-let currentFilter = 'Động cơ điện';
+let currentFilter = 'Tất cả';
 let currentSearch = '';
 
 // Dữ liệu mẫu Trạm sạc & Showroom
@@ -242,7 +242,7 @@ function renderHotCarsSlider() {
         </div>
         <div class="slider-spec-item">
           <span class="slider-spec-lbl">Quãng đường lên tới</span>
-          <span class="slider-spec-val">${car.range_km > 0 ? car.range_km + ' km' : 'Động cơ Xăng'}</span>
+          <span class="slider-spec-val">${car.range_km > 0 ? car.range_km + ' km' : 'Đang cập nhật'}</span>
         </div>
         <div class="slider-spec-item">
           <span class="slider-spec-lbl">Giá bán từ</span>
@@ -251,9 +251,9 @@ function renderHotCarsSlider() {
       </div>
       
       <div class="slider-actions">
-        <a href="#test-drive" class="btn btn-slider-order" onclick="document.getElementById('td-car-select').value='${car.id}';">
-          ĐẶT CỌC
-        </a>
+        <button class="btn btn-slider-order" onclick="openTestDriveModal(${car.id})">
+          ĐĂNG KÝ LÁI THỬ
+        </button>
         <button class="btn btn-slider-details" onclick="showCarDetails(${car.id})">
           XEM CHI TIẾT
         </button>
@@ -303,7 +303,7 @@ function renderShowroomGrid() {
           <p class="car-card-price">Giá từ: ${formatVND(car.price)}</p>
           <div class="car-features-mini">
             <div class="feature-mini-item">
-              <span class="feature-mini-val">${car.range_km > 0 ? car.range_km + ' km' : 'Xăng'}</span>
+              <span class="feature-mini-val">${car.range_km > 0 ? car.range_km + ' km' : 'Đang cập nhật'}</span>
               <span class="feature-mini-lbl">Quãng đường</span>
             </div>
             <div class="feature-mini-item">
@@ -319,9 +319,9 @@ function renderShowroomGrid() {
             <button class="btn btn-primary" onclick="event.stopPropagation(); showCarDetails(${car.id})">
               Xem Chi Tiết
             </button>
-            <button class="btn btn-outline-compare ${isAddedToCompare ? 'added' : ''}" 
-                    onclick="event.stopPropagation(); toggleCompare(${car.id})">
-              ${isAddedToCompare ? '<i class="fa-solid fa-check"></i> Đã thêm' : '<i class="fa-solid fa-plus"></i> So sánh'}
+            <button class="btn btn-outline" 
+                    onclick="event.stopPropagation(); openTestDriveModal(${car.id})">
+              <i class="fa-solid fa-car-side"></i> Lái thử
             </button>
           </div>
         </div>
@@ -415,6 +415,46 @@ carModal.addEventListener('click', (e) => {
   if (e.target === carModal) closeModal();
 });
 
+// Quản lý Modal Đăng Ký Lái Thử
+const testDriveModal = document.getElementById('test-drive-modal');
+const testDriveModalClose = document.getElementById('test-drive-modal-close');
+
+function openTestDriveModal(carId) {
+  if (carId && tdCarSelect) {
+    tdCarSelect.value = carId;
+  }
+  if (testDriveModal) {
+    testDriveModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Tập trung con trỏ vào ô nhập họ tên khách hàng
+    const tdName = document.getElementById('td-name');
+    if (tdName) {
+      setTimeout(() => {
+        tdName.focus();
+      }, 300);
+    }
+  }
+}
+window.openTestDriveModal = openTestDriveModal;
+
+function closeTestDriveModal() {
+  if (testDriveModal) {
+    testDriveModal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+window.closeTestDriveModal = closeTestDriveModal;
+
+if (testDriveModalClose) {
+  testDriveModalClose.addEventListener('click', closeTestDriveModal);
+}
+if (testDriveModal) {
+  testDriveModal.addEventListener('click', (e) => {
+    if (e.target === testDriveModal) closeTestDriveModal();
+  });
+}
+
 // Chuyển nhanh từ Modal chi tiết sang Đăng ký lái thử
 function bookTestDriveFromModal() {
   if (!selectedCarForFinance) return;
@@ -422,16 +462,8 @@ function bookTestDriveFromModal() {
   // Đóng modal chi tiết
   closeModal();
   
-  // Điền xe quan tâm vào dropdown lái thử
-  tdCarSelect.value = selectedCarForFinance.id;
-  
-  // Cuộn mượt mà đến khu vực Đăng ký lái thử
-  document.getElementById('test-drive').scrollIntoView({ behavior: 'smooth' });
-  
-  // Tập trung con trỏ vào ô nhập họ tên khách hàng
-  setTimeout(() => {
-    document.getElementById('td-name').focus();
-  }, 600);
+  // Mở modal lái thử
+  openTestDriveModal(selectedCarForFinance.id);
 }
 window.bookTestDriveFromModal = bookTestDriveFromModal;
 
@@ -762,6 +794,7 @@ testDriveForm.addEventListener('submit', async (e) => {
     testDriveForm.reset();
     tdDistrict.disabled = true;
     tdWard.disabled = true;
+    closeTestDriveModal();
   } catch (error) {
     alert(error.message);
   }

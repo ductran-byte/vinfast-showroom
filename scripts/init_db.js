@@ -367,57 +367,7 @@ async function initDB() {
         })
       },
 
-      // === ĐỘNG CƠ XĂNG ===
-      {
-        name: 'VinFast Lux A2.0',
-        type: 'Sedan',
-        segment: 'D',
-        category: 'Động cơ xăng',
-        price: 881000000.00,
-        range_km: 0,
-        power_hp: 228,
-        torque_nm: 350,
-        battery_kwh: 0,
-        seats: 5,
-        image_url: '/uploads/default-car.jpg',
-        description: 'VinFast Lux A2.0 là dòng xe sedan hạng sang mang thiết kế Ý quyến rũ kết hợp khung gầm và động cơ tăng áp 2.0L hiệu suất cao của Đức.',
-        specifications: JSON.stringify({
-          dimensions: '4973 x 1900 x 1464 mm',
-          wheelbase: '2968 mm',
-          ground_clearance: '150 mm',
-          drive_type: 'Cầu sau (RWD)',
-          charging_time: 'Không có (Chạy Xăng)',
-          safety: '6 túi khí, ABS, EBD, Cân bằng điện tử, Hỗ trợ khởi hành ngang dốc, Cảnh báo điểm mù',
-          colors: [
-            { name: 'Đen Lịch Lãm (Mặc định)', hex: '#1e272e', image_url: '/uploads/default-car.jpg' }
-          ]
-        })
-      },
-      {
-        name: 'VinFast Lux SA2.0',
-        type: 'SUV',
-        segment: 'E',
-        category: 'Động cơ xăng',
-        price: 1200000000.00,
-        range_km: 0,
-        power_hp: 228,
-        torque_nm: 350,
-        battery_kwh: 0,
-        seats: 7,
-        image_url: '/uploads/default-car.jpg',
-        description: 'VinFast Lux SA2.0 là mẫu xe SUV 7 chỗ đa dụng cao cấp sở hữu phong cách thiết kế mạnh mẽ đột phá đầy cuốn hút mang bản sắc Việt.',
-        specifications: JSON.stringify({
-          dimensions: '4940 x 1960 x 1773 mm',
-          wheelbase: '2933 mm',
-          ground_clearance: '192 mm',
-          drive_type: 'Hai cầu chủ động (AWD/RWD)',
-          charging_time: 'Không có (Chạy Xăng)',
-          safety: '6 túi khí, ABS, EBD, Cân bằng điện tử, Hỗ trợ đổ đèo, Cảnh báo điểm mù, Camera 360',
-          colors: [
-            { name: 'Đỏ Đậm (Mặc định)', hex: '#c0392b', image_url: '/uploads/default-car.jpg' }
-          ]
-        })
-      },
+
 
       // === DÒNG XE DỊCH VỤ ===
       {

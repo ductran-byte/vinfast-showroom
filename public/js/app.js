@@ -529,42 +529,75 @@ compareModal.addEventListener('click', (e) => {
 
 
 // --- Logic Đăng Ký Lái Thử ---
-// Thay đổi Tỉnh/Thành -> Lọc Quận/Huyện tự động
-tdProvince.addEventListener('change', function() {
-  const val = this.value;
+// Hàm tải danh sách Tỉnh/Thành từ API
+async function loadProvinces() {
+  try {
+    const response = await fetch('https://esgoo.net/api-tinhthanh/1/0.htm');
+    const result = await response.json();
+    if (result.error === 0 && tdProvince) {
+      tdProvince.innerHTML = '<option value="">Chọn Tỉnh/Thành...</option>';
+      result.data.forEach(prov => {
+        const opt = document.createElement('option');
+        opt.value = prov.id;
+        opt.innerText = prov.name;
+        tdProvince.appendChild(opt);
+      });
+    }
+  } catch (err) {
+    console.error('Lỗi khi tải danh sách Tỉnh/Thành:', err);
+  }
+}
+window.loadProvinces = loadProvinces;
+
+// Thay đổi Tỉnh/Thành -> Lọc Quận/Huyện tự động qua API
+tdProvince.addEventListener('change', async function() {
+  const provinceId = this.value;
   tdDistrict.innerHTML = '<option value="">Chọn Quận/Huyện...</option>';
   tdWard.innerHTML = '<option value="">Chọn Phường/Xã...</option>';
+  tdDistrict.disabled = true;
   tdWard.disabled = true;
   
-  if (val && locationsData[val]) {
-    tdDistrict.disabled = false;
-    Object.keys(locationsData[val]).forEach(dist => {
-      const opt = document.createElement('option');
-      opt.value = dist;
-      opt.innerText = dist;
-      tdDistrict.appendChild(opt);
-    });
-  } else {
-    tdDistrict.disabled = true;
+  if (provinceId) {
+    try {
+      const response = await fetch(`https://esgoo.net/api-tinhthanh/2/${provinceId}.htm`);
+      const result = await response.json();
+      if (result.error === 0) {
+        tdDistrict.disabled = false;
+        result.data.forEach(dist => {
+          const opt = document.createElement('option');
+          opt.value = dist.id;
+          opt.innerText = dist.full_name;
+          tdDistrict.appendChild(opt);
+        });
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải danh sách Quận/Huyện:', err);
+    }
   }
 });
 
-// Thay đổi Quận/Huyện -> Lọc Phường/Xã tự động
-tdDistrict.addEventListener('change', function() {
-  const prov = tdProvince.value;
-  const dist = this.value;
+// Thay đổi Quận/Huyện -> Lọc Phường/Xã tự động qua API
+tdDistrict.addEventListener('change', async function() {
+  const districtId = this.value;
   tdWard.innerHTML = '<option value="">Chọn Phường/Xã...</option>';
+  tdWard.disabled = true;
   
-  if (prov && dist && locationsData[prov] && locationsData[prov][dist]) {
-    tdWard.disabled = false;
-    locationsData[prov][dist].forEach(ward => {
-      const opt = document.createElement('option');
-      opt.value = ward;
-      opt.innerText = ward;
-      tdWard.appendChild(opt);
-    });
-  } else {
-    tdWard.disabled = true;
+  if (districtId) {
+    try {
+      const response = await fetch(`https://esgoo.net/api-tinhthanh/3/${districtId}.htm`);
+      const result = await response.json();
+      if (result.error === 0) {
+        tdWard.disabled = false;
+        result.data.forEach(ward => {
+          const opt = document.createElement('option');
+          opt.value = ward.full_name;
+          opt.innerText = ward.full_name;
+          tdWard.appendChild(opt);
+        });
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải danh sách Phường/Xã:', err);
+    }
   }
 });
 
@@ -576,11 +609,13 @@ testDriveForm.addEventListener('submit', async (e) => {
   const fullname = document.getElementById('td-name').value.trim();
   const phone = document.getElementById('td-phone').value.trim();
   const email = document.getElementById('td-email').value.trim();
-  const province = document.getElementById('td-province').value;
+  
+  // Lấy tên hiển thị (text) thay vì ID của option đã chọn
+  const province = tdProvince.options[tdProvince.selectedIndex].text;
+  const district = tdDistrict.options[tdDistrict.selectedIndex].text;
+  const ward = tdWard.options[tdWard.selectedIndex].text;
   
   // Ghép Quận/Huyện và Phường/Xã để gửi lên trường showroom trong CSDL
-  const district = document.getElementById('td-district').value;
-  const ward = document.getElementById('td-ward').value;
   const showroom = `${district}, ${ward}`;
   
   const preferred_date = document.getElementById('td-date').value;
@@ -681,6 +716,7 @@ filterContainer.addEventListener('click', (e) => {
 fetchCars();
 renderStations();
 checkUserSession();
+loadProvinces();
 
 // --- Logic Đăng Nhập / Đăng Ký Khách Hàng ---
 const authModal = document.getElementById('auth-modal');

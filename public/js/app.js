@@ -128,7 +128,6 @@ async function fetchCars() {
     if (!response.ok) throw new Error('Không thể lấy danh sách xe.');
     cars = await response.json();
     renderCars();
-    populateTestDriveCars();
   } catch (error) {
     console.error(error);
     carGrid.innerHTML = `
@@ -140,12 +139,22 @@ async function fetchCars() {
   }
 }
 
-// Điền danh sách xe vào Form Lái Thử
-function populateTestDriveCars() {
-  const currentVal = tdCarSelect.value;
-  tdCarSelect.innerHTML = '<option value="">-- Chọn dòng xe --</option>' + 
-    cars.map(car => `<option value="${car.id}">${car.name}</option>`).join('');
-  if (currentVal) tdCarSelect.value = currentVal;
+// Tải toàn bộ danh sách xe phục vụ Form Đăng ký lái thử
+async function loadAllCarsForTestDrive() {
+  try {
+    const response = await fetch('/api/cars'); // Không lọc tham số để lấy toàn bộ xe
+    if (!response.ok) throw new Error('Không thể tải danh sách xe lái thử.');
+    const allCars = await response.json();
+    
+    if (tdCarSelect) {
+      const currentVal = tdCarSelect.value;
+      tdCarSelect.innerHTML = '<option value="">-- Chọn dòng xe --</option>' + 
+        allCars.map(car => `<option value="${car.id}">${car.name}</option>`).join('');
+      if (currentVal) tdCarSelect.value = currentVal;
+    }
+  } catch (error) {
+    console.error('Lỗi khi tải danh sách xe lái thử:', error);
+  }
 }
 
 // Định dạng tiền tệ VND
@@ -718,6 +727,7 @@ fetchCars();
 renderStations();
 checkUserSession();
 loadProvinces();
+loadAllCarsForTestDrive();
 
 // --- Logic Đăng Nhập / Đăng Ký Khách Hàng ---
 const authModal = document.getElementById('auth-modal');

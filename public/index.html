@@ -22,7 +22,9 @@
       <nav id="nav-menu">
         <ul>
           <li><a href="#" class="active" id="nav-home">Trang Chủ</a></li>
-          <li><a href="#showcase" id="nav-showroom">Showroom</a></li>
+          <li><a href="#showcase" id="nav-showroom">Sản Phẩm</a></li>
+          <li><a href="#accessories" id="nav-acc">Phụ Kiện</a></li>
+          <li><a href="#services" id="nav-srv">Dịch Vụ</a></li>
           <li><a href="#test-drive" id="nav-drive">Đăng Ký Lái Thử</a></li>
           <li><a href="#stations" id="nav-stations">Liên Hệ</a></li>
         </ul>
@@ -50,25 +52,45 @@
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container hero-content">
-      <span class="hero-subtitle">Kiến Tạo Tương Lai Xanh</span>
-      <h1 class="hero-title">Đột Phá Công Nghệ cùng <span>VinFast EV</span></h1>
-      <p class="hero-desc">
-        Khám phá hệ sinh thái xe ô tô điện thông minh hàng đầu Việt Nam. Tinh hoa thiết kế Ý kết hợp công nghệ lái tự động vượt trội, nâng tầm hành trình di chuyển mỗi ngày của bạn.
-      </p>
-      <div class="hero-actions">
-        <a href="#showcase" class="btn btn-primary">Khám Phá Ngay</a>
-        <a href="#test-drive" class="btn">Lịch Lái Thử <i class="fa-solid fa-calendar-days"></i></a>
+  <!-- Hero Section (Carousel) -->
+  <section class="hero-carousel">
+    <div class="carousel-inner" id="hero-carousel-inner">
+      <div class="carousel-item active" style="background-image: url('/uploads/banner_summer.png');">
+        <div class="carousel-caption">
+          <h2>VINFASCINATION<br><span style="color: var(--accent-color); font-size: 32px;">ĐÓN HÈ RỰC RỠ</span></h2>
+          <p>Nhận ngay ưu đãi giá bán lên đến 3%* cùng cơ hội nhận Voucher nghỉ dưỡng Vinpearl thượng lưu khi đặt cọc các dòng ô tô điện thông minh ngay hôm nay.</p>
+          <div style="display: flex; gap: 12px;">
+            <a href="#showcase" class="btn btn-primary">Khám Phá Xe</a>
+            <a href="#test-drive" class="btn btn-outline" style="border-color: rgba(255,255,255,0.4); color: #fff;">Đăng Ký Lái Thử</a>
+          </div>
+        </div>
       </div>
+      <div class="carousel-item" style="background-image: url('/uploads/banner_eco.png');">
+        <div class="carousel-caption">
+          <h2>TƯƠNG LAI XANH<br><span style="color: var(--accent-color); font-size: 32px;">KIẾN TẠO PHONG CÁCH</span></h2>
+          <p>Hệ sinh thái di chuyển xanh bền vững của VinFast mang tính đột phá về công nghệ, kết nối và trải nghiệm lái tự hành thông minh cấp độ cao.</p>
+          <div style="display: flex; gap: 12px;">
+            <a href="#showcase" class="btn btn-primary">Khám Phá Ngay</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="carousel-controls">
+      <div class="carousel-control-btn" id="hero-prev"><i class="fa-solid fa-chevron-left"></i></div>
+      <div class="carousel-control-btn" id="hero-next"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+    
+    <div class="carousel-indicators" id="hero-indicators">
+      <div class="carousel-indicator active" data-slide="0"></div>
+      <div class="carousel-indicator" data-slide="1"></div>
     </div>
   </section>
 
-  <!-- Showcase Section -->
-  <section id="showcase" class="showcase container">
+  <!-- Showcase Section (Premium Slider) -->
+  <section id="showcase" class="showcase container" style="padding-top: 60px;">
     <!-- Filter and Search Bar -->
-    <div class="control-bar glass-panel">
+    <div class="control-bar glass-panel" style="margin-bottom: 30px;">
       <div class="filter-group" id="filter-container">
         <button class="filter-btn active" data-filter="Động cơ điện">Động cơ điện</button>
         <button class="filter-btn" data-filter="Động cơ xăng">Động cơ xăng</button>
@@ -80,12 +102,133 @@
       </div>
     </div>
 
-    <!-- Cars Grid -->
-    <div class="car-grid" id="car-grid">
-      <!-- Xe sẽ được tải động tại đây bằng JS -->
-      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
-        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 32px; color: var(--accent-color); margin-bottom: 12px;"></i>
-        <p>Đang tải dữ liệu xe...</p>
+    <!-- Premium Interactive Slider -->
+    <div class="showcase-slider-section glass-panel">
+      <!-- Arrow Controls -->
+      <button class="slider-arrow-btn slider-arrow-prev" id="car-slider-prev">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="slider-arrow-btn slider-arrow-next" id="car-slider-next">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+
+      <div class="slider-container-box">
+        <!-- Outlined Background Text -->
+        <div class="slider-bg-text-wrapper">
+          <h2 class="slider-bg-text" id="slider-bg-name">VF 8</h2>
+        </div>
+
+        <!-- Main Car Content -->
+        <div class="slider-main-content" id="slider-main-content">
+          <!-- Tải động bằng JS -->
+          <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 32px; color: var(--accent-color); margin-bottom: 12px;"></i>
+            <p>Đang tải dữ liệu xe...</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Slide indicators -->
+      <div class="slider-nav-dots" id="slider-dots">
+        <!-- Tải động bằng JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Accessories Section -->
+  <section id="accessories" class="accessories-section container">
+    <div style="text-align: center; margin-bottom: 45px;">
+      <span class="hero-subtitle">Thiết Bị Chính Hãng</span>
+      <h2 style="font-size: 32px; font-weight: 800;">Phụ Kiện Chính Hãng VinFast</h2>
+      <p style="color: var(--text-secondary); margin-top: 8px;">Trang bị thêm các phụ kiện đẳng cấp và các bộ sạc thông minh cho xế yêu của bạn.</p>
+    </div>
+    
+    <div class="accessories-grid">
+      <div class="accessory-card glass-panel">
+        <div class="accessory-img-wrapper">
+          <img src="/uploads/acc_charger.png" alt="Bộ sạc treo tường" class="accessory-img">
+        </div>
+        <h4 class="accessory-name">Bộ sạc treo tường thông minh VF Wallbox</h4>
+        <span class="accessory-price">9.400.000 VNĐ</span>
+      </div>
+      <div class="accessory-card glass-panel">
+        <div class="accessory-img-wrapper">
+          <img src="/uploads/acc_mats.png" alt="Thảm lót sàn da" class="accessory-img">
+        </div>
+        <h4 class="accessory-name">Thảm lót sàn da cao cấp thiết kế riêng</h4>
+        <span class="accessory-price">1.500.000 VNĐ</span>
+      </div>
+      <div class="accessory-card glass-panel">
+        <div class="accessory-img-wrapper">
+          <img src="/uploads/acc_umbrella.png" alt="Ô VinFast" class="accessory-img">
+        </div>
+        <h4 class="accessory-name">Ô gập tự động VinFast gấp ngược thông minh</h4>
+        <span class="accessory-price">250.000 VNĐ</span>
+      </div>
+      <div class="accessory-card glass-panel">
+        <div class="accessory-img-wrapper">
+          <img src="/uploads/default-car.jpg" alt="Bơm lốp điện tử" class="accessory-img" style="filter: brightness(0.8) contrast(1.2);">
+        </div>
+        <h4 class="accessory-name">Bơm lốp điện tử tích hợp kích bình khẩn cấp</h4>
+        <span class="accessory-price">850.000 VNĐ</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services & Charging Section -->
+  <section id="services" class="services-section container">
+    <div style="text-align: center; margin-bottom: 45px;">
+      <span class="hero-subtitle">Đồng Hành Suốt Mọi Hành Trình</span>
+      <h2 style="font-size: 32px; font-weight: 800;">Dịch Vụ & Giải Pháp Sạc</h2>
+      <p style="color: var(--text-secondary); margin-top: 8px;">Dịch vụ hậu mãi đẳng cấp kết hợp giải pháp sạc toàn diện, giúp bạn an tâm trên mọi nẻo đường.</p>
+    </div>
+    
+    <div class="services-layout">
+      <div class="services-left-col">
+        <div class="service-card-compact glass-panel">
+          <div class="service-icon-box">
+            <i class="fa-solid fa-charging-station"></i>
+          </div>
+          <div class="service-info">
+            <h4>Mạng Lưới Trạm Sạc Bao Phủ</h4>
+            <p>Hơn 150.000 cổng sạc trên khắp cả nước, bao gồm sạc siêu nhanh DC và sạc AC tiêu chuẩn, đảm bảo bạn sạc xe mọi lúc mọi nơi.</p>
+          </div>
+        </div>
+        <div class="service-card-compact glass-panel">
+          <div class="service-icon-box">
+            <i class="fa-solid fa-truck-medical"></i>
+          </div>
+          <div class="service-info">
+            <h4>Cứu Hộ & Hỗ Trợ 24/7</h4>
+            <p>Tổng đài CSKH và cứu hộ khẩn cấp 24/7. Hỗ trợ sạc pin lưu động trên đường và kéo xe cứu hộ nhanh chóng khi xảy ra sự cố ngoài ý muốn.</p>
+          </div>
+        </div>
+      </div>
+      <div class="service-card-tall glass-panel">
+        <div>
+          <span style="color: var(--accent-color); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Giải pháp tối ưu</span>
+          <h4 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">Dịch Vụ Sạc Tại Nhà Cực Kỳ Tiện Lợi</h4>
+          <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.6; margin-bottom: 20px;">
+            Sạc xe điện VinFast ngay tại gara hoặc sân nhà của bạn với thiết bị sạc gắn tường chính hãng thông minh. Tốc độ sạc tối ưu, tự ngắt nguồn an toàn tuyệt đối và tích hợp ứng dụng theo dõi điện năng sử dụng từ xa trên điện thoại di động.
+          </p>
+        </div>
+        <div class="service-tall-media">
+          <img src="/uploads/acc_charger.png" alt="Sạc tại nhà" style="max-height: 160px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vietnamese Spirit Promo Banner -->
+  <section class="promo-vietnam-banner">
+    <div class="container vietnam-layout">
+      <div class="vietnam-left">
+        <h3><span>Mãnh Liệt Tinh Thần Việt Nam</span>VƯƠN TẦM THẾ GIỚI</h3>
+        <p>Bằng việc lựa chọn xe điện VinFast, bạn đang cùng hàng triệu con người Việt Nam chung tay vì một tương lai xanh bền vững, giảm thiểu khói bụi và xây dựng một nền công nghiệp công nghệ cao tự hào của nước nhà.</p>
+        <a href="#test-drive" class="btn btn-primary" style="padding: 12px 24px;">Ghé Thăm Showroom Ngay</a>
+      </div>
+      <div class="vietnam-right">
+        <img src="/uploads/banner_summer.png" alt="Đội xe điện VinFast">
       </div>
     </div>
   </section>

@@ -83,7 +83,7 @@ const locationsData = {
 };
 
 // Các phần tử DOM
-const carGrid = document.getElementById('car-grid');
+const sliderContent = document.getElementById('slider-main-content');
 const searchInput = document.getElementById('search-input');
 const filterContainer = document.getElementById('filter-container');
 const carModal = document.getElementById('car-modal');
@@ -130,12 +130,15 @@ async function fetchCars() {
     renderCars();
   } catch (error) {
     console.error(error);
-    carGrid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff3b30;">
-        <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; margin-bottom: 12px;"></i>
-        <p>Đã xảy ra lỗi khi tải dữ liệu xe. Vui lòng thử lại.</p>
-      </div>
-    `;
+    const sliderContentEl = document.getElementById('slider-main-content');
+    if (sliderContentEl) {
+      sliderContentEl.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #ff3b30;">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; margin-bottom: 12px;"></i>
+          <p>Đã xảy ra lỗi khi tải dữ liệu xe. Vui lòng thử lại.</p>
+        </div>
+      `;
+    }
   }
 }
 
@@ -162,57 +165,95 @@ function formatVND(value) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 }
 
-// Hiển thị danh sách xe ra Grid
+// Hiển thị dòng xe ra Slider (thay vì Grid)
+let activeCarIndex = 0;
+
 function renderCars() {
+  const sliderContentEl = document.getElementById('slider-main-content');
+  const sliderBgName = document.getElementById('slider-bg-name');
+  const sliderDots = document.getElementById('slider-dots');
+  
+  if (!sliderContentEl) return;
+
   if (cars.length === 0) {
-    carGrid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-muted);">
+    sliderContentEl.innerHTML = `
+      <div style="text-align: center; padding: 60px; color: var(--text-muted);">
         <i class="fa-solid fa-car-rear" style="font-size: 48px; margin-bottom: 16px;"></i>
         <p>Không tìm thấy mẫu xe nào phù hợp với yêu cầu.</p>
       </div>
     `;
+    if (sliderBgName) sliderBgName.innerText = "";
+    if (sliderDots) sliderDots.innerHTML = "";
     return;
   }
 
-  carGrid.innerHTML = cars.map(car => {
-    const isAddedToCompare = compareList.includes(car.id);
-    return `
-      <div class="car-card glass-panel" onclick="showCarDetails(${car.id})">
-        <div class="car-card-image">
-          <span class="car-badge">${car.type}</span>
-          <img src="${car.image_url}" alt="${car.name}" onerror="this.src='/uploads/default-car.jpg'">
+  // Đảm bảo chỉ số activeCarIndex hợp lệ
+  if (activeCarIndex >= cars.length) activeCarIndex = 0;
+  if (activeCarIndex < 0) activeCarIndex = cars.length - 1;
+
+  const car = cars[activeCarIndex];
+  
+  // Cập nhật tên nền chữ lớn phía sau
+  if (sliderBgName) {
+    let shortName = car.name.replace('VinFast ', '');
+    sliderBgName.innerText = shortName;
+  }
+
+  const isAddedToCompare = compareList.includes(car.id);
+  
+  // Điền dữ liệu xe đang chọn vào slider
+  sliderContentEl.innerHTML = `
+    <div class="slider-car-display">
+      <img src="${car.image_url}" alt="${car.name}" class="slider-car-image" id="slider-img" onerror="this.src='/uploads/default-car.jpg'">
+    </div>
+    
+    <div class="slider-car-details">
+      <h3 class="slider-car-title">${car.name}</h3>
+      
+      <div class="slider-spec-grid">
+        <div class="slider-spec-item">
+          <span class="slider-spec-val">${car.range_km > 0 ? car.range_km + ' km' : 'Xăng'}</span>
+          <span class="slider-spec-lbl">Quãng đường</span>
         </div>
-        <div class="car-card-body">
-          <h3 class="car-card-title">${car.name}</h3>
-          <p class="car-card-price">Giá từ: ${formatVND(car.price)}</p>
-          <div class="car-features-mini">
-            <div class="feature-mini-item">
-              <span class="feature-mini-val">${car.range_km} km</span>
-              <span class="feature-mini-lbl">Quãng đường</span>
-            </div>
-            <div class="feature-mini-item">
-              <span class="feature-mini-val">${car.power_hp} Hp</span>
-              <span class="feature-mini-lbl">Công suất</span>
-            </div>
-            <div class="feature-mini-item">
-              <span class="feature-mini-val">${car.seats} chỗ</span>
-              <span class="feature-mini-lbl">Số ghế</span>
-            </div>
-          </div>
-          <div class="car-card-actions">
-            <button class="btn btn-primary" onclick="event.stopPropagation(); showCarDetails(${car.id})">
-              Xem Chi Tiết
-            </button>
-            <button class="btn btn-outline-compare ${isAddedToCompare ? 'added' : ''}" 
-                    onclick="event.stopPropagation(); toggleCompare(${car.id})">
-              ${isAddedToCompare ? '<i class="fa-solid fa-check"></i> Đã thêm' : '<i class="fa-solid fa-plus"></i> So sánh'}
-            </button>
-          </div>
+        <div class="slider-spec-item">
+          <span class="slider-spec-val">${car.power_hp > 0 ? car.power_hp + ' Hp' : 'Đang cập nhật'}</span>
+          <span class="slider-spec-lbl">Công suất</span>
+        </div>
+        <div class="slider-spec-item">
+          <span class="slider-spec-val">${car.seats} chỗ</span>
+          <span class="slider-spec-lbl">Số ghế</span>
+        </div>
+        <div class="slider-spec-item">
+          <span class="slider-spec-val" style="color: #fff; font-size: 16px;">${formatVND(car.price)}</span>
+          <span class="slider-spec-lbl">Giá bán từ</span>
         </div>
       </div>
-    `;
-  }).join('');
+      
+      <div class="slider-actions">
+        <button class="btn btn-primary" onclick="showCarDetails(${car.id})">
+          <i class="fa-solid fa-circle-info"></i> Xem Chi Tiết
+        </button>
+        <button class="btn btn-outline" style="border-color: rgba(255,255,255,0.15); color: #fff;" onclick="toggleCompare(${car.id})">
+          ${isAddedToCompare ? '<i class="fa-solid fa-check"></i> Đã thêm' : '<i class="fa-solid fa-plus"></i> So sánh'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Tạo các chấm tròn chỉ số slide (pagination dots)
+  if (sliderDots) {
+    sliderDots.innerHTML = cars.map((_, idx) => `
+      <div class="slider-dot ${idx === activeCarIndex ? 'active' : ''}" onclick="goToCarSlide(${idx})"></div>
+    `).join('');
+  }
 }
+
+// Di chuyển slide
+function goToCarSlide(index) {
+  activeCarIndex = index;
+  renderCars();
+}
+window.goToCarSlide = goToCarSlide;
 
 // Xem chi tiết xe & Tính toán trả góp
 async function showCarDetails(id) {
@@ -1008,4 +1049,63 @@ document.addEventListener('click', (e) => {
     document.body.style.overflow = '';
     checkUserSession();
   }
+});
+
+// --- Logic Hero Carousel Tự Động & Thủ Công ---
+let heroCurrentSlide = 0;
+const heroSlides = document.querySelectorAll('.carousel-item');
+const heroIndicators = document.querySelectorAll('.carousel-indicator');
+const heroInner = document.getElementById('hero-carousel-inner');
+
+function showHeroSlide(index) {
+  if (!heroInner || heroSlides.length === 0) return;
+  if (index >= heroSlides.length) heroCurrentSlide = 0;
+  else if (index < 0) heroCurrentSlide = heroSlides.length - 1;
+  else heroCurrentSlide = index;
+  
+  heroInner.style.transform = `translateX(-${heroCurrentSlide * 100}%)`;
+  
+  heroIndicators.forEach((dot, idx) => {
+    if (idx === heroCurrentSlide) dot.classList.add('active');
+    else dot.classList.remove('active');
+  });
+}
+
+// Gắn sự kiện cho các nút điều khiển Hero
+const btnHeroPrev = document.getElementById('hero-prev');
+const btnHeroNext = document.getElementById('hero-next');
+if (btnHeroPrev) btnHeroPrev.addEventListener('click', () => showHeroSlide(heroCurrentSlide - 1));
+if (btnHeroNext) btnHeroNext.addEventListener('click', () => showHeroSlide(heroCurrentSlide + 1));
+
+heroIndicators.forEach((dot, idx) => {
+  dot.addEventListener('click', () => showHeroSlide(idx));
+});
+
+// Tự động chuyển slide sau mỗi 5 giây
+setInterval(() => {
+  showHeroSlide(heroCurrentSlide + 1);
+}, 5000);
+
+// --- Logic Nút Điều Hướng Car Slider ---
+const btnCarPrev = document.getElementById('car-slider-prev');
+const btnCarNext = document.getElementById('car-slider-next');
+if (btnCarPrev) {
+  btnCarPrev.addEventListener('click', () => {
+    activeCarIndex--;
+    renderCars();
+  });
+}
+if (btnCarNext) {
+  btnCarNext.addEventListener('click', () => {
+    activeCarIndex++;
+    renderCars();
+  });
+}
+
+// Reset index khi đổi tab lọc
+const filterBtns = document.querySelectorAll('#filter-container .filter-btn');
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeCarIndex = 0;
+  });
 });

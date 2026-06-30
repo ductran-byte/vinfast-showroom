@@ -31,7 +31,7 @@ app.use((err, req, res, next) => {
 });
 
 // Chạy server
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' || require.main === module) {
   app.listen(PORT, () => {
     console.log(`========================================`);
     console.log(`Server đang chạy tại: http://localhost:${PORT}`);

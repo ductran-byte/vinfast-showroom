@@ -843,6 +843,7 @@ filterContainer.addEventListener('click', (e) => {
 
 
 // --- Khởi tạo ---
+fetchBanners();
 fetchHotCars();
 fetchShowroomCars();
 renderStations();
@@ -1127,40 +1128,127 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// --- Logic Hero Carousel Tự Động & Thủ Công ---
+// --- Logic Hero Banners Động ---
+let banners = [];
 let heroCurrentSlide = 0;
-const heroSlides = document.querySelectorAll('.carousel-item');
-const heroIndicators = document.querySelectorAll('.carousel-indicator');
-const heroInner = document.getElementById('hero-carousel-inner');
+let heroInterval = null;
 
-function showHeroSlide(index) {
-  if (!heroInner || heroSlides.length === 0) return;
-  if (index >= heroSlides.length) heroCurrentSlide = 0;
-  else if (index < 0) heroCurrentSlide = heroSlides.length - 1;
-  else heroCurrentSlide = index;
-  
-  heroInner.style.transform = `translateX(-${heroCurrentSlide * 100}%)`;
-  
-  heroIndicators.forEach((dot, idx) => {
-    if (idx === heroCurrentSlide) dot.classList.add('active');
-    else dot.classList.remove('active');
-  });
+async function fetchBanners() {
+  try {
+    const response = await fetch('/api/banners');
+    if (!response.ok) throw new Error('Không thể tải danh sách banners.');
+    banners = await response.json();
+    renderBanners();
+  } catch (error) {
+    console.error('Lỗi khi tải banners:', error);
+    // Phục hồi banner mặc định khi gặp lỗi hệ thống
+    const heroInner = document.getElementById('hero-carousel-inner');
+    if (heroInner) {
+      heroInner.innerHTML = `
+        <div class="carousel-item active" style="background-image: url('/uploads/banner_summer.png');">
+          <div class="carousel-caption">
+            <h2>VINFASCINATION<br><span style="color: var(--accent-color); font-size: 32px;">ĐÓN HÈ RỰC RỠ</span></h2>
+            <p>Nhận ngay ưu đãi giá bán lên đến 3%* cùng cơ hội nhận Voucher nghỉ dưỡng Vinpearl thượng lưu khi đặt cọc các dòng ô tô điện thông minh ngay hôm nay.</p>
+            <div style="display: flex; gap: 12px;">
+              <a href="#showcase" class="btn btn-primary">Khám Phá Xe</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
 }
 
-// Gắn sự kiện cho các nút điều khiển Hero
-const btnHeroPrev = document.getElementById('hero-prev');
-const btnHeroNext = document.getElementById('hero-next');
-if (btnHeroPrev) btnHeroPrev.addEventListener('click', () => showHeroSlide(heroCurrentSlide - 1));
-if (btnHeroNext) btnHeroNext.addEventListener('click', () => showHeroSlide(heroCurrentSlide + 1));
+function renderBanners() {
+  const heroInner = document.getElementById('hero-carousel-inner');
+  const heroIndicators = document.getElementById('hero-indicators');
+  if (!heroInner) return;
 
-heroIndicators.forEach((dot, idx) => {
-  dot.addEventListener('click', () => showHeroSlide(idx));
-});
+  if (banners.length === 0) {
+    heroInner.innerHTML = `
+      <div class="carousel-item active" style="min-height: 500px; display: flex; align-items: center; justify-content: center; background: #0a0f1e;">
+        <div class="carousel-caption" style="text-align: center; position: static; max-width: 100%; transform: none; width: 100%;">
+          <p>Chưa có chương trình ưu đãi nào được đăng.</p>
+        </div>
+      </div>
+    `;
+    if (heroIndicators) heroIndicators.innerHTML = '';
+    return;
+  }
 
-// Tự động chuyển slide sau mỗi 5 giây
-setInterval(() => {
-  showHeroSlide(heroCurrentSlide + 1);
-}, 5000);
+  // Render slides
+  heroInner.innerHTML = banners.map((banner, idx) => `
+    <div class="carousel-item ${idx === 0 ? 'active' : ''}" style="background-image: url('${banner.image_url}');">
+      <div class="carousel-caption">
+        <h2>${banner.title}</h2>
+        <p>${banner.description || ''}</p>
+        <div style="display: flex; gap: 12px;">
+          <a href="${banner.link_url || '#showcase'}" class="btn btn-primary">Khám Phá Ngay</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Render indicators
+  if (heroIndicators) {
+    heroIndicators.innerHTML = banners.map((_, idx) => `
+      <div class="carousel-indicator ${idx === 0 ? 'active' : ''}" data-slide="${idx}"></div>
+    `).join('');
+  }
+
+  // Khởi tạo các sự kiện điều hướng sau khi render xong DOM
+  initHeroCarousel();
+}
+
+function initHeroCarousel() {
+  if (heroInterval) clearInterval(heroInterval);
+
+  const heroInner = document.getElementById('hero-carousel-inner');
+  const slides = heroInner ? heroInner.querySelectorAll('.carousel-item') : [];
+  const indicators = document.querySelectorAll('.carousel-indicator');
+  
+  if (slides.length <= 1) return;
+
+  heroCurrentSlide = 0;
+
+  function showHeroSlide(index) {
+    if (!heroInner || slides.length === 0) return;
+    if (index >= slides.length) heroCurrentSlide = 0;
+    else if (index < 0) heroCurrentSlide = slides.length - 1;
+    else heroCurrentSlide = index;
+    
+    heroInner.style.transform = `translateX(-${heroCurrentSlide * 100}%)`;
+    
+    indicators.forEach((dot, idx) => {
+      if (idx === heroCurrentSlide) dot.classList.add('active');
+      else dot.classList.remove('active');
+    });
+  }
+
+  const btnHeroPrev = document.getElementById('hero-prev');
+  const btnHeroNext = document.getElementById('hero-next');
+
+  if (btnHeroPrev) {
+    const newPrev = btnHeroPrev.cloneNode(true);
+    btnHeroPrev.parentNode.replaceChild(newPrev, btnHeroPrev);
+    newPrev.addEventListener('click', () => showHeroSlide(heroCurrentSlide - 1));
+  }
+  if (btnHeroNext) {
+    const newNext = btnHeroNext.cloneNode(true);
+    btnHeroNext.parentNode.replaceChild(newNext, btnHeroNext);
+    newNext.addEventListener('click', () => showHeroSlide(heroCurrentSlide + 1));
+  }
+
+  indicators.forEach((dot, idx) => {
+    const newDot = dot.cloneNode(true);
+    dot.parentNode.replaceChild(newDot, dot);
+    newDot.addEventListener('click', () => showHeroSlide(idx));
+  });
+
+  heroInterval = setInterval(() => {
+    showHeroSlide(heroCurrentSlide + 1);
+  }, 6000);
+}
 
 // --- Logic Nút Điều Hướng Car Slider ---
 const btnCarPrev = document.getElementById('car-slider-prev');

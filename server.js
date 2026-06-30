@@ -6,6 +6,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const carRoutes = require('./routes/carRoutes');
 const testDriveRoutes = require('./routes/testDriveRoutes');
+const bannerRoutes = require('./routes/bannerRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
 app.use('/api/test-drives', testDriveRoutes);
+app.use('/api/banners', bannerRoutes);
 
 // Xử lý lỗi toàn cục (ví dụ lỗi Multer upload)
 app.use((err, req, res, next) => {

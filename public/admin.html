@@ -67,6 +67,9 @@
       <button class="btn tab-btn" id="tab-drives-btn" onclick="switchTab('drives')">
         <i class="fa-solid fa-calendar-check"></i> Lịch Hẹn Lái Thử
       </button>
+      <button class="btn tab-btn" id="tab-banners-btn" onclick="switchTab('banners')">
+        <i class="fa-solid fa-images"></i> Quản Lý Banner
+      </button>
     </div>
 
     <!-- Tab 1: Danh sách xe -->
@@ -127,6 +130,37 @@
               </tr>
             </thead>
             <tbody id="admin-drive-list">
+              <!-- Load động từ JS -->
+            </tbody>
+          </table>
+        </div>
+    </div>
+    </div>
+
+    <!-- Tab 3: Quản lý Banners -->
+    <div id="tab-banners-content" style="display: none;">
+      <div class="admin-header">
+        <div>
+          <h1 style="font-size: 32px; font-weight: 800;">Quản Lý Banners Quảng Cáo</h1>
+          <p style="color: var(--text-secondary); margin-top: 6px;">Quản lý nội dung tiêu đề, mô tả và hình ảnh hiển thị trên thanh trượt Hero đầu trang chủ.</p>
+        </div>
+        <button class="btn btn-primary" id="btn-add-banner">
+          <i class="fa-solid fa-plus"></i> Thêm Banner Mới
+        </button>
+      </div>
+
+      <div class="glass-panel" style="padding: 24px;">
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Hình ảnh</th>
+                <th>Thông tin Banner</th>
+                <th>Đường dẫn liên kết</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="admin-banner-list">
               <!-- Load động từ JS -->
             </tbody>
           </table>
@@ -260,6 +294,58 @@
           <!-- Nút hành động -->
           <div style="display: flex; justify-content: flex-end; gap: 12px;">
             <button type="button" class="btn" id="btn-cancel-form">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu Lại</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Add/Edit Banner Modal -->
+  <div class="modal-overlay" id="banner-form-modal">
+    <div class="modal-content glass-panel" style="max-width: 600px;">
+      <button class="modal-close-btn" id="banner-form-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 32px;">
+        <h2 id="banner-modal-form-title" class="spec-title" style="margin-bottom: 24px; font-size: 24px;">Thêm Banner Mới</h2>
+        
+        <form id="banner-form" enctype="multipart/form-data">
+          <input type="hidden" id="banner-id">
+          
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="banner-title">Tiêu đề (Title) *</label>
+            <input type="text" id="banner-title" class="form-input" placeholder="VD: TƯƠNG LAI XANH KIẾN TẠO PHONG CÁCH" required>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="banner-subtitle">Phụ đề (Subtitle) *</label>
+            <input type="text" id="banner-subtitle" class="form-input" placeholder="VD: HỆ SINH THÁI XE ĐIỆN" required>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="banner-description">Mô tả chi tiết</label>
+            <textarea id="banner-description" class="form-input" style="height: 80px; resize: vertical;" placeholder="Nhập nội dung quảng cáo đi kèm..."></textarea>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px;">
+            <div class="form-group">
+              <label class="form-label" for="banner-image">Hình ảnh *</label>
+              <input type="file" id="banner-image" class="form-input" accept="image/*">
+              <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Khuyên dùng ảnh quảng cáo rộng (VD: 1920x800)</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="banner-link">Đường dẫn liên kết (Link)</label>
+              <input type="text" id="banner-link" class="form-input" placeholder="VD: #showroom hoặc #test-drive">
+            </div>
+          </div>
+          
+          <div id="banner-image-preview-box" style="display: none; margin-bottom: 20px; text-align: center;">
+            <label class="form-label" style="text-align: left; display: block;">Ảnh hiện tại:</label>
+            <img id="banner-image-preview" src="" alt="Preview" style="max-width: 100%; max-height: 150px; border-radius: 4px; border: 1px solid var(--panel-border);">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <button type="button" class="btn" id="btn-cancel-banner-form">Hủy</button>
             <button type="submit" class="btn btn-primary">Lưu Lại</button>
           </div>
         </form>

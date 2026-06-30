@@ -78,6 +78,7 @@ function checkAuth() {
     adminWelcome.innerText = `Chào, ${adminUser || 'Admin'}`;
     loadAdminCars();
     loadAdminTestDrives();
+    loadAdminBanners();
   } else {
     loginSection.style.display = 'block';
     dashboardSection.style.display = 'none';
@@ -164,20 +165,31 @@ document.addEventListener('click', (e) => {
 function switchTab(tabName) {
   const carsBtn = document.getElementById('tab-cars-btn');
   const drivesBtn = document.getElementById('tab-drives-btn');
+  const bannersBtn = document.getElementById('tab-banners-btn');
+  
   const carsContent = document.getElementById('tab-cars-content');
   const drivesContent = document.getElementById('tab-drives-content');
+  const bannersContent = document.getElementById('tab-banners-content');
+
+  carsContent.style.display = 'none';
+  drivesContent.style.display = 'none';
+  if (bannersContent) bannersContent.style.display = 'none';
+
+  carsBtn.classList.remove('btn-primary');
+  drivesBtn.classList.remove('btn-primary');
+  if (bannersBtn) bannersBtn.classList.remove('btn-primary');
 
   if (tabName === 'cars') {
     carsContent.style.display = 'block';
-    drivesContent.style.display = 'none';
     carsBtn.classList.add('btn-primary');
-    drivesBtn.classList.remove('btn-primary');
-  } else {
-    carsContent.style.display = 'none';
+  } else if (tabName === 'drives') {
     drivesContent.style.display = 'block';
-    carsBtn.classList.remove('btn-primary');
     drivesBtn.classList.add('btn-primary');
-    loadAdminTestDrives(); // Reload lịch hẹn lái thử khi click tab
+    loadAdminTestDrives();
+  } else if (tabName === 'banners') {
+    if (bannersContent) bannersContent.style.display = 'block';
+    if (bannersBtn) bannersBtn.classList.add('btn-primary');
+    loadAdminBanners();
   }
 }
 window.switchTab = switchTab; // Gán global để sử dụng trong onclick html
@@ -544,6 +556,191 @@ async function deleteDrive(id) {
 }
 window.deleteDrive = deleteDrive;
 
+
+// --- Tab 3: Quản Lý Banners Quảng Cáo (CRUD) ---
+const adminBannerList = document.getElementById('admin-banner-list');
+const btnAddBanner = document.getElementById('btn-add-banner');
+const bannerFormModal = document.getElementById('banner-form-modal');
+const bannerFormModalClose = document.getElementById('banner-form-modal-close');
+const btnCancelBannerForm = document.getElementById('btn-cancel-banner-form');
+const bannerForm = document.getElementById('banner-form');
+const bannerImageInput = document.getElementById('banner-image');
+const bannerImagePreviewBox = document.getElementById('banner-image-preview-box');
+const bannerImagePreview = document.getElementById('banner-image-preview');
+const bannerModalFormTitle = document.getElementById('banner-modal-form-title');
+
+let isEditingBanner = false;
+
+async function loadAdminBanners() {
+  if (!adminBannerList) return;
+  try {
+    const response = await fetch('/api/banners');
+    if (!response.ok) throw new Error('Không thể tải danh sách banner.');
+    const banners = await response.json();
+
+    if (banners.length === 0) {
+      adminBannerList.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px;">
+            Chưa có banner nào. Vui lòng nhấn "Thêm Banner Mới".
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    adminBannerList.innerHTML = banners.map(banner => `
+      <tr>
+        <td>
+          <img src="${banner.image_url}" class="car-thumb" style="width: 140px; height: 60px; object-fit: cover;" alt="${banner.title}">
+        </td>
+        <td>
+          <div style="font-weight: 700; color: var(--text-primary); font-size: 15px;">${banner.title}</div>
+          <div style="font-size: 12px; color: var(--accent-color); font-weight: 600; margin-top: 4px;">${banner.subtitle}</div>
+          <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${banner.description || 'Không có mô tả'}</div>
+        </td>
+        <td>
+          <code style="background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px; font-size: 12px;">${banner.link_url}</code>
+        </td>
+        <td>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="openEditBannerModal(${JSON.stringify(banner).replace(/"/g, '&quot;')})">
+              <i class="fa-solid fa-pen-to-square"></i> Sửa
+            </button>
+            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteBanner(${banner.id})">
+              <i class="fa-solid fa-trash-can"></i> Xóa
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (error) {
+    console.error('Lỗi khi tải banner:', error);
+  }
+}
+
+// Mở Modal Thêm Banner
+if (btnAddBanner) {
+  btnAddBanner.addEventListener('click', () => {
+    isEditingBanner = false;
+    if (bannerModalFormTitle) bannerModalFormTitle.innerText = 'Thêm Banner Mới';
+    if (bannerForm) bannerForm.reset();
+    document.getElementById('banner-id').value = '';
+    if (bannerImagePreviewBox) bannerImagePreviewBox.style.display = 'none';
+    if (bannerImageInput) bannerImageInput.required = true;
+    if (bannerFormModal) bannerFormModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  });
+}
+
+// Đóng Modal Banner
+function closeBannerModal() {
+  if (bannerFormModal) bannerFormModal.classList.remove('active');
+  document.body.style.overflow = '';
+  if (bannerForm) bannerForm.reset();
+}
+if (bannerFormModalClose) bannerFormModalClose.addEventListener('click', closeBannerModal);
+if (btnCancelBannerForm) btnCancelBannerForm.addEventListener('click', closeBannerModal);
+
+// Click ngoài đóng modal
+window.addEventListener('click', (e) => {
+  if (e.target === bannerFormModal) closeBannerModal();
+});
+
+// Hàm sửa banner
+window.openEditBannerModal = function(banner) {
+  isEditingBanner = true;
+  if (bannerModalFormTitle) bannerModalFormTitle.innerText = 'Chỉnh Sửa Banner';
+  document.getElementById('banner-id').value = banner.id;
+  document.getElementById('banner-title').value = banner.title;
+  document.getElementById('banner-subtitle').value = banner.subtitle;
+  document.getElementById('banner-description').value = banner.description || '';
+  document.getElementById('banner-link').value = banner.link_url || '#';
+  
+  if (bannerImagePreview) bannerImagePreview.src = banner.image_url;
+  if (bannerImagePreviewBox) bannerImagePreviewBox.style.display = 'block';
+  if (bannerImageInput) bannerImageInput.required = false;
+  
+  if (bannerFormModal) bannerFormModal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+};
+
+// Lưu / Cập nhật Banner
+if (bannerForm) {
+  bannerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById('banner-id').value;
+    const formData = new FormData();
+    formData.append('title', document.getElementById('banner-title').value.trim());
+    formData.append('subtitle', document.getElementById('banner-subtitle').value.trim());
+    formData.append('description', document.getElementById('banner-description').value.trim());
+    formData.append('link_url', document.getElementById('banner-link').value.trim());
+
+    if (bannerImageInput.files[0]) {
+      formData.append('image', bannerImageInput.files[0]);
+    }
+
+    try {
+      let url = '/api/banners';
+      let method = 'POST';
+
+      if (isEditingBanner) {
+        url = `/api/banners/${id}`;
+        method = 'PUT';
+      }
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        handleAuthError();
+        return;
+      }
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Lỗi khi lưu banner.');
+
+      alert(isEditingBanner ? 'Cập nhật banner thành công!' : 'Thêm banner mới thành công!');
+      closeBannerModal();
+      loadAdminBanners();
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
+
+// Xóa Banner
+window.deleteBanner = async function(id) {
+  if (confirm('Bạn có chắc chắn muốn xóa banner này?')) {
+    try {
+      const response = await fetch(`/api/banners/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        handleAuthError();
+        return;
+      }
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Lỗi khi xóa banner.');
+
+      alert('Đã xóa banner thành công!');
+      loadAdminBanners();
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+};
 
 // Khởi tạo chạy ban đầu
 checkAuth();

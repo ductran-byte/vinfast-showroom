@@ -34,6 +34,7 @@ async function initDB() {
     await connection.query('SET FOREIGN_KEY_CHECKS = 0;');
     await connection.query('DROP TABLE IF EXISTS test_drives;');
     await connection.query('DROP TABLE IF EXISTS cars;');
+    await connection.query('DROP TABLE IF EXISTS banners;');
     await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
 
     // Create admins table
@@ -101,6 +102,20 @@ async function initDB() {
       ) ENGINE=InnoDB;
     `);
 
+    // Create banners table
+    console.log('Creating "banners" table...');
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS banners (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        subtitle VARCHAR(255) NOT NULL,
+        description TEXT,
+        image_url VARCHAR(255) NOT NULL,
+        link_url VARCHAR(255) DEFAULT '#',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB;
+    `);
+
     // Check if admin exists, if not insert default admin
     const [admins] = await connection.query('SELECT * FROM admins WHERE username = ?', ['admin']);
     if (admins.length === 0) {
@@ -111,6 +126,33 @@ async function initDB() {
     } else {
       console.log('Admin account already exists.');
     }
+
+    // Refresh sample banners
+    console.log('Inserting default banners...');
+    const defaultBanners = [
+      {
+        title: 'VINFASCINATION ĐÓN HÈ RỰC RỠ',
+        subtitle: 'CHƯƠNG TRÌNH ƯU ĐÃI HÈ',
+        description: 'Nhận ngay ưu đãi giá bán lên đến 3%* cùng cơ hội nhận Voucher nghỉ dưỡng Vinpearl thượng lưu khi đặt cọc các dòng ô tô điện thông minh ngay hôm nay.',
+        image_url: '/uploads/banner_summer.png',
+        link_url: '#showroom'
+      },
+      {
+        title: 'TƯƠNG LAI XANH KIẾN TẠO PHONG CÁCH',
+        subtitle: 'HỆ SINH THÁI XE ĐIỆN',
+        description: 'Hệ sinh thái di chuyển xanh bền vững của VinFast mang tính đột phá về công nghệ, kết nối và trải nghiệm lái tự hành thông minh cấp độ cao.',
+        image_url: '/uploads/banner_eco.png',
+        link_url: '#showroom'
+      }
+    ];
+
+    for (const banner of defaultBanners) {
+      await connection.query(
+        `INSERT INTO banners (title, subtitle, description, image_url, link_url) VALUES (?, ?, ?, ?, ?)`,
+        [banner.title, banner.subtitle, banner.description, banner.image_url, banner.link_url]
+      );
+    }
+    console.log('Default banners inserted.');
 
     // Refresh sample cars
     console.log('Refreshing sample cars...');

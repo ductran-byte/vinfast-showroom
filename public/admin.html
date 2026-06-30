@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống Quản Trị Xe VinFast - Admin Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="scrolled">
+    <div class="container nav-container">
+      <a href="/" class="logo-wrapper">
+        <span class="logo-text">VinFast</span>
+        <span class="logo-badge">Admin</span>
+      </a>
+      <nav id="nav-menu">
+        <ul>
+          <li><a href="/">Trang Chủ Showroom</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions" id="admin-header-actions" style="display: none;">
+        <span id="admin-welcome" style="color: var(--accent-color); font-weight: 500; font-size: 15px;">Chào Admin</span>
+        <button class="btn btn-danger" id="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng Xuất</button>
+      </div>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle Menu" style="margin-left: 10px;">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Login Card (Hiển thị khi chưa đăng nhập) -->
+  <section class="container" id="login-section">
+    <div class="auth-card glass-panel">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <i class="fa-solid fa-user-shield" style="font-size: 48px; color: var(--accent-color); margin-bottom: 12px; filter: drop-shadow(var(--accent-glow));"></i>
+        <h2 style="font-weight: 700; font-size: 24px;">Đăng Nhập Admin</h2>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-top: 6px;">Hệ thống quản lý nội dung xe VinFast</p>
+      </div>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="username">Tài khoản</label>
+          <input type="text" id="username" class="form-input" placeholder="Nhập tài khoản..." required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Mật khẩu</label>
+          <input type="password" id="password" class="form-input" placeholder="Nhập mật khẩu..." required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">Đăng Nhập</button>
+      </form>
+      <div style="text-align: center; margin-top: 20px; font-size: 13px; color: var(--text-muted);">
+        Tài khoản mặc định: <code style="color: var(--accent-color);">admin</code> / <code style="color: var(--accent-color);">admin123</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard Section (Hiển thị sau khi đăng nhập thành công) -->
+  <section class="container admin-section" id="dashboard-section" style="display: none;">
+    <!-- Tabs điều hướng -->
+    <div style="display: flex; gap: 12px; margin-bottom: 30px; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px;">
+      <button class="btn btn-primary tab-btn" id="tab-cars-btn" onclick="switchTab('cars')">
+        <i class="fa-solid fa-car"></i> Quản Lý Xe
+      </button>
+      <button class="btn tab-btn" id="tab-drives-btn" onclick="switchTab('drives')">
+        <i class="fa-solid fa-calendar-check"></i> Lịch Hẹn Lái Thử
+      </button>
+    </div>
+
+    <!-- Tab 1: Danh sách xe -->
+    <div id="tab-cars-content">
+      <div class="admin-header">
+        <div>
+          <h1 style="font-size: 32px; font-weight: 800;">Quản Lý Danh Sách Xe</h1>
+          <p style="color: var(--text-secondary); margin-top: 6px;">Thêm mới bài viết giới thiệu, cập nhật thông số và hình ảnh cho các loại xe.</p>
+        </div>
+        <button class="btn btn-primary" id="btn-add-car">
+          <i class="fa-solid fa-plus"></i> Đăng Xe Mới
+        </button>
+      </div>
+
+      <div class="glass-panel" style="padding: 24px;">
+        <div class="data-table-wrapper">
+          <table class="data-table" id="admin-car-table">
+            <thead>
+              <tr>
+                <th>Hình ảnh</th>
+                <th>Tên xe</th>
+                <th>Loại xe</th>
+                <th>Phân khúc</th>
+                <th>Giá niêm yết</th>
+                <th>Thông số nhanh</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="admin-car-list">
+              <!-- Load động từ JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Lịch hẹn lái thử -->
+    <div id="tab-drives-content" style="display: none;">
+      <div class="admin-header">
+        <div>
+          <h1 style="font-size: 32px; font-weight: 800;">Danh Sách Đăng Ký Lái Thử</h1>
+          <p style="color: var(--text-secondary); margin-top: 6px;">Theo dõi thông tin liên hệ và lịch trình trải nghiệm xe của khách hàng.</p>
+        </div>
+      </div>
+
+      <div class="glass-panel" style="padding: 24px;">
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Khách hàng</th>
+                <th>Liên hệ</th>
+                <th>Xe đăng ký</th>
+                <th>Showroom tiếp đón</th>
+                <th>Ngày lái thử</th>
+                <th>Trạng thái lịch</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="admin-drive-list">
+              <!-- Load động từ JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Form Add/Edit Car Modal -->
+  <div class="modal-overlay" id="car-form-modal">
+    <div class="modal-content glass-panel" style="max-width: 800px;">
+      <button class="modal-close-btn" id="form-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 32px;">
+        <h2 id="modal-form-title" class="spec-title" style="margin-bottom: 24px; font-size: 24px;">Thêm Xe Ô Tô Mới</h2>
+        
+        <form id="car-form" enctype="multipart/form-data">
+          <input type="hidden" id="car-id">
+          
+          <!-- Thông tin cơ bản -->
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="car-name">Tên xe *</label>
+              <input type="text" id="car-name" class="form-input" placeholder="VD: VinFast VF 7 Plus" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="car-type">Loại xe *</label>
+              <input type="text" id="car-type" class="form-input" placeholder="VD: C-SUV hoặc Sedan, Mini" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="car-segment">Phân khúc *</label>
+              <select id="car-segment" class="form-input" required>
+                <option value="Mini">Mini SUV</option>
+                <option value="A">Phân khúc A</option>
+                <option value="B">Phân khúc B</option>
+                <option value="C">Phân khúc C</option>
+                <option value="D">Phân khúc D</option>
+                <option value="E">Phân khúc E</option>
+                <option value="Khác">Khác</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="car-price">Giá niêm yết (VNĐ) *</label>
+              <input type="number" id="car-price" class="form-input" placeholder="VD: 850000000" required>
+            </div>
+          </div>
+
+          <!-- Thông số kỹ thuật nhanh -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="car-range">Quãng đường (km)</label>
+              <input type="number" id="car-range" class="form-input" placeholder="VD: 431">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="car-power">Mã lực (hp)</label>
+              <input type="number" id="car-power" class="form-input" placeholder="VD: 349">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="car-torque">Mô-men xoắn (Nm)</label>
+              <input type="number" id="car-torque" class="form-input" placeholder="VD: 500">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="car-battery">Pin (kWh)</label>
+              <input type="number" step="0.1" id="car-battery" class="form-input" placeholder="VD: 75.3">
+            </div>
+          </div>
+
+          <!-- Số chỗ ngồi & Hình ảnh -->
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="car-seats">Số chỗ ngồi</label>
+              <input type="number" id="car-seats" class="form-input" value="5" placeholder="VD: 5">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="car-image">Hình ảnh xe</label>
+              <input type="file" id="car-image" class="form-input" accept="image/*">
+            </div>
+          </div>
+
+          <!-- Preview ảnh -->
+          <div class="form-group">
+            <span class="form-label">Xem trước ảnh xe</span>
+            <div class="image-preview" id="image-preview-container">
+              <span>Chưa có ảnh nào được chọn</span>
+            </div>
+          </div>
+
+          <!-- Bài viết mô tả -->
+          <div class="form-group">
+            <label class="form-label" for="car-desc">Mô tả giới thiệu bài viết</label>
+            <textarea id="car-desc" class="form-input" placeholder="Nhập bài viết mô tả, ưu điểm nổi bật của xe..."></textarea>
+          </div>
+
+          <!-- Thông số kỹ thuật chi tiết dạng JSON -->
+          <h3 class="spec-title" style="font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Thông số kỹ thuật mở rộng</h3>
+          <div class="specs-form-grid" style="margin-bottom: 24px;">
+            <div class="form-group">
+              <label class="form-label" for="spec-in-dimensions">Kích thước dài x rộng x cao</label>
+              <input type="text" id="spec-in-dimensions" class="form-input" placeholder="VD: 4545 x 1890 x 1635 mm">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="spec-in-wheelbase">Chiều dài cơ sở</label>
+              <input type="text" id="spec-in-wheelbase" class="form-input" placeholder="VD: 2840 mm">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="spec-in-clearance">Khoảng sáng gầm xe</label>
+              <input type="text" id="spec-in-clearance" class="form-input" placeholder="VD: 190 mm">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="spec-in-drive">Hệ truyền động</label>
+              <input type="text" id="spec-in-drive" class="form-input" placeholder="VD: Hai cầu toàn thời gian (AWD)">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="spec-in-charging">Thời gian sạc</label>
+              <input type="text" id="spec-in-charging" class="form-input" placeholder="VD: 24 phút (10% lên 70%)">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="spec-in-safety">Các tính năng an toàn</label>
+              <input type="text" id="spec-in-safety" class="form-input" placeholder="VD: Hệ thống ADAS nâng cao, 8 túi khí...">
+            </div>
+          </div>
+
+          <!-- Nút hành động -->
+          <div style="display: flex; justify-content: flex-end; gap: 12px;">
+            <button type="button" class="btn" id="btn-cancel-form">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu Lại</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Xác Nhận Đăng Xuất Custom -->
+  <div class="modal-overlay" id="logout-confirm-modal">
+    <div class="modal-content glass-panel" style="max-width: 380px;">
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 28px; text-align: center;">
+        <i class="fa-solid fa-circle-question" style="font-size: 42px; color: var(--accent-color); margin-bottom: 16px;"></i>
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Xác Nhận Đăng Xuất</h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;">Bạn có chắc chắn muốn đăng xuất tài khoản Quản Trị?</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button class="btn" id="btn-logout-cancel" style="flex: 1; padding: 10px;">Hủy</button>
+          <button class="btn btn-danger" id="btn-logout-confirm" style="flex: 1; padding: 10px;">Đăng Xuất</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="margin-top: 120px;">
+    <div class="container">
+      <p>&copy; 2026 VinFast Showroom Project. Trang dành riêng cho người quản trị website.</p>
+    </div>
+  </footer>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Khám phá các dòng xe ô tô điện VinFast hiện đại, thông minh và thân thiện với môi trường. Đầy đủ thông tin chi tiết, so sánh xe, tính trả góp tài chính và đăng ký lái thử trực tuyến.">
+  <title>VinFast Showroom - Thế Giới Xe Điện Thông Minh</title>
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header id="header">
+    <div class="container nav-container">
+      <a href="/" class="logo-wrapper">
+        <span class="logo-text">VinFast</span>
+        <span class="logo-badge">EV</span>
+      </a>
+      <nav id="nav-menu">
+        <ul>
+          <li><a href="#" class="active" id="nav-home">Trang Chủ</a></li>
+          <li><a href="#showcase" id="nav-showroom">Showroom</a></li>
+          <li><a href="#test-drive" id="nav-drive">Đăng Ký Lái Thử</a></li>
+          <li><a href="#stations" id="nav-stations">Trạm Sạc</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <!-- Chưa đăng nhập -->
+        <button class="btn btn-primary" id="btn-login-trigger">
+          <i class="fa-solid fa-right-to-bracket"></i> Đăng Nhập
+        </button>
+        <!-- Đã đăng nhập -->
+        <div id="user-header-profile" style="display: none; align-items: center; gap: 12px; margin-right: 8px;">
+          <span id="user-welcome" style="color: var(--text-primary); font-weight: 500; font-size: 14px;">Chào bạn</span>
+          <button class="btn btn-danger" id="btn-user-logout" style="padding: 6px 12px; font-size: 12px;">
+            Đăng Xuất
+          </button>
+        </div>
+        
+        <a href="/admin.html" class="btn" id="btn-admin-portal" style="display: none;">
+          <i class="fa-solid fa-user-gear"></i> Quản Trị
+        </a>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle Menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <span class="hero-subtitle">Kiến Tạo Tương Lai Xanh</span>
+      <h1 class="hero-title">Đột Phá Công Nghệ cùng <span>VinFast EV</span></h1>
+      <p class="hero-desc">
+        Khám phá hệ sinh thái xe ô tô điện thông minh hàng đầu Việt Nam. Tinh hoa thiết kế Ý kết hợp công nghệ lái tự động vượt trội, nâng tầm hành trình di chuyển mỗi ngày của bạn.
+      </p>
+      <div class="hero-actions">
+        <a href="#showcase" class="btn btn-primary">Khám Phá Ngay</a>
+        <a href="#test-drive" class="btn">Lịch Lái Thử <i class="fa-solid fa-calendar-days"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Showcase Section -->
+  <section id="showcase" class="showcase container">
+    <!-- Filter and Search Bar -->
+    <div class="control-bar glass-panel">
+      <div class="filter-group" id="filter-container">
+        <button class="filter-btn active" data-filter="Tất cả">Tất cả</button>
+        <button class="filter-btn" data-filter="Mini">Mini SUV (VF 3)</button>
+        <button class="filter-btn" data-filter="A">Cỡ A (VF 5)</button>
+        <button class="filter-btn" data-filter="B">Cỡ B (VF 6)</button>
+        <button class="filter-btn" data-filter="C">Cỡ C (VF 7)</button>
+        <button class="filter-btn" data-filter="D">Cỡ D (VF 8)</button>
+        <button class="filter-btn" data-filter="E">Cỡ E (VF 9)</button>
+      </div>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm dòng xe (VD: VF 3, VF 7)...">
+      </div>
+    </div>
+
+    <!-- Cars Grid -->
+    <div class="car-grid" id="car-grid">
+      <!-- Xe sẽ được tải động tại đây bằng JS -->
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 32px; color: var(--accent-color); margin-bottom: 12px;"></i>
+        <p>Đang tải dữ liệu xe...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Detail Car Modal -->
+  <div class="modal-overlay" id="car-modal">
+    <div class="modal-content glass-panel">
+      <button class="modal-close-btn" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      
+      <!-- Hình ảnh đầu Modal -->
+      <div class="modal-header-img">
+        <img id="modal-img" src="" alt="VinFast Car">
+      </div>
+      
+      <!-- Chi tiết nội dung -->
+      <div class="modal-body">
+        <div class="modal-title-row" style="margin-bottom: 12px; align-items: center;">
+          <div>
+            <h2 id="modal-name" class="modal-car-title">VinFast VF X</h2>
+            <span id="modal-badge" class="car-badge" style="position: static; margin-top: 8px; display: inline-block;">SUV</span>
+          </div>
+          <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+            <div class="modal-car-price" id="modal-price" style="margin-bottom: 0;">--- VNĐ</div>
+            <button class="btn btn-primary" onclick="bookTestDriveFromModal()" style="padding: 8px 18px; font-size: 13px; border-radius: 20px;">
+              <i class="fa-solid fa-calendar-check"></i> Đăng Ký Lái Thử
+            </button>
+          </div>
+        </div>
+
+        <!-- Trình đổi màu ngoại thất xe (Visualizer) -->
+        <div class="color-visualizer-section" style="margin-bottom: 24px; padding: 12px 0;">
+          <span class="form-label" style="margin-bottom: 10px; display: block; font-size: 13px;">Màu ngoại thất: <span id="selected-color-name" style="color: var(--accent-color); font-weight: 700;">Mặc định</span></span>
+          <div class="color-dots" id="modal-color-dots" style="display: flex; gap: 12px; align-items: center;">
+            <!-- Load động từ JS -->
+          </div>
+        </div>
+
+        <p id="modal-desc" class="modal-car-desc">
+          Mô tả chi tiết xe.
+        </p>
+
+        <!-- Thông số cơ bản (Grid) -->
+        <h3 class="spec-title">Thông Số Kỹ Thuật Chi Tiết</h3>
+        <div class="spec-grid" style="margin-bottom: 40px;">
+          <div class="spec-item">
+            <span class="spec-lbl">Quãng đường (sạc đầy)</span>
+            <span class="spec-val" id="spec-range">--- km</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Công suất tối đa</span>
+            <span class="spec-val" id="spec-power">--- hp</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Mô-men xoắn cực đại</span>
+            <span class="spec-val" id="spec-torque">--- Nm</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Dung lượng Pin</span>
+            <span class="spec-val" id="spec-battery">--- kWh</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Số chỗ ngồi</span>
+            <span class="spec-val" id="spec-seats">--- chỗ</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Kích thước (DxRxC)</span>
+            <span class="spec-val" id="spec-dims">---</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Chiều dài cơ sở</span>
+            <span class="spec-val" id="spec-wheelbase">---</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Khoảng sáng gầm xe</span>
+            <span class="spec-val" id="spec-clearance">---</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Hệ truyền động</span>
+            <span class="spec-val" id="spec-drive">---</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-lbl">Thời gian sạc nhanh (10-70%)</span>
+            <span class="spec-val" id="spec-charging">---</span>
+          </div>
+          <div class="spec-item" style="grid-column: span 2;">
+            <span class="spec-lbl" style="display: block; margin-bottom: 6px;">Tính năng an toàn nổi bật</span>
+            <span class="spec-val" id="spec-safety" style="font-weight: 400; text-align: left; display: block; line-height: 1.4;">---</span>
+          </div>
+        </div>
+
+        <!-- Dự toán Chi Phí & Trả Góp Tài Chính -->
+        <h3 class="spec-title">Dự Toán Chi Phí & Trả Góp</h3>
+        <div class="finance-grid" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-top: 16px;">
+          <!-- Cột nhập liệu -->
+          <div class="glass-panel" style="padding: 20px; background: rgba(0, 0, 0, 0.02);">
+            <div class="form-group">
+              <label class="form-label" style="font-size: 11px;">Phương án Pin</label>
+              <select id="finance-battery-option" class="form-input">
+                <option value="rent">Thuê Pin (Giá mua xe rẻ hơn)</option>
+                <option value="buy">Mua Đứt Pin (Trọn gói kèm xe)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-top: 16px;">
+              <label class="form-label" style="font-size: 11px; display: flex; justify-content: space-between;">
+                <span>Tỷ lệ trả trước</span>
+                <span id="lbl-prepay-percent" style="color: var(--accent-color); font-weight: 700;">20%</span>
+              </label>
+              <input type="range" id="finance-prepay" min="10" max="80" step="5" value="20" class="form-slider" style="width: 100%; accent-color: var(--accent-color);">
+            </div>
+            <div class="form-group" style="margin-top: 16px;">
+              <label class="form-label" style="font-size: 11px; display: flex; justify-content: space-between;">
+                <span>Thời gian trả góp</span>
+                <span id="lbl-loan-months" style="color: var(--accent-color); font-weight: 700;">60 tháng (5 năm)</span>
+              </label>
+              <input type="range" id="finance-months" min="12" max="96" step="12" value="60" class="form-slider" style="width: 100%; accent-color: var(--accent-color);">
+            </div>
+            <div class="form-group" style="margin-top: 16px;">
+              <label class="form-label" style="font-size: 11px; display: flex; justify-content: space-between;">
+                <span>Lãi suất ngân hàng (% / năm)</span>
+                <span id="lbl-interest-rate" style="color: var(--accent-color); font-weight: 700;">7.5%</span>
+              </label>
+              <input type="range" id="finance-interest" min="4" max="12" step="0.5" value="7.5" class="form-slider" style="width: 100%; accent-color: var(--accent-color);">
+            </div>
+          </div>
+          <!-- Cột kết quả -->
+          <div class="glass-panel" style="padding: 20px; background: rgba(15, 83, 197, 0.02); border-color: rgba(15, 83, 197, 0.15); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                <span style="color: var(--text-secondary);">Giá lăn bánh ước tính:</span>
+                <span style="color: var(--accent-color); font-weight: 700;" id="calc-rolling-price">---</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                <span style="color: var(--text-secondary);">Số tiền trả trước (20%):</span>
+                <span style="color: var(--text-primary); font-weight: 600;" id="calc-prepay-amount">---</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                <span style="color: var(--text-secondary);">Số tiền vay ngân hàng:</span>
+                <span style="color: var(--text-primary); font-weight: 600;" id="calc-loan-amount">---</span>
+              </div>
+            </div>
+            <div style="border-top: 1px solid var(--panel-border); padding-top: 16px; margin-top: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-weight: 700; color: var(--text-primary); font-size: 14px;">Gốc + Lãi tháng đầu tiên:</span>
+              </div>
+              <span id="calc-monthly-payment" style="font-size: 24px; font-weight: 800; color: var(--accent-color); text-shadow: var(--accent-glow); display: block;">---</span>
+              <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 12px; line-height: 1.4;">
+                * Lệ phí trước bạ xe điện hiện là 0%. Giá lăn bánh bao gồm giá xe, phí đăng ký biển số thành phố, phí đăng kiểm và phí bảo trì đường bộ 1 năm.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Khách hàng Đăng Nhập / Đăng Ký Modal -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-content glass-panel" style="max-width: 450px;">
+      <button class="modal-close-btn" id="auth-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg);">
+        
+        <!-- Tab Headers -->
+        <div class="auth-tabs" style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px;">
+          <button class="btn btn-primary tab-btn" id="tab-login-btn" onclick="switchAuthTab('login')" style="flex: 1; padding: 10px;">Đăng Nhập</button>
+          <button class="btn tab-btn" id="tab-register-btn" onclick="switchAuthTab('register')" style="flex: 1; padding: 10px;">Đăng Ký</button>
+        </div>
+
+        <!-- Hộp thông báo trạng thái -->
+        <div id="auth-status-msg" style="display: none; margin-bottom: 20px; padding: 10px 14px; border-radius: 8px; font-size: 13.5px; text-align: center; font-weight: 500;"></div>
+
+        <!-- Form Đăng Nhập -->
+        <div id="auth-login-content">
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center;">Đăng Nhập Tài Khoản</h3>
+          <form id="user-login-form">
+            <div class="form-group">
+              <label class="form-label" for="ul-username">Tài khoản</label>
+              <input type="text" id="ul-username" class="form-input" placeholder="Tên đăng nhập..." required autocomplete="username">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ul-password">Mật khẩu</label>
+              <input type="password" id="ul-password" class="form-input" placeholder="Mật khẩu..." required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">Đăng Nhập</button>
+          </form>
+        </div>
+
+        <!-- Form Đăng Ký -->
+        <div id="auth-register-content" style="display: none;">
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center;">Đăng Ký Khách Hàng</h3>
+          <form id="user-register-form">
+            <div class="form-group">
+              <label class="form-label" for="ur-username">Tên tài khoản *</label>
+              <input type="text" id="ur-username" class="form-input" placeholder="Ví dụ: nguyenan" required autocomplete="username">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ur-password">Mật khẩu *</label>
+              <input type="password" id="ur-password" class="form-input" placeholder="Nhập mật khẩu..." required autocomplete="new-password">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ur-fullname">Họ và tên *</label>
+              <input type="text" id="ur-fullname" class="form-input" placeholder="Nhập họ và tên..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ur-phone">Số điện thoại *</label>
+              <input type="tel" id="ur-phone" class="form-input" placeholder="Nhập số điện thoại..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ur-email">Địa chỉ Email</label>
+              <input type="email" id="ur-email" class="form-input" placeholder="Nhập email (tùy chọn)...">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">Đăng Ký</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Xác Nhận Đăng Xuất Custom -->
+  <div class="modal-overlay" id="logout-confirm-modal">
+    <div class="modal-content glass-panel" style="max-width: 380px;">
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); text-align: center;">
+        <i class="fa-solid fa-circle-question" style="font-size: 42px; color: var(--accent-color); margin-bottom: 16px;"></i>
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Xác Nhận Đăng Xuất</h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;">Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button class="btn" id="btn-logout-cancel" style="flex: 1; padding: 10px;">Hủy</button>
+          <button class="btn btn-danger" id="btn-logout-confirm" style="flex: 1; padding: 10px;">Đăng Xuất</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- So Sánh Xe Floating Drawer -->
+  <div class="compare-drawer" id="compare-drawer">
+    <div class="container compare-drawer-content">
+      <div class="compare-info">
+        <span class="compare-title">So Sánh Xe Điện (<span id="compare-count" style="color: var(--accent-color); font-weight: 700;">0</span>/3)</span>
+        <p class="compare-desc" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Chọn tối đa 3 xe để đối chiếu song song thông số kỹ thuật.</p>
+      </div>
+      <div class="compare-slots" id="compare-slots">
+        <!-- Đổ động từ JS -->
+      </div>
+      <div class="compare-actions">
+        <button class="btn btn-primary" id="btn-compare-now" disabled>So Sánh Ngay</button>
+        <button class="btn" id="btn-compare-clear" style="padding: 10px 16px;"><i class="fa-solid fa-trash-can"></i> Xóa hết</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- So Sánh Xe Chi Tiết Modal -->
+  <div class="modal-overlay" id="compare-modal">
+    <div class="modal-content glass-panel" style="max-width: 1000px;">
+      <button class="modal-close-btn" id="compare-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 36px;">
+        <h2 class="spec-title" style="font-size: 24px; margin-bottom: 24px;">Bảng So Sánh Thông Số Xe Chi Tiết</h2>
+        <div class="compare-table-wrapper" style="overflow-x: auto;">
+          <table class="compare-table" id="compare-table">
+            <!-- Đổ động bằng JS -->
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Đăng Ký Lái Thử Section -->
+  <section id="test-drive" class="container" style="padding: 100px 0 60px 0;">
+    <div class="glass-panel" style="padding: 40px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center;">
+      <div>
+        <span class="hero-subtitle" style="font-size: 12px; letter-spacing: 2px;">Trải nghiệm vô lăng</span>
+        <h2 style="font-size: 36px; font-weight: 800; margin-bottom: 16px;">Đăng Ký Lái Thử Xe Điện</h2>
+        <p style="color: var(--text-secondary); line-height: 1.6; font-size: 15px; margin-bottom: 24px;">
+          Hãy là người tiếp theo cảm nhận khả năng tăng tốc tức thì, vận hành êm ái và hệ thống hỗ trợ lái thông minh ADAS trên các dòng xe ô tô điện VinFast. Chọn ngày hẹn và showroom gần nhất để chúng tôi chuẩn bị xe sẵn sàng đón tiếp bạn.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14px; color: var(--text-secondary);">
+          <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Lái thử hoàn toàn miễn phí tại tất cả Showroom VinFast</div>
+          <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Chuyên viên hướng dẫn các tính năng lái thông minh ADAS</div>
+          <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Nhận ngay các phần quà lưu niệm ý nghĩa khi lái thử xe</div>
+        </div>
+      </div>
+      
+      <form id="test-drive-form" style="background: rgba(255, 255, 255, 0.65); padding: 28px; border-radius: var(--radius-lg); border: 1px solid var(--panel-border);">
+        <div class="form-group">
+          <label class="form-label" for="td-car-select">Mẫu xe bạn quan tâm *</label>
+          <select id="td-car-select" class="form-input" required>
+            <option value="">-- Chọn dòng xe --</option>
+            <!-- Tải động bằng JS -->
+          </select>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="td-name">Họ và tên *</label>
+            <input type="text" id="td-name" class="form-input" placeholder="Nhập họ tên..." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="td-phone">Số điện thoại *</label>
+            <input type="tel" id="td-phone" class="form-input" placeholder="Nhập số điện thoại..." required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="td-email">Địa chỉ Email</label>
+          <input type="email" id="td-email" class="form-input" placeholder="VD: name@domain.com">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label" for="td-province">Tỉnh / Thành phố *</label>
+            <select id="td-province" class="form-input" required>
+              <option value="">-- Chọn Tỉnh/Thành --</option>
+              <option value="Hà Nội">Hà Nội</option>
+              <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+              <option value="Đà Nẵng">Đà Nẵng</option>
+              <option value="Hải Phòng">Hải Phòng</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="td-showroom">Địa điểm Showroom *</label>
+            <select id="td-showroom" class="form-input" required disabled>
+              <option value="">Chọn showroom...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="td-date">Chọn ngày hẹn *</label>
+          <input type="date" id="td-date" class="form-input" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 15px;">
+          Gửi Yêu Cầu Đăng Ký
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Bản Đồ Trạm Sạc & Showroom Section -->
+  <section id="stations" class="container" style="padding-top: 60px; padding-bottom: 100px; border-top: 1px solid var(--panel-border);">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <span class="hero-subtitle">Mạng lưới bao phủ rộng khắp</span>
+      <h2 style="font-size: 32px; font-weight: 800;">Trạm Sạc Pin & Showroom</h2>
+      <p style="color: var(--text-secondary); margin-top: 8px;">Dễ dàng tra cứu các vị trí trụ sạc nhanh xe điện và showroom hỗ trợ mua xe trên cả nước.</p>
+    </div>
+    
+    <div class="control-bar glass-panel" style="margin-bottom: 30px;">
+      <div class="filter-group" id="station-province-filter">
+        <button class="filter-btn active" data-province="Tất cả">Tất cả</button>
+        <button class="filter-btn" data-province="Hà Nội">Hà Nội</button>
+        <button class="filter-btn" data-province="TP. Hồ Chí Minh">TP. Hồ Chí Minh</button>
+        <button class="filter-btn" data-province="Đà Nẵng">Đà Nẵng</button>
+        <button class="filter-btn" data-province="Hải Phòng">Hải Phòng</button>
+      </div>
+      <div style="color: var(--text-secondary); font-size: 14px; font-weight: 500;">
+        <i class="fa-solid fa-charging-station" style="color: var(--accent-color); margin-right: 6px;"></i> Đang hiển thị <span id="station-count" style="font-weight: 700; color: var(--text-primary);">0</span> địa điểm
+      </div>
+    </div>
+
+    <!-- Danh sách trạm sạc & Showroom -->
+    <div class="station-grid" id="station-grid">
+      <!-- Tải động bằng JS -->
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 VinFast Showroom Project. Thiết kế phong cách sang trọng bởi Antigravity.</p>
+      <p>Sản phẩm này phục vụ mục đích giới thiệu thông tin và trải nghiệm kỹ thuật.</p>
+    </div>
+  </footer>
+
+  <!-- Floating Quick Contact Buttons -->
+  <div class="floating-contact">
+    <a href="tel:1900232389" class="contact-item phone" title="Hotline gọi hỗ trợ (1900 232389)">
+      <i class="fa-solid fa-phone"></i>
+    </a>
+    <a href="https://zalo.me" target="_blank" class="contact-item zalo" title="Chat Zalo hỗ trợ khách hàng">
+      <span style="font-weight: 800; font-size: 11px;">Zalo</span>
+    </a>
+    <a href="https://m.me" target="_blank" class="contact-item messenger" title="Nhắn tin qua Facebook Messenger">
+      <i class="fa-brands fa-facebook-messenger"></i>
+    </a>
+  </div>
+
+  <!-- Core Javascript Logic -->
+  <script src="/js/app.js"></script>
+</body>
+</html>

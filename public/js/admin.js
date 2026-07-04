@@ -166,18 +166,22 @@ function switchTab(tabName) {
   const carsBtn = document.getElementById('tab-cars-btn');
   const drivesBtn = document.getElementById('tab-drives-btn');
   const bannersBtn = document.getElementById('tab-banners-btn');
+  const settingsBtn = document.getElementById('tab-settings-btn');
   
   const carsContent = document.getElementById('tab-cars-content');
   const drivesContent = document.getElementById('tab-drives-content');
   const bannersContent = document.getElementById('tab-banners-content');
+  const settingsContent = document.getElementById('tab-settings-content');
 
   carsContent.style.display = 'none';
   drivesContent.style.display = 'none';
   if (bannersContent) bannersContent.style.display = 'none';
+  if (settingsContent) settingsContent.style.display = 'none';
 
   carsBtn.classList.remove('btn-primary');
   drivesBtn.classList.remove('btn-primary');
   if (bannersBtn) bannersBtn.classList.remove('btn-primary');
+  if (settingsBtn) settingsBtn.classList.remove('btn-primary');
 
   if (tabName === 'cars') {
     carsContent.style.display = 'block';
@@ -190,6 +194,10 @@ function switchTab(tabName) {
     if (bannersContent) bannersContent.style.display = 'block';
     if (bannersBtn) bannersBtn.classList.add('btn-primary');
     loadAdminBanners();
+  } else if (tabName === 'settings') {
+    if (settingsContent) settingsContent.style.display = 'block';
+    if (settingsBtn) settingsBtn.classList.add('btn-primary');
+    loadAdminSettings();
   }
 }
 window.switchTab = switchTab; // Gán global để sử dụng trong onclick html
@@ -424,7 +432,7 @@ async function deleteCar(id) {
 window.deleteCar = deleteCar;
 
 
-// --- Tab 2: Quản Lý Lịch Đăng Ký Lái Thử ---
+// --- Tab 2: Quản Lý Yêu Cầu Báo Giá ---
 async function loadAdminTestDrives() {
   try {
     const response = await fetch('/api/test-drives', {
@@ -439,14 +447,14 @@ async function loadAdminTestDrives() {
     }
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Không thể tải lịch đăng ký lái thử.');
+    if (!response.ok) throw new Error(data.message || 'Không thể tải danh sách yêu cầu.');
     const drives = data;
 
     if (drives.length === 0) {
       adminDriveList.innerHTML = `
         <tr>
           <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">
-            Chưa có khách hàng đăng ký lái thử xe.
+            Chưa có yêu cầu báo giá hoặc lái thử nào từ khách hàng.
           </td>
         </tr>
       `;
@@ -454,9 +462,19 @@ async function loadAdminTestDrives() {
     }
 
     adminDriveList.innerHTML = drives.map(drive => {
-      // Định dạng ngày hẹn sang định dạng DD/MM/YYYY
-      const date = new Date(drive.preferred_date);
-      const formattedDate = isNaN(date.getTime()) ? drive.preferred_date : `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      const isQuote = drive.type === 'quote';
+      const typeBadge = isQuote
+        ? `<span class="badge" style="background: rgba(15, 83, 197, 0.1); color: var(--accent-color); border: 1px solid rgba(15, 83, 197, 0.2); padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">Nhận Báo Giá</span>`
+        : `<span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">Đăng Ký Lái Thử</span>`;
+
+      const detailsHtml = isQuote
+        ? `<div style="font-size: 13px;"><i class="fa-solid fa-location-dot" style="color: var(--text-muted); margin-right: 4px;"></i> ${drive.address || 'Chưa cung cấp'}</div>`
+        : `<div style="font-size: 12.5px; display: flex; flex-direction: column; gap: 4px;">
+            ${drive.address ? `<div><i class="fa-solid fa-location-dot" style="color: var(--text-muted); margin-right: 4px;"></i> Địa chỉ: <span style="color: var(--text-secondary);">${drive.address}</span></div>` : ''}
+            ${drive.province ? `<div><i class="fa-solid fa-map-location-dot" style="color: var(--text-muted); margin-right: 4px;"></i> Tỉnh/Thành: <strong>${drive.province}</strong></div>` : ''}
+            ${drive.showroom ? `<div><i class="fa-solid fa-store" style="color: var(--text-muted); margin-right: 4px;"></i> Showroom: <span style="color: var(--text-secondary);">${drive.showroom}</span></div>` : ''}
+            <div><i class="fa-solid fa-calendar-days" style="color: var(--accent-color); margin-right: 4px;"></i> Ngày hẹn: <strong style="color: var(--text-primary);">${drive.preferred_date ? new Date(drive.preferred_date).toLocaleDateString('vi-VN') : ''}</strong></div>
+           </div>`;
 
       return `
         <tr>
@@ -473,17 +491,18 @@ async function loadAdminTestDrives() {
               ${drive.car_name || 'Xe đã bị xóa'}
             </span>
           </td>
-          <td style="font-size: 13px;">
-            <div style="font-weight:500;">${drive.province}</div>
-            <div style="color: var(--text-muted); font-size:11px; margin-top: 2px;">${drive.showroom}</div>
+          <td>
+            ${typeBadge}
           </td>
-          <td style="font-weight: 600; color: var(--text-primary);">${formattedDate}</td>
+          <td>
+            ${detailsHtml}
+          </td>
           <td>
             <select class="form-input" style="padding: 6px 12px; font-size: 13px; width: auto;" onchange="updateDriveStatus(${drive.id}, this.value)">
               <option value="Chờ liên hệ" ${drive.status === 'Chờ liên hệ' ? 'selected' : ''}>Chờ liên hệ</option>
-              <option value="Đã xác nhận" ${drive.status === 'Đã xác nhận' ? 'selected' : ''}>Đã xác nhận</option>
-              <option value="Đã lái thử" ${drive.status === 'Đã lái thử' ? 'selected' : ''}>Đã lái thử</option>
-              <option value="Hủy lịch" ${drive.status === 'Hủy lịch' ? 'selected' : ''}>Hủy lịch</option>
+              <option value="Đã liên hệ" ${drive.status === 'Đã liên hệ' ? 'selected' : ''}>Đã liên hệ</option>
+              <option value="Hoàn thành" ${drive.status === 'Hoàn thành' ? 'selected' : ''}>Hoàn thành</option>
+              <option value="Hủy yêu cầu" ${drive.status === 'Hủy yêu cầu' ? 'selected' : ''}>Hủy yêu cầu</option>
             </select>
           </td>
           <td>
@@ -499,8 +518,9 @@ async function loadAdminTestDrives() {
     console.error(error);
   }
 }
+window.loadAdminTestDrives = loadAdminTestDrives;
 
-// Hàm cập nhật nhanh trạng thái lịch lái thử
+// Hàm cập nhật nhanh trạng thái yêu cầu báo giá
 async function updateDriveStatus(id, newStatus) {
   try {
     const response = await fetch(`/api/test-drives/${id}`, {
@@ -520,7 +540,7 @@ async function updateDriveStatus(id, newStatus) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Lỗi khi cập nhật.');
 
-    alert('Đã cập nhật trạng thái lịch hẹn!');
+    alert('Đã cập nhật trạng thái yêu cầu báo giá!');
     loadAdminTestDrives();
   } catch (error) {
     alert(error.message);
@@ -528,9 +548,9 @@ async function updateDriveStatus(id, newStatus) {
 }
 window.updateDriveStatus = updateDriveStatus;
 
-// Hàm xóa lịch lái thử
+// Hàm xóa yêu cầu báo giá
 async function deleteDrive(id) {
-  if (confirm('Bạn chắc chắn muốn xóa lịch hẹn đăng ký lái thử này?')) {
+  if (confirm('Bạn chắc chắn muốn xóa yêu cầu báo giá này?')) {
     try {
       const response = await fetch(`/api/test-drives/${id}`, {
         method: 'DELETE',
@@ -547,7 +567,7 @@ async function deleteDrive(id) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Lỗi khi xóa.');
 
-      alert('Đã xóa lịch hẹn thành công!');
+      alert('Đã xóa yêu cầu báo giá thành công!');
       loadAdminTestDrives();
     } catch (error) {
       alert(error.message);
@@ -741,6 +761,67 @@ window.deleteBanner = async function(id) {
     }
   }
 };
+
+// --- Tab 4: Cấu Hình Hệ Thống (settings) ---
+async function loadAdminSettings() {
+  try {
+    const response = await fetch('/api/settings');
+    if (!response.ok) throw new Error('Không thể tải cấu hình hệ thống.');
+    const settings = await response.json();
+
+    document.getElementById('setting-showroom-name').value = settings.showroom_name || '';
+    document.getElementById('setting-contact-phone').value = settings.contact_phone || '';
+    document.getElementById('setting-contact-email').value = settings.contact_email || '';
+    document.getElementById('setting-contact-hours').value = settings.contact_hours || '';
+    document.getElementById('setting-contact-address').value = settings.contact_address || '';
+    document.getElementById('setting-zalo-link').value = settings.zalo_link || '';
+    document.getElementById('setting-messenger-link').value = settings.messenger_link || '';
+  } catch (error) {
+    alert(error.message);
+  }
+}
+window.loadAdminSettings = loadAdminSettings;
+
+const adminSettingsForm = document.getElementById('admin-settings-form');
+if (adminSettingsForm) {
+  adminSettingsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const settings = {
+      showroom_name: document.getElementById('setting-showroom-name').value.trim(),
+      contact_phone: document.getElementById('setting-contact-phone').value.trim(),
+      contact_email: document.getElementById('setting-contact-email').value.trim(),
+      contact_hours: document.getElementById('setting-contact-hours').value.trim(),
+      contact_address: document.getElementById('setting-contact-address').value.trim(),
+      zalo_link: document.getElementById('setting-zalo-link').value.trim(),
+      messenger_link: document.getElementById('setting-messenger-link').value.trim()
+    };
+
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(settings)
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        handleAuthError();
+        return;
+      }
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Lỗi khi lưu cấu hình.');
+
+      alert('Đã lưu cấu hình hệ thống thành công!');
+      loadAdminSettings();
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
 
 // Khởi tạo chạy ban đầu
 checkAuth();

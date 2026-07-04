@@ -93,9 +93,10 @@ async function initDB() {
         fullname VARCHAR(100) NOT NULL,
         phone VARCHAR(20) NOT NULL,
         email VARCHAR(100),
-        province VARCHAR(50) NOT NULL,
-        showroom VARCHAR(100) NOT NULL,
-        preferred_date DATE NOT NULL,
+        province VARCHAR(50),
+        showroom VARCHAR(100),
+        preferred_date DATE,
+        address VARCHAR(255),
         status VARCHAR(30) DEFAULT 'Chờ liên hệ',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (car_id) REFERENCES cars(id) ON DELETE SET NULL
@@ -117,6 +118,33 @@ async function initDB() {
     `);
 
     // Check if admin exists, if not insert default admin
+    // Create settings table
+    console.log('Creating "settings" table...');
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS settings (
+        \`key\` VARCHAR(50) PRIMARY KEY,
+        \`value\` TEXT NOT NULL
+      ) ENGINE=InnoDB;
+    `);
+
+    // Insert default settings if they don't exist
+    const defaultSettings = {
+      'contact_phone': '1900 232389',
+      'contact_email': 'support@vinfast.vn',
+      'contact_address': 'Toà K3, KĐT The K Park, Kiến Hưng, Hà Đông, Hà Nội',
+      'contact_hours': '08:00 - 21:00 (Hàng ngày, kể cả thứ 7 & Chủ Nhật)',
+      'showroom_name': 'VinFast HTA Văn Phú',
+      'zalo_link': 'https://zalo.me/',
+      'messenger_link': 'https://m.me/'
+    };
+
+    for (const [key, value] of Object.entries(defaultSettings)) {
+      const [existing] = await connection.query('SELECT * FROM settings WHERE `key` = ?', [key]);
+      if (existing.length === 0) {
+        await connection.query('INSERT INTO settings (`key`, \`value\`) VALUES (?, ?)', [key, value]);
+      }
+    }
+
     const [admins] = await connection.query('SELECT * FROM admins WHERE username = ?', ['admin']);
     if (admins.length === 0) {
       console.log('Inserting default admin account...');

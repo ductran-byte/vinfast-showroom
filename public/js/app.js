@@ -101,12 +101,12 @@ const compareModal = document.getElementById('compare-modal');
 const compareModalClose = document.getElementById('compare-modal-close');
 const compareTable = document.getElementById('compare-table');
 
-// DOM cho Lái Thử
+// DOM cho Nhận Báo Giá & Lái Thử
 const tdCarSelect = document.getElementById('td-car-select');
-const tdProvince = document.getElementById('td-province');
-const tdDistrict = document.getElementById('td-district');
-const tdWard = document.getElementById('td-ward');
+const tdAddress = document.getElementById('td-address');
 const testDriveForm = document.getElementById('test-drive-form');
+
+const homeTestDriveForm = document.getElementById('home-test-drive-form');
 
 // DOM cho Trạm sạc
 const stationGrid = document.getElementById('station-grid');
@@ -177,6 +177,14 @@ async function loadAllCarsForTestDrive() {
       tdCarSelect.innerHTML = '<option value="">-- Chọn dòng xe --</option>' + 
         allCars.map(car => `<option value="${car.id}">${car.name}</option>`).join('');
       if (currentVal) tdCarSelect.value = currentVal;
+    }
+
+    const homeTdCarSelect = document.getElementById('home-td-car-select');
+    if (homeTdCarSelect) {
+      const currentValHome = homeTdCarSelect.value;
+      homeTdCarSelect.innerHTML = '<option value="">-- Chọn dòng xe --</option>' + 
+        allCars.map(car => `<option value="${car.id}">${car.name}</option>`).join('');
+      if (currentValHome) homeTdCarSelect.value = currentValHome;
     }
   } catch (error) {
     console.error('Lỗi khi tải danh sách xe lái thử:', error);
@@ -315,14 +323,20 @@ function renderShowroomGrid() {
               <span class="feature-mini-lbl">Số ghế</span>
             </div>
           </div>
-          <div class="car-card-actions">
-            <button class="btn btn-primary" onclick="event.stopPropagation(); showCarDetails(${car.id})">
+          <div class="car-card-actions" style="display: flex; flex-direction: column; gap: 8px;">
+            <button class="btn btn-primary" onclick="event.stopPropagation(); showCarDetails(${car.id})" style="width: 100%;">
               Xem Chi Tiết
             </button>
-            <button class="btn btn-outline" 
-                    onclick="event.stopPropagation(); openTestDriveModal(${car.id})">
-              <i class="fa-solid fa-car-side"></i> Lái thử
-            </button>
+            <div class="card-btn-row">
+              <button class="btn btn-outline" style="flex: 1; padding: 8px 12px; font-size: 13px;"
+                      onclick="event.stopPropagation(); openTestDriveModal(${car.id})">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Báo giá
+              </button>
+              <button class="btn btn-outline" style="flex: 1; padding: 8px 12px; font-size: 13px;"
+                      onclick="event.stopPropagation(); scrollToTestDrive(${car.id})">
+                <i class="fa-solid fa-car-side"></i> Lái thử
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -455,17 +469,32 @@ if (testDriveModal) {
   });
 }
 
-// Chuyển nhanh từ Modal chi tiết sang Đăng ký lái thử
-function bookTestDriveFromModal() {
+// Chuyển nhanh từ Modal chi tiết sang Đăng ký lái thử hoặc Nhận báo giá
+function bookTestDriveFromModal(isTestDrive = false) {
   if (!selectedCarForFinance) return;
   
   // Đóng modal chi tiết
   closeModal();
   
-  // Mở modal lái thử
-  openTestDriveModal(selectedCarForFinance.id);
+  if (isTestDrive) {
+    scrollToTestDrive(selectedCarForFinance.id);
+  } else {
+    openTestDriveModal(selectedCarForFinance.id);
+  }
 }
 window.bookTestDriveFromModal = bookTestDriveFromModal;
+
+function scrollToTestDrive(carId) {
+  const section = document.getElementById('test-drive');
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
+  const homeTdCarSelect = document.getElementById('home-td-car-select');
+  if (homeTdCarSelect && carId) {
+    homeTdCarSelect.value = carId;
+  }
+}
+window.scrollToTestDrive = scrollToTestDrive;
 
 // --- Logic Tính Toán Trả Góp / Tài Chính ---
 function updateFinanceLabels() {
@@ -685,120 +714,137 @@ compareModal.addEventListener('click', (e) => {
 });
 
 
-// --- Logic Đăng Ký Lái Thử ---
-// Hàm tải danh sách Tỉnh/Thành từ API
-async function loadProvinces() {
+// --- Logic Đăng Ký Nhận Báo Giá ---
+// Gửi form đăng ký nhận báo giá lên Backend API
+if (testDriveForm) {
+  testDriveForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const car_id = document.getElementById('td-car-select').value;
+    const fullname = document.getElementById('td-name').value.trim();
+    const phone = document.getElementById('td-phone').value.trim();
+    const address = document.getElementById('td-address').value.trim();
+
+    try {
+      const response = await fetch('/api/test-drives', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ type: 'quote', car_id, fullname, phone, address })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Lỗi khi gửi yêu cầu báo giá.');
+
+      alert(data.message);
+      testDriveForm.reset();
+      closeTestDriveModal();
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
+
+// --- Tải Cấu Hình Hệ Thống (Địa Chỉ, Hotline...) ---
+async function fetchSystemSettings() {
   try {
-    const response = await fetch('https://esgoo.net/api-tinhthanh/1/0.htm');
-    const result = await response.json();
-    if (result.error === 0 && tdProvince) {
-      tdProvince.innerHTML = '<option value="">Chọn Tỉnh/Thành...</option>';
-      result.data.forEach(prov => {
-        const opt = document.createElement('option');
-        opt.value = prov.id;
-        opt.innerText = prov.name;
-        tdProvince.appendChild(opt);
+    const response = await fetch('/api/settings');
+    if (!response.ok) throw new Error('Không thể tải cấu hình.');
+    const settings = await response.json();
+
+    // 1. Cập nhật khối thông tin liên hệ phần Đăng ký lái thử
+    const tdShowroom = document.getElementById('td-info-showroom');
+    const tdPhone = document.getElementById('td-info-phone');
+    const tdEmail = document.getElementById('td-info-email');
+    const tdAddress = document.getElementById('td-info-address');
+
+    if (tdShowroom && settings.showroom_name) tdShowroom.innerText = settings.showroom_name;
+    if (tdPhone && settings.contact_phone) tdPhone.innerText = settings.contact_phone;
+    if (tdEmail && settings.contact_email) tdEmail.innerText = settings.contact_email;
+    if (tdAddress && settings.contact_address) tdAddress.innerText = settings.contact_address;
+
+    // 2. Cập nhật phần Showroom Location ở cuối trang
+    const locName = document.getElementById('locator-showroom-name');
+    const locDesc = document.getElementById('locator-showroom-desc');
+    const locAddr = document.getElementById('locator-showroom-address');
+    const locPhone = document.getElementById('locator-showroom-phone');
+    const locPhoneLink = document.getElementById('locator-showroom-phone-link');
+    const locHours = document.getElementById('locator-showroom-hours');
+    const locRouteBtn = document.getElementById('locator-route-btn');
+    const locCallBtn = document.getElementById('locator-call-btn');
+    const locIframe = document.getElementById('locator-map-iframe');
+
+    if (locName && settings.showroom_name) locName.innerText = settings.showroom_name;
+    if (locDesc && settings.showroom_name) {
+      document.querySelectorAll('.locator-showroom-name-inline').forEach(el => {
+        el.innerText = settings.showroom_name;
       });
     }
-  } catch (err) {
-    console.error('Lỗi khi tải danh sách Tỉnh/Thành:', err);
+    if (locAddr && settings.contact_address) locAddr.innerText = settings.contact_address;
+    if (locPhone && settings.contact_phone) locPhone.innerText = settings.contact_phone;
+    if (locPhoneLink && settings.contact_phone) locPhoneLink.href = `tel:${settings.contact_phone.replace(/\s+/g, '')}`;
+    if (locHours && settings.contact_hours) locHours.innerText = settings.contact_hours;
+    if (locCallBtn && settings.contact_phone) locCallBtn.href = `tel:${settings.contact_phone.replace(/\s+/g, '')}`;
+
+    if (settings.contact_address) {
+      if (locRouteBtn) {
+        locRouteBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(settings.contact_address)}`;
+      }
+      if (locIframe) {
+        locIframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(settings.contact_address)}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+      }
+    }
+
+    // 3. Cập nhật các nút liên hệ nổi (Floating contact)
+    const floatPhone = document.getElementById('float-phone-link');
+    const floatZalo = document.getElementById('float-zalo-link');
+    const floatMessenger = document.getElementById('float-messenger-link');
+
+    if (floatPhone && settings.contact_phone) {
+      floatPhone.href = `tel:${settings.contact_phone.replace(/\s+/g, '')}`;
+      floatPhone.title = `Hotline gọi hỗ trợ (${settings.contact_phone})`;
+    }
+    if (floatZalo && settings.zalo_link) floatZalo.href = settings.zalo_link;
+    if (floatMessenger && settings.messenger_link) floatMessenger.href = settings.messenger_link;
+
+  } catch (error) {
+    console.error('Lỗi khi tải cấu hình liên hệ:', error);
   }
 }
-window.loadProvinces = loadProvinces;
+window.fetchSystemSettings = fetchSystemSettings;
 
-// Thay đổi Tỉnh/Thành -> Lọc Quận/Huyện tự động qua API
-tdProvince.addEventListener('change', async function() {
-  const provinceId = this.value;
-  tdDistrict.innerHTML = '<option value="">Chọn Quận/Huyện...</option>';
-  tdWard.innerHTML = '<option value="">Chọn Phường/Xã...</option>';
-  tdDistrict.disabled = true;
-  tdWard.disabled = true;
-  
-  if (provinceId) {
+// --- Logic Đăng Ký Lái Thử (Embedded Form) ---
+if (homeTestDriveForm) {
+  homeTestDriveForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const car_id = document.getElementById('home-td-car-select').value;
+    const fullname = document.getElementById('home-td-name').value.trim();
+    const phone = document.getElementById('home-td-phone').value.trim();
+    const email = document.getElementById('home-td-email').value.trim();
+    const address = document.getElementById('home-td-address').value.trim();
+    const preferred_date = document.getElementById('home-td-date').value;
+
     try {
-      const response = await fetch(`https://esgoo.net/api-tinhthanh/2/${provinceId}.htm`);
-      const result = await response.json();
-      if (result.error === 0) {
-        tdDistrict.disabled = false;
-        result.data.forEach(dist => {
-          const opt = document.createElement('option');
-          opt.value = dist.id;
-          opt.innerText = dist.full_name;
-          tdDistrict.appendChild(opt);
-        });
-      }
-    } catch (err) {
-      console.error('Lỗi khi tải danh sách Quận/Huyện:', err);
+      const response = await fetch('/api/test-drives', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ type: 'drive', car_id, fullname, phone, email, address, preferred_date })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Lỗi khi gửi yêu cầu lái thử.');
+
+      alert(data.message);
+      homeTestDriveForm.reset();
+    } catch (error) {
+      alert(error.message);
     }
-  }
-});
-
-// Thay đổi Quận/Huyện -> Lọc Phường/Xã tự động qua API
-tdDistrict.addEventListener('change', async function() {
-  const districtId = this.value;
-  tdWard.innerHTML = '<option value="">Chọn Phường/Xã...</option>';
-  tdWard.disabled = true;
-  
-  if (districtId) {
-    try {
-      const response = await fetch(`https://esgoo.net/api-tinhthanh/3/${districtId}.htm`);
-      const result = await response.json();
-      if (result.error === 0) {
-        tdWard.disabled = false;
-        result.data.forEach(ward => {
-          const opt = document.createElement('option');
-          opt.value = ward.full_name;
-          opt.innerText = ward.full_name;
-          tdWard.appendChild(opt);
-        });
-      }
-    } catch (err) {
-      console.error('Lỗi khi tải danh sách Phường/Xã:', err);
-    }
-  }
-});
-
-// Gửi form đăng ký lên Backend API
-testDriveForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const car_id = document.getElementById('td-car-select').value;
-  const fullname = document.getElementById('td-name').value.trim();
-  const phone = document.getElementById('td-phone').value.trim();
-  const email = document.getElementById('td-email').value.trim();
-  
-  // Lấy tên hiển thị (text) thay vì ID của option đã chọn
-  const province = tdProvince.options[tdProvince.selectedIndex].text;
-  const district = tdDistrict.options[tdDistrict.selectedIndex].text;
-  const ward = tdWard.options[tdWard.selectedIndex].text;
-  const detailAddr = document.getElementById('td-address-detail').value.trim();
-  
-  // Ghép chi tiết, Quận/Huyện và Phường/Xã để gửi lên trường showroom trong CSDL
-  const showroom = detailAddr ? `${detailAddr}, ${district}, ${ward}` : `${district}, ${ward}`;
-  
-  const preferred_date = document.getElementById('td-date').value;
-
-  try {
-    const response = await fetch('/api/test-drives', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ car_id, fullname, phone, email, province, showroom, preferred_date })
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Lỗi khi gửi đăng ký.');
-
-    alert(data.message);
-    testDriveForm.reset();
-    tdDistrict.disabled = true;
-    tdWard.disabled = true;
-    closeTestDriveModal();
-  } catch (error) {
-    alert(error.message);
-  }
-});
+  });
+}
 
 
 // --- Logic Bản Đồ Trạm Sạc / Showroom ---
@@ -881,8 +927,8 @@ fetchHotCars();
 fetchShowroomCars();
 renderStations();
 checkUserSession();
-loadProvinces();
 loadAllCarsForTestDrive();
+fetchSystemSettings();
 
 // --- Logic Đăng Nhập / Đăng Ký Khách Hàng ---
 const authModal = document.getElementById('auth-modal');

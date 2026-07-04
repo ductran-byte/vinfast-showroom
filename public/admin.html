@@ -60,15 +60,18 @@
   <!-- Dashboard Section (Hiển thị sau khi đăng nhập thành công) -->
   <section class="container admin-section" id="dashboard-section" style="display: none;">
     <!-- Tabs điều hướng -->
-    <div style="display: flex; gap: 12px; margin-bottom: 30px; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px;">
+    <div style="display: flex; gap: 12px; margin-bottom: 30px; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px; flex-wrap: wrap;">
       <button class="btn btn-primary tab-btn" id="tab-cars-btn" onclick="switchTab('cars')">
         <i class="fa-solid fa-car"></i> Quản Lý Xe
       </button>
       <button class="btn tab-btn" id="tab-drives-btn" onclick="switchTab('drives')">
-        <i class="fa-solid fa-calendar-check"></i> Lịch Hẹn Lái Thử
+        <i class="fa-solid fa-file-invoice-dollar"></i> Yêu Cầu Báo Giá & Lái Thử
       </button>
       <button class="btn tab-btn" id="tab-banners-btn" onclick="switchTab('banners')">
         <i class="fa-solid fa-images"></i> Quản Lý Banner
+      </button>
+      <button class="btn tab-btn" id="tab-settings-btn" onclick="switchTab('settings')">
+        <i class="fa-solid fa-gears"></i> Cấu Hình Liên Hệ
       </button>
     </div>
 
@@ -106,12 +109,12 @@
       </div>
     </div>
 
-    <!-- Tab 2: Lịch hẹn lái thử -->
+    <!-- Tab 2: Yêu Cầu Báo Giá & Lái Thử -->
     <div id="tab-drives-content" style="display: none;">
       <div class="admin-header">
         <div>
-          <h1 style="font-size: 32px; font-weight: 800;">Danh Sách Đăng Ký Lái Thử</h1>
-          <p style="color: var(--text-secondary); margin-top: 6px;">Theo dõi thông tin liên hệ và lịch trình trải nghiệm xe của khách hàng.</p>
+          <h1 style="font-size: 32px; font-weight: 800;">Yêu Cầu Báo Giá & Lái Thử</h1>
+          <p style="color: var(--text-secondary); margin-top: 6px;">Theo dõi thông tin liên hệ, yêu cầu nhận báo giá và lịch trình trải nghiệm xe của khách hàng.</p>
         </div>
       </div>
 
@@ -122,10 +125,10 @@
               <tr>
                 <th>Khách hàng</th>
                 <th>Liên hệ</th>
-                <th>Xe đăng ký</th>
-                <th>Khu vực / Địa chỉ</th>
-                <th>Ngày lái thử</th>
-                <th>Trạng thái lịch</th>
+                <th>Xe quan tâm</th>
+                <th>Phân loại</th>
+                <th>Chi tiết yêu cầu</th>
+                <th>Trạng thái</th>
                 <th>Hành động</th>
               </tr>
             </thead>
@@ -165,6 +168,59 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Cấu Hình Liên Hệ -->
+    <div id="tab-settings-content" style="display: none;">
+      <div class="admin-header">
+        <div>
+          <h1 style="font-size: 32px; font-weight: 800;">Cấu Hình Thông Tin Liên Hệ</h1>
+          <p style="color: var(--text-secondary); margin-top: 6px;">Cấu hình số điện thoại hotline, email, địa chỉ showroom và các mạng xã hội hiển thị công khai trên website.</p>
+        </div>
+      </div>
+
+      <div class="glass-panel" style="padding: 32px; background: #ffffff;">
+        <form id="admin-settings-form">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+              <label class="form-label" for="setting-showroom-name">Tên Showroom *</label>
+              <input type="text" id="setting-showroom-name" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="setting-contact-phone">Hotline Tư Vấn *</label>
+              <input type="text" id="setting-contact-phone" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="setting-contact-email">Email Hỗ Trợ *</label>
+              <input type="email" id="setting-contact-email" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="setting-contact-hours">Giờ Mở Cửa / Giờ Làm Việc *</label>
+              <input type="text" id="setting-contact-hours" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label class="form-label" for="setting-contact-address">Địa Chỉ Showroom *</label>
+            <input type="text" id="setting-contact-address" class="form-input" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px;">
+            <div class="form-group">
+              <label class="form-label" for="setting-zalo-link">Đường dẫn Zalo (VD: https://zalo.me/sodt) *</label>
+              <input type="url" id="setting-zalo-link" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="setting-messenger-link">Đường dẫn Messenger (VD: https://m.me/username) *</label>
+              <input type="url" id="setting-messenger-link" class="form-input" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="padding: 12px 30px; font-size: 15px;">
+            <i class="fa-solid fa-floppy-disk"></i> Lưu Cấu Hình Hệ Thống
+          </button>
+        </form>
       </div>
     </div>
   </section>

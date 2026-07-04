@@ -145,42 +145,72 @@
     </div>
   </section>
 
-  <!-- Accessories Section -->
-  <section id="accessories" class="accessories-section container">
-    <div style="text-align: center; margin-bottom: 45px;">
-      <span class="hero-subtitle">Thiết Bị Chính Hãng</span>
-      <h2 style="font-size: 32px; font-weight: 800;">Phụ Kiện Chính Hãng VinFast</h2>
-      <p style="color: var(--text-secondary); margin-top: 8px;">Trang bị thêm các phụ kiện đẳng cấp và các bộ sạc thông minh cho xế yêu của bạn.</p>
-    </div>
-    
-    <div class="accessories-grid">
-      <div class="accessory-card glass-panel">
-        <div class="accessory-img-wrapper">
-          <img src="/uploads/acc_charger.png" alt="Bộ sạc treo tường" class="accessory-img">
+  <!-- Test Drive Registration Section -->
+  <section id="test-drive" class="test-drive-section container" style="padding-top: 80px; padding-bottom: 80px; border-top: 1px solid var(--panel-border);">
+    <div class="glass-panel" style="padding: 40px; background: #ffffff;">
+      <div class="test-drive-grid">
+        <div>
+          <span class="hero-subtitle" style="font-size: 12px; letter-spacing: 2px;">Trải nghiệm vô lăng</span>
+          <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 16px; color: var(--text-primary);">Đăng Ký Lái Thử Xe Điện</h2>
+          <p style="color: var(--text-secondary); line-height: 1.6; font-size: 15px; margin-bottom: 24px;">
+            Hãy là người tiếp theo cảm nhận khả năng tăng tốc tức thì, vận hành êm ái và hệ thống hỗ trợ lái thông minh ADAS trên các dòng xe ô tô điện VinFast. Chọn ngày hẹn và địa chỉ của bạn để chúng tôi liên hệ chuẩn bị xe sẵn sàng đón tiếp.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">
+            <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Lái thử hoàn toàn miễn phí tại tất cả Showroom VinFast</div>
+            <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Chuyên viên hướng dẫn các tính năng lái thông minh ADAS</div>
+            <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Nhận ngay các phần quà lưu niệm ý nghĩa khi lái thử xe</div>
+          </div>
+          
+          <div class="glass-panel" style="padding: 20px; background: rgba(15, 83, 197, 0.02); border: 1px solid rgba(15, 83, 197, 0.1); border-radius: var(--radius-md); box-shadow: none;">
+            <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Thông tin liên hệ tư vấn:</h4>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13.5px;">
+              <div><i class="fa-solid fa-store" style="color: var(--accent-color); margin-right: 8px; width: 16px;"></i> <strong>Showroom:</strong> <span id="td-info-showroom">VinFast HTA Văn Phú</span></div>
+              <div><i class="fa-solid fa-phone" style="color: var(--accent-color); margin-right: 8px; width: 16px;"></i> <strong>Hotline:</strong> <span id="td-info-phone">1900 232389</span></div>
+              <div><i class="fa-solid fa-envelope" style="color: var(--accent-color); margin-right: 8px; width: 16px;"></i> <strong>Email:</strong> <span id="td-info-email">support@vinfast.vn</span></div>
+              <div><i class="fa-solid fa-location-dot" style="color: var(--accent-color); margin-right: 8px; width: 16px;"></i> <strong>Địa chỉ:</strong> <span id="td-info-address">Toà K3, KĐT The K Park, Kiến Hưng, Hà Đông, Hà Nội</span></div>
+            </div>
+          </div>
         </div>
-        <h4 class="accessory-name">Bộ sạc treo tường thông minh VF Wallbox</h4>
-        <span class="accessory-price">9.400.000 VNĐ</span>
-      </div>
-      <div class="accessory-card glass-panel">
-        <div class="accessory-img-wrapper">
-          <img src="/uploads/acc_mats.png" alt="Thảm lót sàn da" class="accessory-img">
-        </div>
-        <h4 class="accessory-name">Thảm lót sàn da cao cấp thiết kế riêng</h4>
-        <span class="accessory-price">1.500.000 VNĐ</span>
-      </div>
-      <div class="accessory-card glass-panel">
-        <div class="accessory-img-wrapper">
-          <img src="/uploads/acc_umbrella.png" alt="Ô VinFast" class="accessory-img">
-        </div>
-        <h4 class="accessory-name">Ô gập tự động VinFast gấp ngược thông minh</h4>
-        <span class="accessory-price">250.000 VNĐ</span>
-      </div>
-      <div class="accessory-card glass-panel">
-        <div class="accessory-img-wrapper">
-          <img src="/uploads/default-car.jpg" alt="Bơm lốp điện tử" class="accessory-img" style="filter: brightness(0.8) contrast(1.2);">
-        </div>
-        <h4 class="accessory-name">Bơm lốp điện tử tích hợp kích bình khẩn cấp</h4>
-        <span class="accessory-price">850.000 VNĐ</span>
+        
+        <form id="home-test-drive-form" style="background: var(--bg-secondary); padding: 32px; border-radius: var(--radius-lg); border: 1px solid var(--panel-border);">
+          <div class="form-group">
+            <label class="form-label" for="home-td-car-select">Mẫu xe bạn muốn lái thử *</label>
+            <select id="home-td-car-select" class="form-input" required>
+              <option value="">-- Chọn dòng xe --</option>
+              <!-- Tải động bằng JS -->
+            </select>
+          </div>
+          
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label class="form-label" for="home-td-name">Họ và tên *</label>
+              <input type="text" id="home-td-name" class="form-input" placeholder="Nhập họ tên..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="home-td-phone">Số điện thoại *</label>
+              <input type="tel" id="home-td-phone" class="form-input" placeholder="Nhập số điện thoại..." required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="home-td-email">Địa chỉ Email</label>
+            <input type="email" id="home-td-email" class="form-input" placeholder="VD: name@domain.com">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="home-td-address">Địa chỉ *</label>
+            <input type="text" id="home-td-address" class="form-input" placeholder="Nhập địa chỉ..." required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="home-td-date">Chọn ngày hẹn *</label>
+            <input type="date" id="home-td-date" class="form-input" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 15px;">
+            Gửi Yêu Cầu Đăng Ký Lái Thử
+          </button>
+        </form>
       </div>
     </div>
   </section>
@@ -505,87 +535,46 @@
     </div>
   </div>
 
-  <!-- Đăng Ký Lái Thử Modal -->
+  <!-- Đăng Ký Nhận Báo Giá Modal -->
   <div class="modal-overlay" id="test-drive-modal">
-    <div class="modal-content glass-panel" style="max-width: 900px;">
+    <div class="modal-content glass-panel" style="max-width: 600px;">
       <button class="modal-close-btn" id="test-drive-modal-close"><i class="fa-solid fa-xmark"></i></button>
       
       <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 36px;">
-        <div class="test-drive-modal-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; align-items: center;">
-          <div>
-            <span class="hero-subtitle" style="font-size: 12px; letter-spacing: 2px;">Trải nghiệm vô lăng</span>
-            <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 16px; color: var(--text-primary);">Đăng Ký Lái Thử Xe Điện</h2>
-            <p style="color: var(--text-secondary); line-height: 1.6; font-size: 15px; margin-bottom: 24px;">
-              Hãy là người tiếp theo cảm nhận khả năng tăng tốc tức thì, vận hành êm ái và hệ thống hỗ trợ lái thông minh ADAS trên các dòng xe ô tô điện VinFast. Chọn ngày hẹn và showroom gần nhất để chúng tôi chuẩn bị xe sẵn sàng đón tiếp bạn.
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14px; color: var(--text-secondary);">
-              <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Lái thử hoàn toàn miễn phí tại tất cả Showroom VinFast</div>
-              <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Chuyên viên hướng dẫn các tính năng lái thông minh ADAS</div>
-              <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Nhận ngay các phần quà lưu niệm ý nghĩa khi lái thử xe</div>
-            </div>
+        <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); text-align: center;">Yêu Cầu Báo Giá Lăn Bánh</h2>
+        <p style="color: var(--text-secondary); text-align: center; font-size: 14px; margin-bottom: 24px;">
+          Vui lòng để lại thông tin chính xác. Nhân viên tư vấn VinFast sẽ gửi bảng tính giá lăn bánh, quà tặng khuyến mãi và phương án trả góp tốt nhất cho bạn.
+        </p>
+        
+        <form id="test-drive-form">
+          <div class="form-group">
+            <label class="form-label" for="td-car-select">Dòng xe bạn quan tâm *</label>
+            <select id="td-car-select" class="form-input" required>
+              <option value="">-- Chọn dòng xe --</option>
+              <!-- Tải động bằng JS -->
+            </select>
           </div>
           
-          <form id="test-drive-form" style="background: var(--bg-secondary); padding: 28px; border-radius: var(--radius-lg); border: 1px solid var(--panel-border);">
+          <div class="form-row-2col">
             <div class="form-group">
-              <label class="form-label" for="td-car-select">Mẫu xe bạn quan tâm *</label>
-              <select id="td-car-select" class="form-input" required>
-                <option value="">-- Chọn dòng xe --</option>
-                <!-- Tải động bằng JS -->
-              </select>
+              <label class="form-label" for="td-name">Họ và tên *</label>
+              <input type="text" id="td-name" class="form-input" placeholder="Nhập họ tên..." required>
             </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-              <div class="form-group">
-                <label class="form-label" for="td-name">Họ và tên *</label>
-                <input type="text" id="td-name" class="form-input" placeholder="Nhập họ tên..." required>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="td-phone">Số điện thoại *</label>
-                <input type="tel" id="td-phone" class="form-input" placeholder="Nhập số điện thoại..." required>
-              </div>
-            </div>
-    
             <div class="form-group">
-              <label class="form-label" for="td-email">Địa chỉ Email</label>
-              <input type="email" id="td-email" class="form-input" placeholder="VD: name@domain.com">
+              <label class="form-label" for="td-phone">Số điện thoại *</label>
+              <input type="tel" id="td-phone" class="form-input" placeholder="Nhập số điện thoại..." required>
             </div>
-    
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
-              <div class="form-group">
-                <label class="form-label" for="td-province">Tỉnh / Thành *</label>
-                <select id="td-province" class="form-input" required>
-                  <option value="">Chọn Tỉnh/Thành...</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="td-district">Quận / Huyện *</label>
-                <select id="td-district" class="form-input" required disabled>
-                  <option value="">Chọn Quận/Huyện...</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="td-ward">Phường / Xã *</label>
-                <select id="td-ward" class="form-input" required disabled>
-                  <option value="">Chọn Phường/Xã...</option>
-                </select>
-              </div>
-            </div>
-    
-            <div class="form-group" style="margin-top: 12px;">
-              <label class="form-label" for="td-address-detail">Địa chỉ chi tiết (Không bắt buộc)</label>
-              <input type="text" id="td-address-detail" class="form-input" placeholder="VD: Số 123, đường Nguyễn Trãi...">
-            </div>
-    
-            <div class="form-group">
-              <label class="form-label" for="td-date">Chọn ngày hẹn *</label>
-              <input type="date" id="td-date" class="form-input" required>
-            </div>
-    
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 10px; font-size: 15px;">
-              Gửi Yêu Cầu Đăng Ký
-            </button>
-          </form>
-        </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="td-address">Địa chỉ của bạn *</label>
+            <input type="text" id="td-address" class="form-input" placeholder="VD: Quận Hà Đông, Hà Nội..." required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 15px; font-size: 15px;">
+            Nhận Báo Giá Ngay
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -603,9 +592,9 @@
       <div style="display: flex; flex-direction: column; justify-content: center; gap: 24px;">
         <div>
           <span style="background: rgba(15, 83, 197, 0.1); color: var(--accent-color); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 12px;">Showroom Chính Thức</span>
-          <h3 style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">VinFast HTA Văn Phú</h3>
-          <p style="color: var(--text-secondary); line-height: 1.6;">
-            Chào mừng Quý khách đến với Showroom VinFast HTA Văn Phú. Chúng tôi cung cấp đầy đủ các dịch vụ: Trưng bày xe mới, Đăng ký lái thử, Tư vấn trả góp tài chính và Hỗ trợ thủ tục đăng ký xe chuyên nghiệp.
+          <h3 id="locator-showroom-name" style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">VinFast HTA Văn Phú</h3>
+          <p id="locator-showroom-desc" style="color: var(--text-secondary); line-height: 1.6;">
+            Chào mừng Quý khách đến với Showroom <span class="locator-showroom-name-inline">VinFast HTA Văn Phú</span>. Chúng tôi cung cấp đầy đủ các dịch vụ: Trưng bày xe mới, Đăng ký lái thử, Tư vấn trả góp tài chính và Hỗ trợ thủ tục đăng ký xe chuyên nghiệp.
           </p>
         </div>
         
@@ -616,7 +605,7 @@
             </div>
             <div>
               <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Địa chỉ showroom</h4>
-              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.4;">Toà K3, KĐT The K Park, Kiến Hưng, Hà Đông, Hà Nội</p>
+              <p id="locator-showroom-address" style="color: var(--text-secondary); font-size: 14px; line-height: 1.4;">Toà K3, KĐT The K Park, Kiến Hưng, Hà Đông, Hà Nội</p>
             </div>
           </div>
           
@@ -626,7 +615,7 @@
             </div>
             <div>
               <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Hotline tư vấn</h4>
-              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.4;"><a href="tel:1900232389" style="color: var(--accent-color); font-weight: 700; text-decoration: none;">1900 232389</a> (Phím 1)</p>
+              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.4;"><a id="locator-showroom-phone-link" href="tel:1900232389" style="color: var(--accent-color); font-weight: 700; text-decoration: none;"><span id="locator-showroom-phone">1900 232389</span></a> (Phím 1)</p>
             </div>
           </div>
 
@@ -636,16 +625,16 @@
             </div>
             <div>
               <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Giờ mở cửa</h4>
-              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.4;">08:00 - 21:00 (Hàng ngày, kể cả thứ 7 & Chủ Nhật)</p>
+              <p id="locator-showroom-hours" style="color: var(--text-secondary); font-size: 14px; line-height: 1.4;">08:00 - 21:00 (Hàng ngày, kể cả thứ 7 & Chủ Nhật)</p>
             </div>
           </div>
         </div>
         
         <div style="margin-top: 10px; display: flex; gap: 12px;">
-          <a href="https://www.google.com/maps/dir/?api=1&destination=Vinfast+HTA+V%C3%A3n+Ph%C3%BA%2C+To%C3%A0+K3%2C+K%C4%90T+The+K+Park%2C+Ki%E1%BA%BFn+H%C6%B0ng%2C+H%C3%A0+C%C3%B4ng%2C+H%C3%A0+%C4%90%C3%B4ng%2C+H%C3%A0+N%E1%BB%99i" target="_blank" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+          <a id="locator-route-btn" href="https://www.google.com/maps/dir/?api=1&destination=Vinfast+HTA+V%C3%A3n+Ph%C3%BA%2C+To%C3%A0+K3%2C+K%C4%90T+The+K+Park%2C+Ki%E1%BA%BFn+H%C6%B0ng%2C+H%C3%A0+C%C3%B4ng%2C+H%C3%A0+%C4%90%C3%B4ng%2C+H%C3%A0+N%E1%BB%99i" target="_blank" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-route"></i> Chỉ đường
           </a>
-          <a href="tel:1900232389" class="btn btn-outline" style="padding: 10px 20px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--panel-border); background: transparent;">
+          <a id="locator-call-btn" href="tel:1900232389" class="btn btn-outline" style="padding: 10px 20px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--panel-border); background: transparent;">
             <i class="fa-solid fa-phone"></i> Gọi điện ngay
           </a>
         </div>
@@ -654,6 +643,7 @@
       <!-- Showroom Map -->
       <div style="border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--panel-border); min-height: 350px;">
         <iframe 
+          id="locator-map-iframe"
           src="https://maps.google.com/maps?q=Vinfast%20HTA%20V%C4%83n%20Ph%C3%BA%2C%20To%C3%A0%20K3%2C%20K%C4%90T%20The%20K%20Park%2C%20Ki%E1%BA%BFn%20H%C6%B0ng%2C%20H%C3%A0%20%C4%90%C3%B4ng%2C%20H%C3%A0%20N%E1%BB%99i&t=&z=16&ie=UTF8&iwloc=&output=embed" 
           width="100%" 
           height="100%" 
@@ -676,13 +666,13 @@
 
   <!-- Floating Quick Contact Buttons -->
   <div class="floating-contact">
-    <a href="tel:1900232389" class="contact-item phone" title="Hotline gọi hỗ trợ (1900 232389)">
+    <a id="float-phone-link" href="tel:1900232389" class="contact-item phone" title="Hotline gọi hỗ trợ (1900 232389)">
       <i class="fa-solid fa-phone"></i>
     </a>
-    <a href="https://zalo.me" target="_blank" class="contact-item zalo" title="Chat Zalo hỗ trợ khách hàng">
+    <a id="float-zalo-link" href="https://zalo.me" target="_blank" class="contact-item zalo" title="Chat Zalo hỗ trợ khách hàng">
       <span style="font-weight: 800; font-size: 11px;">Zalo</span>
     </a>
-    <a href="https://m.me" target="_blank" class="contact-item messenger" title="Nhắn tin qua Facebook Messenger">
+    <a id="float-messenger-link" href="https://m.me" target="_blank" class="contact-item messenger" title="Nhắn tin qua Facebook Messenger">
       <i class="fa-brands fa-facebook-messenger"></i>
     </a>
   </div>

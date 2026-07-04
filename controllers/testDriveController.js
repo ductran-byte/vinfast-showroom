@@ -1,37 +1,52 @@
 const db = require('../config/db');
 
-// Khách đăng ký lịch lái thử
+// Khách đăng ký nhận báo giá hoặc đăng ký lái thử
 exports.createTestDrive = async (req, res) => {
-  const { car_id, fullname, phone, email, province, showroom, preferred_date } = req.body;
+  const { type = 'drive', car_id, fullname, phone, email, preferred_date, address } = req.body;
 
-  if (!fullname || !phone || !province || !showroom || !preferred_date) {
-    return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: Họ tên, Số điện thoại, Tỉnh thành, Showroom và Ngày hẹn.' });
+  if (!car_id || !fullname || !phone) {
+    return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: Mẫu xe, Họ tên và Số điện thoại.' });
+  }
+
+  if (type === 'quote') {
+    if (!address) {
+      return res.status(400).json({ message: 'Vui lòng cung cấp địa chỉ nhận báo giá.' });
+    }
+  } else {
+    if (!address || !preferred_date) {
+      return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin lái thử: Địa chỉ và Ngày hẹn.' });
+    }
   }
 
   try {
     const [result] = await db.query(
-      `INSERT INTO test_drives (car_id, fullname, phone, email, province, showroom, preferred_date) 
+      `INSERT INTO test_drives (car_id, fullname, phone, email, address, preferred_date, type) 
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
-        car_id ? parseInt(car_id) : null,
+        parseInt(car_id),
         fullname.trim(),
         phone.trim(),
         email ? email.trim() : null,
-        province,
-        showroom,
-        preferred_date
+        address.trim(),
+        type === 'drive' ? preferred_date : null,
+        type
       ]
     );
 
+    const successMessage = type === 'quote'
+      ? 'Yêu cầu nhận báo giá thành công! Nhân viên VinFast sẽ liên hệ với bạn trong thời gian sớm nhất.'
+      : 'Đăng ký lái thử thành công! Nhân viên VinFast sẽ liên hệ với bạn để xác nhận lịch hẹn trong thời gian sớm nhất.';
+
     res.status(201).json({
-      message: 'Đăng ký lái thử thành công! Nhân viên VinFast sẽ liên hệ với bạn trong thời gian sớm nhất.',
+      message: successMessage,
       bookingId: result.insertId
     });
   } catch (error) {
-    console.error('Lỗi khi đăng ký lái thử:', error);
-    res.status(500).json({ message: 'Lỗi hệ thống khi xử lý yêu cầu đăng ký lái thử.' });
+    console.error('Lỗi khi xử lý yêu cầu đăng ký:', error);
+    res.status(500).json({ message: 'Lỗi hệ thống khi xử lý yêu cầu đăng ký.' });
   }
 };
+
 
 // Admin lấy danh sách lịch hẹn lái thử (Bảo mật)
 exports.getAllTestDrives = async (req, res) => {

@@ -62,7 +62,11 @@ exports.getCarById = async (req, res) => {
       }
     }
 
-    res.json({ ...car, specifications: specs });
+    // Lấy danh sách khuyến mãi từ bảng promotions
+    const [promoRows] = await db.query('SELECT content FROM promotions WHERE car_id = ? ORDER BY id ASC', [id]);
+    const promotions = promoRows.map(r => r.content);
+
+    res.json({ ...car, specifications: specs, promotions });
   } catch (error) {
     console.error('Lỗi lấy chi tiết xe:', error);
     res.status(500).json({ message: 'Lỗi hệ thống khi tải thông tin xe.' });
@@ -84,7 +88,8 @@ exports.createCar = async (req, res) => {
       battery_kwh,
       seats,
       description,
-      specifications
+      specifications,
+      promotions
     } = req.body;
 
     if (!name || !type || !price) {
@@ -123,9 +128,28 @@ exports.createCar = async (req, res) => {
       ]
     );
 
+    const carId = result.insertId;
+
+    // Chèn danh sách khuyến mãi vào bảng promotions
+    if (promotions) {
+      let promoArray = [];
+      try {
+        promoArray = typeof promotions === 'string' ? JSON.parse(promotions) : promotions;
+      } catch (e) {
+        promoArray = [];
+      }
+      if (Array.isArray(promoArray)) {
+        for (const content of promoArray) {
+          if (content && content.trim() !== '') {
+            await db.query('INSERT INTO promotions (car_id, content) VALUES (?, ?)', [carId, content.trim()]);
+          }
+        }
+      }
+    }
+
     res.status(201).json({
       message: 'Thêm xe mới thành công!',
-      carId: result.insertId
+      carId: carId
     });
 
   } catch (error) {
@@ -161,7 +185,8 @@ exports.updateCar = async (req, res) => {
       battery_kwh,
       seats,
       description,
-      specifications
+      specifications,
+      promotions
     } = req.body;
 
     let imageUrl = currentCar.image_url;
@@ -212,6 +237,26 @@ exports.updateCar = async (req, res) => {
         id
       ]
     );
+
+    // Cập nhật khuyến mãi trong bảng promotions
+    if (promotions !== undefined) {
+      // Xóa khuyến mãi cũ
+      await db.query('DELETE FROM promotions WHERE car_id = ?', [id]);
+      
+      let promoArray = [];
+      try {
+        promoArray = typeof promotions === 'string' ? JSON.parse(promotions) : promotions;
+      } catch (e) {
+        promoArray = [];
+      }
+      if (Array.isArray(promoArray)) {
+        for (const content of promoArray) {
+          if (content && content.trim() !== '') {
+            await db.query('INSERT INTO promotions (car_id, content) VALUES (?, ?)', [id, content.trim()]);
+          }
+        }
+      }
+    }
 
     res.json({ message: 'Cập nhật thông tin xe thành công!' });
 

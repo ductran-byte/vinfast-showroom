@@ -1445,11 +1445,13 @@ footer a {
 /* Hero Carousel */
 .hero-carousel {
   position: relative;
-  width: 100%;
-  height: 520px;
+  max-width: 1280px;
+  margin: 90px auto 0;
+  height: 480px;
   overflow: hidden;
-  margin-top: 75px;
   background: #000;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .carousel-inner {
@@ -2047,7 +2049,9 @@ footer a {
 @media (max-width: 768px) {
   .hero-carousel {
     height: 360px;
-    margin-top: 65px;
+    margin-top: 75px;
+    margin-left: 16px;
+    margin-right: 16px;
   }
   .carousel-caption h2 {
     font-size: 26px;
@@ -2119,6 +2123,180 @@ footer a {
   #home-test-drive-form {
     padding: 20px !important;
   }
+}
+
+/* Price note highlighting and pulsing animation */
+@keyframes price-note-pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.82; transform: scale(1.015); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.car-card-price-note {
+  animation: price-note-pulse 1.8s infinite ease-in-out;
+  display: inline-block;
+  background: rgba(185, 28, 28, 0.05);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px dashed #b91c1c;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #b91c1c;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.detail-price-note-highlight {
+  animation: price-note-pulse 1.8s infinite ease-in-out;
+  display: inline-block;
+  background: rgba(169, 3, 3, 0.05);
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px dashed #a90303;
+  color: #a90303;
+  font-weight: 700;
+  font-size: 13.5px;
+  margin-top: 8px;
+}
+
+/* Styling for Rich Text Description (Quill outputs) */
+#detail-description img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 24px auto;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+#detail-description p {
+  margin-bottom: 16px;
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+#detail-description h1, #detail-description h2, #detail-description h3, #detail-description h4 {
+  color: var(--text-primary);
+  margin-top: 28px;
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+
+#detail-description h1 { font-size: 22px; }
+#detail-description h2 { font-size: 20px; }
+#detail-description h3 { font-size: 18px; }
+
+/* Image captions center styling inside Quill */
+#detail-description em {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Quill text alignment helpers */
+.ql-align-center {
+  text-align: center;
+}
+.ql-align-right {
+  text-align: right;
+}
+.ql-align-justify {
+  text-align: justify;
+}
+
+/* Reusable Success/Notification Modal */
+.notification-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.notification-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.notification-modal-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  transform: scale(0.85);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.notification-modal-overlay.active .notification-modal-card {
+  transform: scale(1);
+}
+
+.notification-modal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 28px;
+}
+
+.notification-modal-icon.success {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 2px solid #22c55e;
+}
+
+.notification-modal-icon.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 2px solid #ef4444;
+}
+
+.notification-modal-title {
+  font-size: 19px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #1f2937;
+}
+
+.notification-modal-message {
+  font-size: 14.5px;
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.notification-modal-btn {
+  background: #a90303;
+  color: white;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 14.5px;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.notification-modal-btn:hover {
+  background: #c20404;
 }
 
 

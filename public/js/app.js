@@ -1,3 +1,45 @@
+// Reusable Success/Error Notification Modal
+function showNotification(message, isSuccess = true) {
+  let overlay = document.getElementById('notification-modal');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'notification-modal';
+    overlay.className = 'notification-modal-overlay';
+    overlay.innerHTML = `
+      <div class="notification-modal-card">
+        <div class="notification-modal-icon" id="notification-icon"></div>
+        <div class="notification-modal-title" id="notification-title"></div>
+        <div class="notification-modal-message" id="notification-message"></div>
+        <button class="notification-modal-btn" onclick="closeNotification()">Đóng</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    window.closeNotification = function() {
+      const modal = document.getElementById('notification-modal');
+      if (modal) modal.classList.remove('active');
+    };
+  }
+
+  const iconEl = overlay.querySelector('#notification-icon');
+  const titleEl = overlay.querySelector('#notification-title');
+  const messageEl = overlay.querySelector('#notification-message');
+
+  if (isSuccess) {
+    iconEl.className = 'notification-modal-icon success';
+    iconEl.innerHTML = '<i class="fa-solid fa-check"></i>';
+    titleEl.innerText = 'Thành công';
+  } else {
+    iconEl.className = 'notification-modal-icon error';
+    iconEl.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+    titleEl.innerText = 'Thông báo';
+  }
+
+  messageEl.innerText = message;
+  overlay.classList.add('active');
+}
+window.showNotification = showNotification;
+
 // Hiệu ứng thay đổi kiểu Header khi cuộn trang
 window.addEventListener('scroll', () => {
   const header = document.getElementById('header');
@@ -308,7 +350,8 @@ function renderShowroomGrid() {
         </div>
         <div class="car-card-body">
           <h3 class="car-card-title">${car.name}</h3>
-          <p class="car-card-price">Giá từ: ${formatVND(car.price)}</p>
+          <p class="car-card-price" style="${car.specifications && car.specifications.price_note ? 'margin-bottom: 4px;' : 'margin-bottom: 20px;'}">Giá từ: ${formatVND(car.price)}</p>
+          ${car.specifications && car.specifications.price_note ? `<div class="car-card-price-note">${car.specifications.price_note}</div>` : ''}
           <div class="car-features-mini">
             <div class="feature-mini-item">
               <span class="feature-mini-val">${car.range_km > 0 ? car.range_km + ' km' : 'Đang cập nhật'}</span>
@@ -667,11 +710,11 @@ if (testDriveForm) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Lỗi khi gửi yêu cầu báo giá.');
 
-      alert(data.message);
+      showNotification(data.message, true);
       testDriveForm.reset();
       closeTestDriveModal();
     } catch (error) {
-      alert(error.message);
+      showNotification(error.message, false);
     }
   });
 }
@@ -768,10 +811,10 @@ if (homeTestDriveForm) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Lỗi khi gửi yêu cầu lái thử.');
 
-      alert(data.message);
+      showNotification(data.message, true);
       homeTestDriveForm.reset();
     } catch (error) {
-      alert(error.message);
+      showNotification(error.message, false);
     }
   });
 }
@@ -1037,6 +1080,7 @@ function checkUserSession() {
   const token = localStorage.getItem('userToken');
   const profileStr = localStorage.getItem('userProfile');
   const adminToken = localStorage.getItem('adminToken');
+  const adminUser = localStorage.getItem('adminUser');
   
   const userHeaderProfile = document.getElementById('user-header-profile');
   const welcomeText = document.getElementById('user-welcome');
@@ -1049,14 +1093,15 @@ function checkUserSession() {
 
   // Hiển thị nút Quản Trị chỉ khi đã đăng nhập tài khoản admin
   if (btnAdminPortal) {
-    if (adminToken) {
-      btnAdminPortal.style.display = 'inline-flex';
-    } else {
-      btnAdminPortal.style.display = 'none';
-    }
+    btnAdminPortal.style.display = adminToken ? 'inline-flex' : 'none';
   }
 
-  if (token && profileStr) {
+  if (adminToken) {
+    // Admin đã đăng nhập: ẩn nút Đăng Nhập, hiện lời chào Admin + nút Đăng Xuất
+    if (btnLoginTrigger) btnLoginTrigger.style.display = 'none';
+    if (userHeaderProfile) userHeaderProfile.style.display = 'flex';
+    if (welcomeText) welcomeText.innerText = `Chào, ${adminUser || 'Admin'}`;
+  } else if (token && profileStr) {
     const profile = JSON.parse(profileStr);
     
     // Hiển thị lời chào

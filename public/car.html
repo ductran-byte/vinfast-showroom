@@ -7,7 +7,6 @@
   <title id="page-title">Chi Tiết Xe VinFast EV</title>
   <!-- Google Fonts & FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="/css/style.css?v=1.0.3">
   <style>
     /* Custom styles for dedicated car page */
@@ -30,20 +29,30 @@
       color: var(--accent-color);
       transform: translateX(-4px);
     }
-    .car-layout {
+    .car-layout-new {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 40px;
+      grid-template-columns: 1.8fr 1.1fr 1fr;
+      gap: 24px;
       margin-bottom: 48px;
+      align-items: stretch;
     }
-    @media (max-width: 992px) {
-      .car-layout {
+    @media (max-width: 1200px) {
+      .car-layout-new {
+        grid-template-columns: 1.2fr 1fr;
+      }
+      .vinfast-vn-col {
+        grid-column: span 2;
+      }
+    }
+    @media (max-width: 768px) {
+      .car-layout-new {
         grid-template-columns: 1fr;
+      }
+      .vinfast-vn-col {
+        grid-column: span 1;
       }
     }
     .image-preview-panel {
-      position: sticky;
-      top: 100px;
       padding: 30px;
       display: flex;
       justify-content: center;
@@ -60,28 +69,46 @@
     .main-car-img:hover {
       transform: scale(1.03);
     }
-    .color-dots-wrapper {
-      display: flex;
-      gap: 12px;
-      margin: 16px 0;
-    }
-    .color-dot {
-      width: 28px;
-      height: 28px;
+    
+    .color-dot-new {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
       transition: var(--transition-smooth);
+      display: inline-block;
     }
-    .color-dot:hover {
+    .color-dot-new:hover {
       transform: scale(1.15);
     }
-    .color-dot.active {
+    .color-dot-new.active {
       border-color: #fff;
-      box-shadow: 0 0 0 2px var(--accent-color);
+      box-shadow: 0 0 0 2.5px var(--accent-color);
       transform: scale(1.1);
     }
+    
+    /* Rectangular/Pill dots for premium colors */
+    .color-dot-premium {
+      width: 52px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+      transition: var(--transition-smooth);
+      display: inline-block;
+    }
+    .color-dot-premium:hover {
+      transform: scale(1.1);
+    }
+    .color-dot-premium.active {
+      border-color: #fff;
+      box-shadow: 0 0 0 2.5px var(--accent-color);
+      transform: scale(1.05);
+    }
+    
     .spec-badge {
       display: inline-block;
       padding: 6px 12px;
@@ -98,6 +125,54 @@
       color: var(--accent-color);
       margin: 16px 0;
     }
+    
+    /* Versions table styles */
+    .versions-table th, .versions-table td {
+      border: 1px solid #d5a3a3;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      text-align: center;
+    }
+    .versions-table tbody tr {
+      background: white;
+      transition: background 0.2s;
+    }
+    .versions-table tbody tr:hover {
+      background: #fdf2f2;
+    }
+    .versions-table td.base-price {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+    .versions-table td.promo-price {
+      color: #a90303;
+      font-weight: 700;
+    }
+    .versions-table td.version-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    /* CTA buttons micro-animations */
+    .btn-promo-cta, .btn-promo-phone-cta, .btn-card-phone-cta, .btn-card-quote-cta {
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .btn-promo-cta:hover, .btn-card-quote-cta:hover {
+      background: #c0392b !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(192, 57, 43, 0.3);
+    }
+    .btn-promo-phone-cta:hover {
+      background: #730a0a !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(92, 6, 6, 0.3);
+    }
+    .btn-card-phone-cta:hover {
+      background: #c0392b !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(169, 3, 3, 0.4);
+    }
+    
     /* Specs Cards Grid */
     .specs-grid-layout {
       display: grid;
@@ -175,14 +250,18 @@
         <ul>
           <li><a href="/">Trang Chủ</a></li>
           <li><a href="/#showroom">Sản Phẩm</a></li>
-          <li><a href="/#accessories">Phụ Kiện</a></li>
+
           <li><a href="/#services">Dịch Vụ</a></li>
           <li><a href="javascript:void(0)" onclick="scrollToSection('test-drive-section')">Đăng Ký Lái Thử</a></li>
           <li><a href="/#stations">Liên Hệ</a></li>
         </ul>
       </nav>
       <div class="header-actions">
-        <!-- Profile info loaded from server -->
+        <!-- Chưa đăng nhập -->
+        <button class="btn btn-primary" id="btn-login-trigger">
+          <i class="fa-solid fa-right-to-bracket"></i> Đăng Nhập
+        </button>
+        <!-- Đã đăng nhập -->
         <div id="user-header-profile" style="display: none; align-items: center; gap: 12px; margin-right: 8px;">
           <span id="user-welcome" style="color: var(--text-primary); font-weight: 500; font-size: 14px;">Chào bạn</span>
           <button class="btn btn-danger" id="btn-user-logout" style="padding: 6px 12px; font-size: 12px;">
@@ -204,41 +283,197 @@
       <i class="fa-solid fa-arrow-left"></i> Quay lại Danh mục showroom
     </a>
 
-    <!-- Layout Container -->
-    <div class="car-layout">
-      <!-- Left side: Image and color display -->
-      <div class="glass-panel image-preview-panel">
-        <img id="detail-img" src="/uploads/default-car.jpg" alt="VinFast EV" class="main-car-img" onerror="this.src='/uploads/default-car.jpg'">
-      </div>
+    <!-- New Layout Container (3 Columns) -->
+    <div class="car-layout-new">
+      
+      <!-- COLUMN 1: Visualizer & Pricing Versions Table (Left Column) -->
+      <div class="car-visualizer-col">
+        <!-- Image Preview Panel -->
+        <div class="glass-panel image-preview-panel">
+          <img id="detail-img" src="/uploads/default-car.jpg" alt="VinFast EV" class="main-car-img" onerror="this.src='/uploads/default-car.jpg'">
+        </div>
 
-      <!-- Right side: Car basic details & Visualizer -->
-      <div style="display: flex; flex-direction: column; justify-content: center;">
-        <span class="spec-badge" id="detail-badge">Loading...</span>
-        <h1 id="detail-name" style="font-size: 40px; font-weight: 800; line-height: 1.2;">Đang tải...</h1>
-        <div class="car-price-tag" id="detail-price">---</div>
-        
-        <p id="detail-desc" style="color: var(--text-secondary); line-height: 1.6; font-size: 16px; margin-bottom: 24px;">
-          Đang tải dữ liệu mô tả mẫu xe...
-        </p>
-
-        <!-- Color Selector visualizer -->
-        <h4 style="font-size: 14px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Chọn Màu Ngoại Thất:</h4>
-        <div style="display: flex; align-items: center; gap: 12px; margin-top: 10px;">
-          <div class="color-dots-wrapper" id="detail-color-dots">
-            <!-- Render dynamically -->
+        <!-- Color Selector Visualizer -->
+        <div class="color-selector-panel glass-panel" style="padding: 20px; margin-top: 16px; margin-bottom: 24px;">
+          <!-- Basic Colors -->
+          <h4 class="color-section-title" style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 8px; text-align: center;">• MÀU CƠ BẢN</h4>
+          <div class="color-dots-wrapper" id="detail-color-dots-basic" style="display: flex; gap: 12px; justify-content: center; margin-bottom: 16px;">
+            <!-- Render basic colors dynamically -->
           </div>
-          <span id="selected-color-name" style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Đang tải màu sắc...</span>
+
+          <!-- Divider line -->
+          <div style="border-top: 1px dashed var(--panel-border); margin: 12px 0;"></div>
+
+          <!-- Premium Colors -->
+          <h4 class="color-section-title" style="font-size: 13px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 8px; text-align: center;">★ MÀU NÂNG CAO + 12.000.000 VNĐ</h4>
+          <div class="color-dots-wrapper" id="detail-color-dots-premium" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <!-- Render premium colors dynamically -->
+          </div>
+
+          <!-- Selected Color Text -->
+          <div style="text-align: center; margin-top: 16px;">
+            <span id="selected-color-name" style="font-size: 14px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; background: rgba(0,0,0,0.05); padding: 4px 12px; border-radius: 20px;">Đang tải màu sắc...</span>
+          </div>
         </div>
 
-        <div style="display: flex; gap: 16px; margin-top: 32px;">
-          <button class="btn btn-primary" onclick="scrollToSection('test-drive-section')" style="padding: 14px 28px; font-size: 15px;">
-            <i class="fa-solid fa-car-side" style="margin-right: 8px;"></i> Đăng Ký Lái Thử
-          </button>
-          <button class="btn btn-outline" onclick="scrollToSection('finance-section')" style="padding: 14px 28px; font-size: 15px; border: 1px solid var(--panel-border); background: transparent;">
-            <i class="fa-solid fa-calculator" style="margin-right: 8px;"></i> Dự Toán Trả Góp
-          </button>
+        <!-- Car Name Header -->
+        <h2 id="detail-name" style="font-size: 32px; font-weight: 800; text-align: center; margin: 24px 0 16px 0; text-transform: uppercase; color: var(--text-primary);">Đang tải...</h2>
+
+        <!-- Version Price Table -->
+        <div class="versions-table-container">
+          <table class="versions-table" style="width: 100%; border-collapse: collapse; margin-bottom: 12px; border: 1px solid #c0392b;">
+            <thead>
+              <tr style="background: #a90303; color: white;">
+                <th style="padding: 10px; font-size: 14px; font-weight: 700; text-align: center; border: 1px solid #a90303; text-transform: uppercase;">Tên Phiên Bản</th>
+                <th style="padding: 10px; font-size: 14px; font-weight: 700; text-align: center; border: 1px solid #a90303; text-transform: uppercase;">Giá Gốc</th>
+                <th style="padding: 10px; font-size: 14px; font-weight: 700; text-align: center; border: 1px solid #a90303; text-transform: uppercase;">Giá Ưu Đãi</th>
+              </tr>
+            </thead>
+            <tbody id="detail-versions-body">
+              <!-- Render versions dynamically -->
+            </tbody>
+          </table>
+          <div class="versions-notes" style="font-size: 12px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 24px;">
+            <div>Giá trên đã bao gồm VAT</div>
+            <div>Giá xe chưa bao gồm các tuỳ chọn</div>
+            <div style="color: #c0392b; font-weight: 600;">(*) Mức giá ưu đãi mang tính chất tham khảo. Chương trình áp dụng theo điều khoản & điều kiện</div>
+            <div id="detail-price-note" style="color: #a90303; font-weight: bold; font-size: 13.5px; margin-top: 8px;"></div>
+          </div>
         </div>
       </div>
+
+      <!-- COLUMN 2: Promotion Program (Middle Column) -->
+      <div class="promo-program-col">
+        <div class="promo-card" style="border: 2px dashed #c0392b; border-radius: 8px; overflow: hidden; background: #ebf3fc; height: 100%; display: flex; flex-direction: column;">
+          <div class="promo-header" style="background: #a90303; color: white; padding: 12px; text-align: center; font-weight: 800; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;">
+            Chương Trình Khuyến Mãi
+          </div>
+          <div class="promo-body" style="padding: 16px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="promo-list" style="margin-bottom: 20px;">
+              
+              <!-- Dynamic title for promotion -->
+              <div id="promo-car-title" style="font-weight: bold; font-size: 13px; color: var(--text-primary); margin-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 8px;">
+                🎁 ƯU ĐÃI VINFAST VEHICLE ALL NEW MỚI NHẤT:
+              </div>
+
+              <!-- Static/Dynamic bullet points with bottom border separators -->
+              <!-- Dynamic promo items container -->
+              <div id="promo-list-items">
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Đặt cọc 10 - 30 triệu</span>
+                </div>
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Miễn 100% thuế trước bạ</span>
+                </div>
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Giảm 6% giá trị xe</span>
+                </div>
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Giảm 5% ngành Công An & Quân Đội</span>
+                </div>
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Giảm tới 80 triệu VNĐ đối với khách hàng là chủ sở hữu đầu tiên của xe xăng VinFast</span>
+                </div>
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Ưu đãi riêng xin vui lòng liên hệ</span>
+                </div>
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Sạc pin miễn phí 3 năm tại các trạm sạch V-GREEN tới hết 2/2029</span>
+                </div>
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Bảo hành 7 năm hoặc 160.000km</span>
+                </div>
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Cứu hộ miễn phí 24/7 toàn quốc</span>
+                </div>
+                <div class="promo-item" style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e;">
+                  <span style="color: #a90303;">🎁</span>
+                  <span>Tặng ngay gói phụ kiện (Liên hệ)</span>
+                </div>
+              </div>
+
+              <!-- Action text -->
+              <div style="font-weight: bold; font-size: 13px; color: #a90303; margin-top: 14px; text-align: center;">
+                📞 Liên hệ ngay để nhận ưu đãi tốt nhất hôm nay!
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button class="btn btn-promo-cta" onclick="triggerGiftCta()" style="width: 100%; background: #a90303; color: white; font-weight: bold; border: none; padding: 12px; border-radius: 4px; font-size: 14px; cursor: pointer; text-transform: uppercase;">
+                Nhận Quà Tặng
+              </button>
+              <a href="tel:0964269988" id="promo-phone-btn" class="btn btn-promo-phone-cta" style="width: 100%; display: block; box-sizing: border-box; text-decoration: none; text-align: center; background: #5c0606; color: white; font-weight: bold; border: none; padding: 12px; border-radius: 4px; font-size: 14px; cursor: pointer; text-transform: uppercase;">
+                📞 0964.269.988
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMN 3: VinFast Vietnam (Right Column) -->
+      <div class="vinfast-vn-col">
+        <div class="vinfast-card" style="border-radius: 8px; overflow: hidden; background: #5c0606; color: white; height: 100%; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <!-- Top Card Image -->
+          <div style="height: 180px; overflow: hidden; background: #000;">
+            <img src="/uploads/banner_eco.png" alt="VinFast Việt Nam" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <!-- Card Body -->
+          <div class="vinfast-card-body" style="padding: 16px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 18px; font-weight: 800; text-align: center; color: white; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 16px; text-transform: uppercase;">
+                VinFast Việt Nam
+              </h3>
+              <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4;">
+                  <span style="color: #ffdd59;">•</span>
+                  <span>Giá tốt nhất khi gọi Hotline</span>
+                </li>
+                <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4;">
+                  <span style="color: #ffdd59;">•</span>
+                  <span>Ký hợp đồng và giao xe tận nhà</span>
+                </li>
+                <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4;">
+                  <span style="color: #ffdd59;">•</span>
+                  <span>Hỗ trợ đăng ký xe mọi miền tổ quốc</span>
+                </li>
+                <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4;">
+                  <span style="color: #ffdd59;">•</span>
+                  <span>Hỗ trợ vay lên đến 85%, lãi suất cực ưu đãi</span>
+                </li>
+                <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4;">
+                  <span style="color: #ffdd59;">•</span>
+                  <span>Duyệt vay trong ngày khi Quý khách bổ sung đủ hồ sơ, hỗ trợ hồ sơ nợ xấu</span>
+                </li>
+                <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4;">
+                  <span style="color: #ffdd59;">•</span>
+                  <span>Thu mua xe cũ, đổi xe mới</span>
+                </li>
+              </ul>
+            </div>
+            
+            <!-- Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <a href="tel:0964269988" id="vinfast-phone-btn" class="btn btn-card-phone-cta" style="width: 100%; display: block; box-sizing: border-box; text-decoration: none; text-align: center; background: #a90303; color: white; font-weight: bold; border: none; padding: 12px; border-radius: 24px; font-size: 14px; cursor: pointer; text-transform: uppercase;">
+                📞 0964.269.988
+              </a>
+              <button class="btn btn-card-quote-cta" onclick="triggerQuoteCta()" style="width: 100%; background: #a90303; color: white; font-weight: bold; border: none; padding: 12px; border-radius: 24px; font-size: 14px; cursor: pointer; text-transform: uppercase;">
+                📞 Báo Giá Nhanh
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
     </div>
 
     <!-- Key specs grid section -->
@@ -303,6 +538,14 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Detailed Introduction Section -->
+    <section id="introduction-section" style="margin-bottom: 60px; display: none;">
+      <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 20px; border-left: 4px solid var(--accent-color); padding-left: 12px;">Đánh Giá & Giới Thiệu Chi Tiết</h3>
+      <div id="detail-description" class="glass-panel" style="padding: 32px; line-height: 1.8; font-size: 15px; color: var(--text-primary);">
+        <!-- Render description HTML dynamically -->
+      </div>
+    </section>
 
     <!-- Installment / Financial Calculator -->
     <section id="finance-section" style="margin-bottom: 60px; scroll-margin-top: 100px;">
@@ -411,23 +654,8 @@
             </div>
     
             <div class="form-group" style="margin-bottom: 16px;">
-              <label class="form-label" for="td-email" style="font-weight: 600; display: block; margin-bottom: 6px;">Địa chỉ Email</label>
-              <input type="email" id="td-email" class="form-input" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--panel-border); padding: 10px 12px;" placeholder="VD: name@domain.com">
-            </div>
-    
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-              <div class="form-group">
-                <label class="form-label" for="td-province" style="font-weight: 600; display: block; margin-bottom: 6px;">Tỉnh / Thành *</label>
-                <select id="td-province" class="form-input" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--panel-border); padding: 10px 12px;" required>
-                  <option value="">Chọn Tỉnh/Thành...</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="td-showroom" style="font-weight: 600; display: block; margin-bottom: 6px;">Showroom đón tiếp *</label>
-                <select id="td-showroom" class="form-input" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--panel-border); padding: 10px 12px;" required disabled>
-                  <option value="">Chọn Showroom...</option>
-                </select>
-              </div>
+              <label class="form-label" for="td-address" style="font-weight: 600; display: block; margin-bottom: 6px;">Địa chỉ liên hệ của bạn *</label>
+              <input type="text" id="td-address" class="form-input" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--panel-border); padding: 10px 12px;" placeholder="VD: 123 Đường Láng, Đống Đa, Hà Nội" required>
             </div>
     
             <div class="form-group" style="margin-bottom: 20px;">
@@ -451,6 +679,84 @@
       <p>Sản phẩm này phục vụ mục đích giới thiệu thông tin và trải nghiệm kỹ thuật.</p>
     </div>
   </footer>
+
+  <!-- Khách hàng Đăng Nhập / Đăng Ký Modal -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-content glass-panel" style="max-width: 450px;">
+      <button class="modal-close-btn" id="auth-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg);">
+        
+        <!-- Tab Headers -->
+        <div class="auth-tabs" style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px;">
+          <button class="btn btn-primary tab-btn" id="tab-login-btn" onclick="switchAuthTab('login')" style="flex: 1; padding: 10px;">Đăng Nhập</button>
+          <button class="btn tab-btn" id="tab-register-btn" onclick="switchAuthTab('register')" style="flex: 1; padding: 10px;">Đăng Ký</button>
+        </div>
+
+        <!-- Hộp thông báo trạng thái -->
+        <div id="auth-status-msg" style="display: none; margin-bottom: 20px; padding: 10px 14px; border-radius: 8px; font-size: 13.5px; text-align: center; font-weight: 500;"></div>
+
+        <!-- Form Đăng Nhập -->
+        <div id="auth-login-content">
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center;">Đăng Nhập Tài Khoản</h3>
+          <form id="user-login-form">
+            <div class="form-group">
+              <label class="form-label" for="ul-username">Tài khoản</label>
+              <input type="text" id="ul-username" class="form-input" placeholder="Tên đăng nhập..." required autocomplete="username">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ul-password">Mật khẩu</label>
+              <input type="password" id="ul-password" class="form-input" placeholder="Mật khẩu..." required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">Đăng Nhập</button>
+          </form>
+        </div>
+
+        <!-- Form Đăng Ký -->
+        <div id="auth-register-content" style="display: none;">
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center;">Đăng Ký Khách Hàng</h3>
+          <form id="user-register-form">
+            <div class="form-group">
+              <label class="form-label" for="ur-username">Tên tài khoản *</label>
+              <input type="text" id="ur-username" class="form-input" placeholder="Ví dụ: nguyenan" required autocomplete="username">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ur-password">Mật khẩu *</label>
+              <input type="password" id="ur-password" class="form-input" placeholder="Nhập mật khẩu..." required autocomplete="new-password">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ur-fullname">Họ và tên *</label>
+              <input type="text" id="ur-fullname" class="form-input" placeholder="Nhập họ và tên..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ur-phone">Số điện thoại *</label>
+              <input type="tel" id="ur-phone" class="form-input" placeholder="Nhập số điện thoại..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ur-email">Địa chỉ Email</label>
+              <input type="email" id="ur-email" class="form-input" placeholder="Nhập email (tùy chọn)...">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 12px;">Đăng Ký</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Xác Nhận Đăng Xuất Custom -->
+  <div class="modal-overlay" id="logout-confirm-modal">
+    <div class="modal-content glass-panel" style="max-width: 380px;">
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); text-align: center;">
+        <i class="fa-solid fa-circle-question" style="font-size: 42px; color: var(--accent-color); margin-bottom: 16px;"></i>
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Xác Nhận Đăng Xuất</h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;">Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          <button class="btn" id="btn-logout-cancel" style="flex: 1; padding: 10px;">Hủy</button>
+          <button class="btn btn-danger" id="btn-logout-confirm" style="flex: 1; padding: 10px;">Đăng Xuất</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Floating Quick Contact Buttons -->
   <div class="floating-contact">

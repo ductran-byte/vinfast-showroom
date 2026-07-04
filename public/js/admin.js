@@ -1,7 +1,81 @@
 // Quản lý trạng thái Admin
 let token = localStorage.getItem('adminToken');
 let adminUser = localStorage.getItem('adminUser');
+let currentEditingColors = [];
+let quillEditor = null;
 
+// Initialize Quill Editor
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('editor-container');
+  if (container) {
+    quillEditor = new Quill('#editor-container', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          ['link', 'image'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          ['clean']
+        ]
+      }
+    });
+  }
+});
+
+// Helper to add version rows dynamically
+function addVersionRow(name = '', basePrice = '', promoPrice = '') {
+  const container = document.getElementById('versions-list-inputs');
+  if (!container) return;
+  
+  const row = document.createElement('div');
+  row.className = 'version-row';
+  row.style.display = 'grid';
+  row.style.gridTemplateColumns = '2fr 1.5fr 1.5fr 50px';
+  row.style.gap = '10px';
+  row.style.marginBottom = '10px';
+  row.style.alignItems = 'center';
+
+  row.innerHTML = `
+    <input type="text" class="form-input ver-name" value="${name}" placeholder="Tên phiên bản (VD: VinFast VF3 ECO)" required>
+    <input type="number" class="form-input ver-base-price" value="${basePrice}" placeholder="Giá gốc (VNĐ)" required>
+    <input type="number" class="form-input ver-promo-price" value="${promoPrice}" placeholder="Giá ưu đãi (VNĐ)" required>
+    <button type="button" class="btn btn-danger btn-remove-version" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white;"><i class="fa-solid fa-trash"></i></button>
+  `;
+
+  // Bind remove button click
+  row.querySelector('.btn-remove-version').onclick = function() {
+    row.remove();
+  };
+
+  container.appendChild(row);
+}
+
+// Helper to add promo rows dynamically
+function addPromoRow(content = '') {
+  const container = document.getElementById('promo-list-inputs');
+  if (!container) return;
+
+  const row = document.createElement('div');
+  row.className = 'promo-row';
+  row.style.display = 'grid';
+  row.style.gridTemplateColumns = '1fr 50px';
+  row.style.gap = '10px';
+  row.style.marginBottom = '10px';
+  row.style.alignItems = 'center';
+
+  row.innerHTML = `
+    <input type="text" class="form-input promo-content" value="${content}" placeholder="Nội dung khuyến mãi (VD: Đặt cọc 10 - 30 triệu)" required>
+    <button type="button" class="btn btn-danger btn-remove-promo" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white;"><i class="fa-solid fa-trash"></i></button>
+  `;
+
+  // Bind remove button click
+  row.querySelector('.btn-remove-promo').onclick = function() {
+    row.remove();
+  };
+
+  container.appendChild(row);
+}
 // DOM Elements
 const loginSection = document.getElementById('login-section');
 const dashboardSection = document.getElementById('dashboard-section');
@@ -273,6 +347,18 @@ btnAddCar.addEventListener('click', () => {
   carForm.reset();
   document.getElementById('car-id').value = '';
   imagePreviewContainer.innerHTML = `<span>Chưa có ảnh nào được chọn</span>`;
+  document.getElementById('spec-price-note').value = '';
+  const specContactPhone = document.getElementById('spec-contact-phone');
+  if (specContactPhone) specContactPhone.value = '';
+  if (quillEditor) quillEditor.root.innerHTML = '';
+
+  // Clear versions and promotions list inputs and reset current editing colors
+  const container = document.getElementById('versions-list-inputs');
+  if (container) container.innerHTML = '';
+  const promoContainer = document.getElementById('promo-list-inputs');
+  if (promoContainer) promoContainer.innerHTML = '';
+  currentEditingColors = [];
+
   carFormModal.classList.add('active');
   document.body.style.overflow = 'hidden';
 });
@@ -287,6 +373,22 @@ btnCancelForm.addEventListener('click', closeFormModal);
 carFormModal.addEventListener('click', (e) => {
   if (e.target === carFormModal) closeFormModal();
 });
+
+// Bind add version row button click listener
+const btnAddVer = document.getElementById('btn-add-version-row');
+if (btnAddVer) {
+  btnAddVer.onclick = function() {
+    addVersionRow('', '', '');
+  };
+}
+
+// Bind add promo row button click listener
+const btnAddPromo = document.getElementById('btn-add-promo-row');
+if (btnAddPromo) {
+  btnAddPromo.onclick = function() {
+    addPromoRow('');
+  };
+}
 
 // Hàm sửa thông tin xe
 async function editCar(id) {
@@ -309,7 +411,9 @@ async function editCar(id) {
     document.getElementById('car-torque').value = car.torque_nm;
     document.getElementById('car-battery').value = car.battery_kwh;
     document.getElementById('car-seats').value = car.seats;
-    document.getElementById('car-desc').value = car.description || '';
+    if (quillEditor) {
+      quillEditor.root.innerHTML = car.description || '';
+    }
 
     // Xem trước hình ảnh hiện tại
     imagePreviewContainer.innerHTML = `<img src="${car.image_url}" alt="${car.name}" onerror="this.src='/uploads/default-car.jpg'">`;
@@ -322,6 +426,34 @@ async function editCar(id) {
     document.getElementById('spec-in-drive').value = specs.drive_type || '';
     document.getElementById('spec-in-charging').value = specs.charging_time || '';
     document.getElementById('spec-in-safety').value = specs.safety || '';
+    document.getElementById('spec-price-note').value = specs.price_note || '';
+    const specContactPhone = document.getElementById('spec-contact-phone');
+    if (specContactPhone) {
+      specContactPhone.value = specs.contact_phone || '';
+    }
+
+    // Clear and populate versions list
+    const container = document.getElementById('versions-list-inputs');
+    if (container) {
+      container.innerHTML = '';
+      const versions = specs.versions || [];
+      versions.forEach(v => {
+        addVersionRow(v.name, v.base_price, v.promo_price);
+      });
+    }
+
+    // Clear and populate promotions list
+    const promoContainer = document.getElementById('promo-list-inputs');
+    if (promoContainer) {
+      promoContainer.innerHTML = '';
+      const promotions = car.promotions || [];
+      promotions.forEach(p => {
+        addPromoRow(p);
+      });
+    }
+
+    // Preserve original colors
+    currentEditingColors = specs.colors || [];
 
     carImageInput.value = '';
 
@@ -350,7 +482,27 @@ carForm.addEventListener('submit', async (e) => {
   formData.append('torque_nm', document.getElementById('car-torque').value);
   formData.append('battery_kwh', document.getElementById('car-battery').value);
   formData.append('seats', document.getElementById('car-seats').value);
-  formData.append('description', document.getElementById('car-desc').value);
+  formData.append('description', quillEditor ? quillEditor.root.innerHTML.trim() : '');
+
+  // Lấy danh sách các phiên bản từ form
+  const versions = [];
+  document.querySelectorAll('.version-row').forEach(row => {
+    const name = row.querySelector('.ver-name').value.trim();
+    const base_price = parseFloat(row.querySelector('.ver-base-price').value);
+    const promo_price = parseFloat(row.querySelector('.ver-promo-price').value);
+    if (name && !isNaN(base_price) && !isNaN(promo_price)) {
+      versions.push({ name, base_price, promo_price });
+    }
+  });
+
+  // Lấy danh sách các khuyến mãi từ form
+  const promotions = [];
+  document.querySelectorAll('.promo-row').forEach(row => {
+    const content = row.querySelector('.promo-content').value.trim();
+    if (content) {
+      promotions.push(content);
+    }
+  });
 
   // Tạo specifications JSON
   const specifications = {
@@ -359,9 +511,14 @@ carForm.addEventListener('submit', async (e) => {
     ground_clearance: document.getElementById('spec-in-clearance').value.trim(),
     drive_type: document.getElementById('spec-in-drive').value.trim(),
     charging_time: document.getElementById('spec-in-charging').value.trim(),
-    safety: document.getElementById('spec-in-safety').value.trim()
+    safety: document.getElementById('spec-in-safety').value.trim(),
+    price_note: document.getElementById('spec-price-note').value.trim(),
+    contact_phone: document.getElementById('spec-contact-phone') ? document.getElementById('spec-contact-phone').value.trim() : '',
+    versions: versions,
+    colors: currentEditingColors // bảo toàn danh sách màu sắc gốc
   };
   formData.append('specifications', JSON.stringify(specifications));
+  formData.append('promotions', JSON.stringify(promotions));
 
   if (carImageInput.files[0]) {
     formData.append('image', carImageInput.files[0]);

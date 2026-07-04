@@ -34,6 +34,7 @@ async function initDB() {
     await connection.query('DROP TABLE IF EXISTS test_drives;');
     await connection.query('DROP TABLE IF EXISTS cars;');
     await connection.query('DROP TABLE IF EXISTS banners;');
+    await connection.query('DROP TABLE IF EXISTS promotions;');
     await connection.query('SET FOREIGN_KEY_CHECKS = 1;');
 
     // Create admins table
@@ -77,7 +78,7 @@ async function initDB() {
         battery_kwh DECIMAL(5, 2) NOT NULL,
         seats INT NOT NULL,
         image_url VARCHAR(255) NOT NULL,
-        description TEXT,
+        description LONGTEXT,
         specifications JSON,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       ) ENGINE=InnoDB;
@@ -97,6 +98,7 @@ async function initDB() {
         preferred_date DATE,
         address VARCHAR(255),
         status VARCHAR(30) DEFAULT 'Chờ liên hệ',
+        type VARCHAR(20) DEFAULT 'drive',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (car_id) REFERENCES cars(id) ON DELETE SET NULL
       ) ENGINE=InnoDB;
@@ -122,6 +124,17 @@ async function initDB() {
       CREATE TABLE IF NOT EXISTS settings (
         \`key\` VARCHAR(50) PRIMARY KEY,
         \`value\` TEXT NOT NULL
+      ) ENGINE=InnoDB;
+    `);
+
+    // Create promotions table
+    console.log('Creating "promotions" table...');
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS promotions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        car_id INT NOT NULL,
+        content VARCHAR(255) NOT NULL,
+        FOREIGN KEY (car_id) REFERENCES cars(id) ON DELETE CASCADE
       ) ENGINE=InnoDB;
     `);
 
@@ -207,9 +220,18 @@ async function initDB() {
           charging_time: '36 phút (10% lên 70%)',
           safety: 'Phanh ABS, EBD, Hỗ trợ khởi hành ngang dốc, Cảm biến lùi, 1 túi khí',
           colors: [
-            { name: 'Vàng Dã Ngoại (Mặc định)', hex: '#EBC83C', image_url: '/uploads/vf3.jpg' },
-            { name: 'Trắng Tinh Khôi', hex: '#F5F6F8', image_url: '/uploads/vf3_white.jpg' },
-            { name: 'Hồng Phấn', hex: '#F3A3B8', image_url: '/uploads/vf3_pink.jpg' }
+            { name: 'Trắng Tinh Khôi', hex: '#F5F6F8', image_url: '/uploads/vf3_white.jpg', type: 'basic' },
+            { name: 'Xám Kim Loại', hex: '#7F8C8D', image_url: '/uploads/vf3.jpg', type: 'basic' },
+            { name: 'Đỏ Crimson', hex: '#C0392B', image_url: '/uploads/vf3.jpg', type: 'basic' },
+            { name: 'Vàng Dã Ngoại / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #EBC83C 50%)', image_url: '/uploads/vf3.jpg', type: 'premium' },
+            { name: 'Xanh Dương / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #3498db 50%)', image_url: '/uploads/vf3.jpg', type: 'premium' },
+            { name: 'Hồng Phấn / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #F3A3B8 50%)', image_url: '/uploads/vf3_pink.jpg', type: 'premium' },
+            { name: 'Xanh Lá / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #2ecc71 50%)', image_url: '/uploads/vf3.jpg', type: 'premium' }
+          ],
+          versions: [
+            { name: 'VinFast VF3 TC 1', base_price: 299000000, promo_price: 186110000 },
+            { name: 'VinFast VF3 ECO', base_price: 302000000, promo_price: 188780000 },
+            { name: 'VinFast VF3 PLUS', base_price: 315000000, promo_price: 200350000 }
           ]
         })
       },
@@ -530,6 +552,30 @@ async function initDB() {
       );
     }
     console.log('Sample cars inserted with color configurations.');
+
+    // Insert promotions for VinFast VF 3
+    console.log('Inserting default promotions for VinFast VF 3...');
+    const [vf3Rows] = await connection.query('SELECT id FROM cars WHERE name = ?', ['VinFast VF 3']);
+    if (vf3Rows.length > 0) {
+      const vf3Id = vf3Rows[0].id;
+      const defaultPromotions = [
+        'Đặt cọc 10 - 30 triệu',
+        'Miễn 100% thuế trước bạ',
+        'Giảm 6% giá trị xe',
+        'Giảm 5% ngành Công An & Quân Đội',
+        'Giảm tới 80 triệu VNĐ đối với khách hàng là chủ sở hữu đầu tiên của xe xăng VinFast',
+        'Ưu đãi riêng xin vui lòng liên hệ',
+        'Sạc pin miễn phí 3 năm tại các trạm sạch V-GREEN tới hết 2/2029',
+        'Bảo hành 7 năm hoặc 160.000km',
+        'Cứu hộ miễn phí 24/7 toàn quốc',
+        'Tặng ngay gói phụ kiện (Liên hệ)'
+      ];
+
+      for (const content of defaultPromotions) {
+        await connection.query('INSERT INTO promotions (car_id, content) VALUES (?, ?)', [vf3Id, content]);
+      }
+      console.log('Default promotions for VF 3 inserted successfully.');
+    }
 
     console.log('Database initialization and upgrades completed successfully!');
   } catch (error) {

@@ -298,23 +298,127 @@ async function loadSystemSettings() {
   }
 }
 
-// CTA Trigger Functions
-function triggerGiftCta() {
-  scrollToSection('test-drive-section');
-  const nameInput = document.getElementById('td-name');
-  if (nameInput) {
-    nameInput.focus();
-    nameInput.placeholder = "Nhập họ tên để đăng ký nhận quà tặng...";
+// CTA Trigger Functions & Quote Modal Logic
+let allCarsList = null;
+
+async function populateQuoteCarSelect() {
+  const selectEl = document.getElementById('quote-car-select');
+  if (!selectEl) return;
+  
+  if (!allCarsList) {
+    try {
+      const response = await fetch('/api/cars');
+      if (response.ok) {
+        allCarsList = await response.json();
+      }
+    } catch (err) {
+      console.error('Lỗi khi tải danh sách xe cho báo giá:', err);
+    }
+  }
+  
+  if (allCarsList) {
+    selectEl.innerHTML = '<option value="">-- Chọn dòng xe --</option>' +
+      allCarsList.map(car => `<option value="${car.id}">${car.name}</option>`).join('');
   }
 }
 
-function triggerQuoteCta() {
-  scrollToSection('test-drive-section');
-  const nameInput = document.getElementById('td-name');
-  if (nameInput) {
-    nameInput.focus();
-    nameInput.placeholder = "Nhập họ tên để nhận báo giá nhanh...";
+async function openQuoteModal() {
+  const modal = document.getElementById('quote-modal');
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Load cars list and auto-select current car
+    await populateQuoteCarSelect();
+    const selectEl = document.getElementById('quote-car-select');
+    if (selectEl && currentCar) {
+      selectEl.value = currentCar.id;
+    }
+    
+    // Autofill user profile if logged in
+    const profileStr = localStorage.getItem('userProfile');
+    const quoteName = document.getElementById('quote-name');
+    const quotePhone = document.getElementById('quote-phone');
+    if (profileStr) {
+      const profile = JSON.parse(profileStr);
+      if (quoteName) {
+        quoteName.value = profile.fullname || '';
+        quoteName.readOnly = true;
+      }
+      if (quotePhone) {
+        quotePhone.value = profile.phone || '';
+        quotePhone.readOnly = true;
+      }
+    } else {
+      if (quoteName) {
+        quoteName.value = '';
+        quoteName.readOnly = false;
+      }
+      if (quotePhone) {
+        quotePhone.value = '';
+        quotePhone.readOnly = false;
+      }
+    }
   }
+}
+
+function closeQuoteModal() {
+  const modal = document.getElementById('quote-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+function triggerGiftCta() {
+  openQuoteModal();
+}
+
+function triggerQuoteCta() {
+  openQuoteModal();
+}
+
+// Close and submit event handlers for quote modal
+document.addEventListener('click', (e) => {
+  const closeBtn = e.target.closest('#quote-modal-close');
+  const modal = document.getElementById('quote-modal');
+  if (closeBtn && modal) {
+    closeQuoteModal();
+  }
+  if (e.target === modal) {
+    closeQuoteModal();
+  }
+});
+
+const quoteForm = document.getElementById('quote-form');
+if (quoteForm) {
+  quoteForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const car_id = document.getElementById('quote-car-select').value;
+    const fullname = document.getElementById('quote-name').value.trim();
+    const phone = document.getElementById('quote-phone').value.trim();
+    const address = document.getElementById('quote-address').value.trim();
+    
+    try {
+      const response = await fetch('/api/test-drives', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ type: 'quote', car_id, fullname, phone, address })
+      });
+      
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Lỗi khi gửi yêu cầu báo giá.');
+      
+      showNotification(data.message || 'Gửi yêu cầu báo giá thành công! Chúng tôi sẽ liên hệ bạn sớm.', true);
+      quoteForm.reset();
+      closeQuoteModal();
+    } catch (error) {
+      showNotification(error.message, false);
+    }
+  });
 }
 
 // Expose to window scope

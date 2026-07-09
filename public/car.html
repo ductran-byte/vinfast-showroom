@@ -758,6 +758,49 @@
     </div>
   </div>
 
+  <!-- Đăng Ký Nhận Báo Giá Modal -->
+  <div class="modal-overlay" id="quote-modal">
+    <div class="modal-content glass-panel" style="max-width: 600px;">
+      <button class="modal-close-btn" id="quote-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 36px;">
+        <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); text-align: center;">Yêu Cầu Báo Giá Lăn Bánh</h2>
+        <p style="color: var(--text-secondary); text-align: center; font-size: 14px; margin-bottom: 24px;">
+          Vui lòng để lại thông tin chính xác. Nhân viên tư vấn VinFast sẽ gửi bảng tính giá lăn bánh, quà tặng khuyến mãi và phương án trả góp tốt nhất cho bạn.
+        </p>
+        
+        <form id="quote-form">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="quote-car-select" style="font-weight: 600; display: block; margin-bottom: 6px;">Dòng xe bạn quan tâm *</label>
+            <select id="quote-car-select" class="form-input" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--panel-border); padding: 10px 12px; background: #fff;" required>
+              <option value="">-- Chọn dòng xe --</option>
+            </select>
+          </div>
+          
+          <div class="form-row-2col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+            <div class="form-group">
+              <label class="form-label" for="quote-name" style="font-weight: 600; display: block; margin-bottom: 6px;">Họ và tên *</label>
+              <input type="text" id="quote-name" class="form-input" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--panel-border); padding: 10px 12px;" placeholder="Nhập họ tên..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="quote-phone" style="font-weight: 600; display: block; margin-bottom: 6px;">Số điện thoại *</label>
+              <input type="tel" id="quote-phone" class="form-input" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--panel-border); padding: 10px 12px;" placeholder="Nhập số điện thoại..." required>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="quote-address" style="font-weight: 600; display: block; margin-bottom: 6px;">Địa chỉ của bạn *</label>
+            <input type="text" id="quote-address" class="form-input" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--panel-border); padding: 10px 12px;" placeholder="VD: Quận Hà Đông, Hà Nội..." required>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 15px; font-size: 15px;">
+            Nhận Báo Giá Ngay
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Floating Quick Contact Buttons -->
   <div class="floating-contact">
     <a href="tel:1900232389" class="contact-item phone" title="Hotline gọi hỗ trợ (1900 232389)">

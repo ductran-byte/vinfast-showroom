@@ -350,8 +350,11 @@ function renderShowroomGrid() {
         </div>
         <div class="car-card-body">
           <h3 class="car-card-title">${car.name}</h3>
-          <p class="car-card-price" style="${car.specifications && car.specifications.price_note ? 'margin-bottom: 4px;' : 'margin-bottom: 20px;'}">Giá từ: ${formatVND(car.price)}</p>
-          ${car.specifications && car.specifications.price_note ? `<div class="car-card-price-note">${car.specifications.price_note}</div>` : ''}
+          <p class="car-card-price" style="margin-bottom: 4px;">Giá từ: ${formatVND(car.price)}</p>
+          ${car.specifications && car.specifications.price_note ? `<div class="car-card-price-note" style="margin-bottom: 4px;">${car.specifications.price_note}</div>` : ''}
+          <div class="flashing-price-alert">
+            GIÁ TRÊN LÀ GIÁ CÔNG KHAI CỦA HÃNG, NHẬN “GIÁ ĐÁY” TỐT NHẤT ANH/CHỊ ĐỂ LẠI THÔNG TIN ĐỂ NHẬN ƯU ĐÃI
+          </div>
           <div class="car-features-mini">
             <div class="feature-mini-item">
               <span class="feature-mini-val">${car.range_km > 0 ? car.range_km + ' km' : 'Đang cập nhật'}</span>

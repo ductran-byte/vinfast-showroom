@@ -242,8 +242,19 @@ async function initCarDetailPage() {
     // Load dynamic settings (Hotline phone numbers, Zalo, Messenger links)
     loadSystemSettings();
 
+    // Hide page loader once loaded
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+      loader.classList.add('fade-out');
+      setTimeout(() => loader.remove(), 400);
+    }
+
   } catch (err) {
     console.error('Error hydrating page details:', err);
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+      loader.remove();
+    }
     showNotification('Có lỗi xảy ra khi tải dữ liệu dòng xe.', false);
     window.location.href = '/';
   }

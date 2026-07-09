@@ -10,6 +10,7 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || 'vinfast_db',
   waitForConnections: true,
   connectionLimit: 2,
+  idleTimeout: 10000,
   queueLimit: 0
 });
 

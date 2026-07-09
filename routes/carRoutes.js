@@ -46,8 +46,8 @@ router.get('/', carController.getAllCars);
 router.get('/:id', carController.getCarById);
 
 // API routes được bảo mật cho Admin để chỉnh sửa thông tin xe
-router.post('/', authMiddleware, upload.single('image'), carController.createCar);
-router.put('/:id', authMiddleware, upload.single('image'), carController.updateCar);
+router.post('/', authMiddleware, upload.any(), carController.createCar);
+router.put('/:id', authMiddleware, upload.any(), carController.updateCar);
 router.delete('/:id', authMiddleware, carController.deleteCar);
 
 module.exports = router;

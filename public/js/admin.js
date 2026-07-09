@@ -1,7 +1,6 @@
 // Quản lý trạng thái Admin
 let token = localStorage.getItem('adminToken');
 let adminUser = localStorage.getItem('adminUser');
-let currentEditingColors = [];
 let quillEditor = null;
 
 // Initialize Quill Editor
@@ -71,6 +70,41 @@ function addPromoRow(content = '') {
 
   // Bind remove button click
   row.querySelector('.btn-remove-promo').onclick = function() {
+    row.remove();
+  };
+
+  container.appendChild(row);
+}
+
+// Helper to add color rows dynamically
+function addColorRow(colorObj = null) {
+  const container = document.getElementById('colors-list-inputs');
+  if (!container) return;
+
+  const row = document.createElement('div');
+  row.className = 'color-row';
+  row.style.display = 'grid';
+  row.style.gridTemplateColumns = '50px 2fr 3fr 50px';
+  row.style.gap = '10px';
+  row.style.marginBottom = '10px';
+  row.style.alignItems = 'center';
+
+  const hexVal = colorObj ? colorObj.hex : '#000000';
+  const nameVal = colorObj ? colorObj.name : '';
+  const imgUrl = colorObj ? colorObj.image_url : '';
+
+  row.innerHTML = `
+    <input type="color" class="color-hex" value="${hexVal}" style="width: 100%; height: 42px; padding: 2px; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); cursor: pointer;">
+    <input type="text" class="form-input color-name" value="${nameVal}" placeholder="Tên màu (VD: Đỏ Năng Động)" required style="height: 42px;">
+    <div style="display: flex; gap: 8px; align-items: center; overflow: hidden;">
+      <input type="file" class="form-input color-file-input" accept="image/*" style="flex: 1; padding: 8px 10px; font-size: 12px; height: 42px;">
+      ${imgUrl ? `<img class="color-preview" src="${imgUrl}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl}">` : ''}
+    </div>
+    <button type="button" class="btn btn-danger btn-remove-color" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white;"><i class="fa-solid fa-trash"></i></button>
+  `;
+
+  // Bind remove button click
+  row.querySelector('.btn-remove-color').onclick = function() {
     row.remove();
   };
 
@@ -352,12 +386,13 @@ btnAddCar.addEventListener('click', () => {
   if (specContactPhone) specContactPhone.value = '';
   if (quillEditor) quillEditor.root.innerHTML = '';
 
-  // Clear versions and promotions list inputs and reset current editing colors
+  // Clear versions, promotions, and colors list inputs
   const container = document.getElementById('versions-list-inputs');
   if (container) container.innerHTML = '';
   const promoContainer = document.getElementById('promo-list-inputs');
   if (promoContainer) promoContainer.innerHTML = '';
-  currentEditingColors = [];
+  const colorContainer = document.getElementById('colors-list-inputs');
+  if (colorContainer) colorContainer.innerHTML = '';
 
   carFormModal.classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -379,6 +414,14 @@ const btnAddVer = document.getElementById('btn-add-version-row');
 if (btnAddVer) {
   btnAddVer.onclick = function() {
     addVersionRow('', '', '');
+  };
+}
+
+// Bind add color row button click listener
+const btnAddColor = document.getElementById('btn-add-color-row');
+if (btnAddColor) {
+  btnAddColor.onclick = function() {
+    addColorRow();
   };
 }
 
@@ -442,6 +485,16 @@ async function editCar(id) {
       });
     }
 
+    // Clear and populate colors list
+    const colorContainer = document.getElementById('colors-list-inputs');
+    if (colorContainer) {
+      colorContainer.innerHTML = '';
+      const colors = specs.colors || [];
+      colors.forEach(c => {
+        addColorRow(c);
+      });
+    }
+
     // Clear and populate promotions list
     const promoContainer = document.getElementById('promo-list-inputs');
     if (promoContainer) {
@@ -451,9 +504,6 @@ async function editCar(id) {
         addPromoRow(p);
       });
     }
-
-    // Preserve original colors
-    currentEditingColors = specs.colors || [];
 
     carImageInput.value = '';
 
@@ -504,6 +554,35 @@ carForm.addEventListener('submit', async (e) => {
     }
   });
 
+  // Lấy danh sách các màu sắc từ form
+  const colors = [];
+  document.querySelectorAll('.color-row').forEach((row, index) => {
+    const hex = row.querySelector('.color-hex').value;
+    const name = row.querySelector('.color-name').value.trim();
+    const fileInput = row.querySelector('.color-file-input');
+    const previewImg = row.querySelector('.color-preview');
+    
+    let image_url = '';
+    let fileKey = '';
+    
+    if (fileInput.files[0]) {
+      fileKey = `color_image_${index}`;
+      formData.append(fileKey, fileInput.files[0]);
+    } else if (previewImg) {
+      image_url = previewImg.getAttribute('data-url') || '';
+    }
+    
+    if (name) {
+      const colorObj = { name, hex };
+      if (fileKey) {
+        colorObj.fileKey = fileKey;
+      } else {
+        colorObj.image_url = image_url;
+      }
+      colors.push(colorObj);
+    }
+  });
+
   // Tạo specifications JSON
   const specifications = {
     dimensions: document.getElementById('spec-in-dimensions').value.trim(),
@@ -515,7 +594,7 @@ carForm.addEventListener('submit', async (e) => {
     price_note: document.getElementById('spec-price-note').value.trim(),
     contact_phone: document.getElementById('spec-contact-phone') ? document.getElementById('spec-contact-phone').value.trim() : '',
     versions: versions,
-    colors: currentEditingColors // bảo toàn danh sách màu sắc gốc
+    colors: colors
   };
   formData.append('specifications', JSON.stringify(specifications));
   formData.append('promotions', JSON.stringify(promotions));

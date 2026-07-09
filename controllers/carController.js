@@ -98,14 +98,34 @@ exports.createCar = async (req, res) => {
 
     // Xử lý hình ảnh
     let imageUrl = '/uploads/default-car.jpg'; // Ảnh mặc định nếu không tải lên
-    if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
+    if (req.files && req.files.length > 0) {
+      const mainImage = req.files.find(f => f.fieldname === 'image');
+      if (mainImage) {
+        imageUrl = `/uploads/${mainImage.filename}`;
+      }
     }
 
     // Chuẩn hóa specifications thành chuỗi JSON
     let specsJson = '{}';
     if (specifications) {
-      specsJson = typeof specifications === 'string' ? specifications : JSON.stringify(specifications);
+      try {
+        let specs = typeof specifications === 'string' ? JSON.parse(specifications) : specifications;
+        if (specs.colors && Array.isArray(specs.colors)) {
+          specs.colors = specs.colors.map(color => {
+            if (color.fileKey && req.files) {
+              const file = req.files.find(f => f.fieldname === color.fileKey);
+              if (file) {
+                color.image_url = `/uploads/${file.filename}`;
+              }
+              delete color.fileKey;
+            }
+            return color;
+          });
+        }
+        specsJson = JSON.stringify(specs);
+      } catch (e) {
+        specsJson = typeof specifications === 'string' ? specifications : JSON.stringify(specifications);
+      }
     }
 
     const [result] = await db.query(
@@ -166,8 +186,14 @@ exports.updateCar = async (req, res) => {
     const [rows] = await db.query('SELECT * FROM cars WHERE id = ?', [id]);
     if (rows.length === 0) {
       // Nếu có ảnh vừa tải lên, xóa đi để tránh rác
-      if (req.file) {
-        fs.unlinkSync(path.join(__dirname, '../public', 'uploads', req.file.filename));
+      if (req.files && req.files.length > 0) {
+        req.files.forEach(file => {
+          try {
+            fs.unlinkSync(file.path);
+          } catch (err) {
+            console.error('Không thể xóa file rác:', err);
+          }
+        });
       }
       return res.status(404).json({ message: 'Không tìm thấy thông tin xe cần cập nhật.' });
     }
@@ -191,8 +217,9 @@ exports.updateCar = async (req, res) => {
 
     let imageUrl = currentCar.image_url;
     // Nếu có file ảnh mới tải lên
-    if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
+    let mainImage = req.files ? req.files.find(f => f.fieldname === 'image') : null;
+    if (mainImage) {
+      imageUrl = `/uploads/${mainImage.filename}`;
       // Xóa ảnh cũ nếu nó không phải là ảnh mặc định và ảnh mẫu ban đầu (chỉ xóa các ảnh được upload sau này)
       if (currentCar.image_url && 
           !currentCar.image_url.startsWith('/uploads/vf') && 
@@ -213,7 +240,24 @@ exports.updateCar = async (req, res) => {
 
     let specsJson = currentCar.specifications;
     if (specifications) {
-      specsJson = typeof specifications === 'string' ? specifications : JSON.stringify(specifications);
+      try {
+        let specs = typeof specifications === 'string' ? JSON.parse(specifications) : specifications;
+        if (specs.colors && Array.isArray(specs.colors)) {
+          specs.colors = specs.colors.map(color => {
+            if (color.fileKey && req.files) {
+              const file = req.files.find(f => f.fieldname === color.fileKey);
+              if (file) {
+                color.image_url = `/uploads/${file.filename}`;
+              }
+              delete color.fileKey;
+            }
+            return color;
+          });
+        }
+        specsJson = JSON.stringify(specs);
+      } catch (e) {
+        specsJson = typeof specifications === 'string' ? specifications : JSON.stringify(specifications);
+      }
     }
 
     await db.query(

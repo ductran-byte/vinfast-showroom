@@ -84,7 +84,7 @@ function addColorRow(colorObj = null) {
   const row = document.createElement('div');
   row.className = 'color-row';
   row.style.display = 'grid';
-  row.style.gridTemplateColumns = '50px 2fr 3fr 50px';
+  row.style.gridTemplateColumns = '50px 2fr 1.5fr 3fr 50px';
   row.style.gap = '10px';
   row.style.marginBottom = '10px';
   row.style.alignItems = 'center';
@@ -92,10 +92,15 @@ function addColorRow(colorObj = null) {
   const hexVal = colorObj ? colorObj.hex : '#000000';
   const nameVal = colorObj ? colorObj.name : '';
   const imgUrl = colorObj ? colorObj.image_url : '';
+  const typeVal = colorObj ? colorObj.type : 'basic';
 
   row.innerHTML = `
     <input type="color" class="color-hex" value="${hexVal}" style="width: 100%; height: 42px; padding: 2px; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); cursor: pointer;">
     <input type="text" class="form-input color-name" value="${nameVal}" placeholder="Tên màu (VD: Đỏ Năng Động)" required style="height: 42px;">
+    <select class="form-input color-type" style="height: 42px; background: #fff;">
+      <option value="basic" ${typeVal === 'basic' ? 'selected' : ''}>Màu cơ bản</option>
+      <option value="premium" ${typeVal === 'premium' ? 'selected' : ''}>Màu nâng cao</option>
+    </select>
     <div style="display: flex; gap: 8px; align-items: center; overflow: hidden;">
       <input type="file" class="form-input color-file-input" accept="image/*" style="flex: 1; padding: 8px 10px; font-size: 12px; height: 42px;">
       ${imgUrl ? `<img class="color-preview" src="${imgUrl}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl}">` : ''}
@@ -559,6 +564,7 @@ carForm.addEventListener('submit', async (e) => {
   document.querySelectorAll('.color-row').forEach((row, index) => {
     const hex = row.querySelector('.color-hex').value;
     const name = row.querySelector('.color-name').value.trim();
+    const type = row.querySelector('.color-type').value;
     const fileInput = row.querySelector('.color-file-input');
     const previewImg = row.querySelector('.color-preview');
     
@@ -573,7 +579,7 @@ carForm.addEventListener('submit', async (e) => {
     }
     
     if (name) {
-      const colorObj = { name, hex };
+      const colorObj = { name, hex, type };
       if (fileKey) {
         colorObj.fileKey = fileKey;
       } else {

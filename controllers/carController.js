@@ -1,11 +1,18 @@
 const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
+const cache = require('../config/cache');
 
 // Lấy danh sách tất cả các xe (hỗ trợ lọc theo type và tìm kiếm theo tên)
 exports.getAllCars = async (req, res) => {
   try {
     const { search, type } = req.query;
+    const cacheKey = `cars_${search || ''}_${type || ''}`;
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      return res.json(cachedData);
+    }
+
     let query = 'SELECT * FROM cars WHERE 1=1';
     const queryParams = [];
 
@@ -36,6 +43,7 @@ exports.getAllCars = async (req, res) => {
       return { ...car, specifications: specs };
     });
 
+    cache.set(cacheKey, cars);
     res.json(cars);
   } catch (error) {
     console.error('Lỗi lấy danh sách xe:', error);
@@ -47,6 +55,12 @@ exports.getAllCars = async (req, res) => {
 exports.getCarById = async (req, res) => {
   const { id } = req.params;
   try {
+    const cacheKey = `car_${id}`;
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      return res.json(cachedData);
+    }
+
     const [rows] = await db.query('SELECT * FROM cars WHERE id = ?', [id]);
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Không tìm thấy thông tin xe.' });
@@ -66,7 +80,9 @@ exports.getCarById = async (req, res) => {
     const [promoRows] = await db.query('SELECT content FROM promotions WHERE car_id = ? ORDER BY id ASC', [id]);
     const promotions = promoRows.map(r => r.content);
 
-    res.json({ ...car, specifications: specs, promotions });
+    const resultData = { ...car, specifications: specs, promotions };
+    cache.set(cacheKey, resultData);
+    res.json(resultData);
   } catch (error) {
     console.error('Lỗi lấy chi tiết xe:', error);
     res.status(500).json({ message: 'Lỗi hệ thống khi tải thông tin xe.' });
@@ -167,6 +183,7 @@ exports.createCar = async (req, res) => {
       }
     }
 
+    cache.clear();
     res.status(201).json({
       message: 'Thêm xe mới thành công!',
       carId: carId
@@ -302,6 +319,7 @@ exports.updateCar = async (req, res) => {
       }
     }
 
+    cache.clear();
     res.json({ message: 'Cập nhật thông tin xe thành công!' });
 
   } catch (error) {
@@ -341,6 +359,7 @@ exports.deleteCar = async (req, res) => {
       }
     }
 
+    cache.clear();
     res.json({ message: 'Xóa xe thành công!' });
   } catch (error) {
     console.error('Lỗi xóa xe:', error);

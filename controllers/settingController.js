@@ -1,13 +1,21 @@
 const db = require('../config/db');
+const cache = require('../config/cache');
 
 // Lấy tất cả cấu hình
 exports.getSettings = async (req, res) => {
   try {
+    const cacheKey = 'settings_all';
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      return res.json(cachedData);
+    }
+
     const [rows] = await db.query('SELECT * FROM settings');
     const settings = {};
     rows.forEach(row => {
       settings[row.key] = row.value;
     });
+    cache.set(cacheKey, settings);
     res.json(settings);
   } catch (error) {
     console.error('Lỗi lấy danh sách cấu hình:', error);
@@ -28,6 +36,7 @@ exports.updateSettings = async (req, res) => {
       );
     }
     
+    cache.clear();
     res.json({ message: 'Cập nhật cấu hình hệ thống thành công!' });
   } catch (error) {
     console.error('Lỗi cập nhật cấu hình:', error);

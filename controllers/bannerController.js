@@ -1,11 +1,19 @@
 const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
+const cache = require('../config/cache');
 
 // Lấy danh sách tất cả các banner
 exports.getAllBanners = async (req, res) => {
   try {
+    const cacheKey = 'banners_all';
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+      return res.json(cachedData);
+    }
+
     const [rows] = await db.query('SELECT * FROM banners ORDER BY id ASC');
+    cache.set(cacheKey, rows);
     res.json(rows);
   } catch (error) {
     console.error('Lỗi lấy danh sách banner:', error);
@@ -44,6 +52,7 @@ exports.createBanner = async (req, res) => {
       ]
     );
 
+    cache.clear();
     res.status(201).json({
       message: 'Thêm banner mới thành công!',
       bannerId: result.insertId
@@ -103,6 +112,7 @@ exports.updateBanner = async (req, res) => {
       ]
     );
 
+    cache.clear();
     res.json({ message: 'Cập nhật banner thành công!' });
 
   } catch (error) {
@@ -137,6 +147,7 @@ exports.deleteBanner = async (req, res) => {
     }
 
     await db.query('DELETE FROM banners WHERE id = ?', [id]);
+    cache.clear();
     res.json({ message: 'Xóa banner thành công!' });
 
   } catch (error) {

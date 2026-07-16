@@ -988,6 +988,7 @@ async function loadAdminTestDrives() {
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Không thể tải danh sách yêu cầu.');
+    window.loadedDrives = data;
     const drives = data;
 
     if (drives.length === 0) {
@@ -1365,3 +1366,237 @@ if (adminSettingsForm) {
 
 // Khởi tạo chạy ban đầu
 checkAuth();
+
+// --- Tính năng Xuất dữ liệu (Excel, CSV, PDF) cho Yêu Cầu Báo Giá & Lái Thử ---
+
+// Toggle Dropdown
+window.toggleExportDropdown = function() {
+  const menu = document.getElementById('export-dropdown-menu');
+  if (menu) {
+    const isVisible = menu.style.display === 'block';
+    menu.style.display = isVisible ? 'none' : 'block';
+  }
+};
+
+// Đóng dropdown khi click ngoài
+document.addEventListener('click', (e) => {
+  const btn = document.getElementById('btn-export-dropdown');
+  const menu = document.getElementById('export-dropdown-menu');
+  if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+// Trigger Export theo định dạng
+window.triggerExport = function(format) {
+  const drives = window.loadedDrives || [];
+  if (drives.length === 0) {
+    alert('Không có dữ liệu để xuất!');
+    return;
+  }
+
+  // Ẩn menu dropdown sau khi click chọn
+  const menu = document.getElementById('export-dropdown-menu');
+  if (menu) menu.style.display = 'none';
+
+  if (format === 'csv') {
+    exportCSV(drives);
+  } else if (format === 'excel') {
+    exportExcel(drives);
+  } else if (format === 'pdf') {
+    exportPDF(drives);
+  }
+};
+
+// 1. Xuất CSV (.csv)
+function exportCSV(drives) {
+  let csvContent = "\uFEFF"; // UTF-8 BOM chống lỗi font tiếng Việt trong Excel
+  csvContent += "Mã yêu cầu,Họ và Tên,Số điện thoại,Email,Dòng xe quan tâm,Phân loại,Địa chỉ/Showroom,Ngày hẹn lái thử,Trạng thái,Ngày gửi\n";
+  
+  drives.forEach(d => {
+    const typeStr = d.type === 'quote' ? 'Nhận Báo Giá' : 'Đăng Ký Lái Thử';
+    const dateStr = d.preferred_date ? new Date(d.preferred_date).toLocaleDateString('vi-VN') : '';
+    const createdStr = d.created_at ? new Date(d.created_at).toLocaleDateString('vi-VN') : '';
+    
+    let detailAddress = d.address || '';
+    if (d.type !== 'quote') {
+      const parts = [];
+      if (d.showroom) parts.push(`Showroom: ${d.showroom}`);
+      if (d.province) parts.push(`Tỉnh: ${d.province}`);
+      if (d.address) parts.push(`ĐC: ${d.address}`);
+      detailAddress = parts.join(' - ');
+    }
+
+    const row = [
+      d.id,
+      `"${d.fullname.replace(/"/g, '""')}"`,
+      `"${d.phone}"`,
+      `"${(d.email || '').replace(/"/g, '""')}"`,
+      `"${(d.car_name || 'Chưa chọn').replace(/"/g, '""')}"`,
+      `"${typeStr}"`,
+      `"${detailAddress.replace(/"/g, '""')}"`,
+      `"${dateStr}"`,
+      `"${d.status}"`,
+      `"${createdStr}"`
+    ].join(',');
+    
+    csvContent += row + "\n";
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", `Danh_sach_Yeu_cau_Bao_gia_Lai_thu_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// 2. Xuất Excel (.xlsx) qua SheetJS loaded dynamically
+function exportExcel(drives) {
+  if (typeof XLSX === 'undefined') {
+    // Tải động thư viện SheetJS từ CDN
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    script.onload = () => {
+      doExportExcel(drives);
+    };
+    document.head.appendChild(script);
+  } else {
+    doExportExcel(drives);
+  }
+}
+
+function doExportExcel(drives) {
+  const data = drives.map(d => {
+    let detailAddress = d.address || '';
+    if (d.type !== 'quote') {
+      const parts = [];
+      if (d.showroom) parts.push(`Showroom: ${d.showroom}`);
+      if (d.province) parts.push(`Tỉnh/Thành: ${d.province}`);
+      if (d.address) parts.push(`ĐC: ${d.address}`);
+      detailAddress = parts.join(' - ');
+    }
+
+    return {
+      'Mã yêu cầu': d.id,
+      'Họ và Tên': d.fullname,
+      'Số điện thoại': d.phone,
+      'Email': d.email || 'Chưa cung cấp',
+      'Dòng xe quan tâm': d.car_name || 'Chưa chọn',
+      'Phân loại': d.type === 'quote' ? 'Nhận Báo Giá' : 'Đăng Ký Lái Thử',
+      'Địa chỉ/Showroom': detailAddress,
+      'Ngày hẹn lái thử': d.preferred_date ? new Date(d.preferred_date).toLocaleDateString('vi-VN') : '',
+      'Trạng thái': d.status,
+      'Ngày gửi': d.created_at ? new Date(d.created_at).toLocaleDateString('vi-VN') : ''
+    };
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Yêu Cầu");
+  
+  // Tự động căn chỉnh độ rộng cột
+  const maxProps = [];
+  data.forEach(row => {
+    Object.keys(row).forEach((key, colIndex) => {
+      const val = row[key] ? row[key].toString() : '';
+      if (!maxProps[colIndex] || val.length > maxProps[colIndex]) {
+        maxProps[colIndex] = val.length;
+      }
+    });
+  });
+  worksheet['!cols'] = maxProps.map(w => ({ wch: Math.max(w + 4, 12) }));
+
+  XLSX.writeFile(workbook, `Danh_sach_Yeu_cau_Bao_gia_Lai_thu_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+// 3. Xuất PDF (.pdf) hỗ trợ tiếng Việt hoàn hảo qua Print Window
+function exportPDF(drives) {
+  const printWindow = window.open('', '_blank');
+  
+  let tableRows = '';
+  drives.forEach(d => {
+    let detailAddress = d.address || '';
+    if (d.type !== 'quote') {
+      const parts = [];
+      if (d.showroom) parts.push(`Showroom: ${d.showroom}`);
+      if (d.province) parts.push(`Tỉnh/Thành: ${d.province}`);
+      if (d.address) parts.push(`ĐC: ${d.address}`);
+      detailAddress = parts.join(' - ');
+    }
+
+    tableRows += `
+      <tr>
+        <td>${d.id}</td>
+        <td><strong>${d.fullname}</strong></td>
+        <td>${d.phone}</td>
+        <td>${d.email || 'Chưa cung cấp'}</td>
+        <td>${d.car_name || 'Chưa chọn'}</td>
+        <td><span class="badge ${d.type}">${d.type === 'quote' ? 'Nhận Báo Giá' : 'Đăng Ký Lái Thử'}</span></td>
+        <td>${detailAddress}</td>
+        <td>${d.preferred_date ? new Date(d.preferred_date).toLocaleDateString('vi-VN') : ''}</td>
+        <td>${d.status}</td>
+        <td>${d.created_at ? new Date(d.created_at).toLocaleDateString('vi-VN') : ''}</td>
+      </tr>
+    `;
+  });
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Báo Cáo Yêu Cầu Báo Giá & Lái Thử - VinFast</title>
+      <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 20px; color: #2c3e50; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0f53c5; padding-bottom: 15px; }
+        .header h1 { margin: 0; color: #0f53c5; font-size: 24px; text-transform: uppercase; }
+        .header p { margin: 5px 0 0; font-size: 14px; color: #7f8c8d; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
+        th, td { border: 1px solid #bdc3c7; padding: 8px 10px; text-align: left; }
+        th { background-color: #f2f2f2; color: #34495e; font-weight: 700; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .badge { display: inline-block; padding: 3px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
+        .badge.quote { background-color: #ebf3fc; color: #0f53c5; border: 1px solid #d0e1f9; }
+        .badge.drive { background-color: #eafaf1; color: #2ecc71; border: 1px solid #d4f5e3; }
+        @media print {
+          body { padding: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>Báo Cáo Yêu Cầu Báo Giá & Lái Thử</h1>
+        <p>Ngày xuất bản: ${new Date().toLocaleDateString('vi-VN')} ${new Date().toLocaleTimeString('vi-VN')}</p>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Mã</th>
+            <th>Họ và Tên</th>
+            <th>Điện thoại</th>
+            <th>Email</th>
+            <th>Xe quan tâm</th>
+            <th>Phân loại</th>
+            <th>Địa chỉ / Showroom</th>
+            <th>Ngày hẹn</th>
+            <th>Trạng thái</th>
+            <th>Ngày gửi</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+      <script>
+        window.onload = function() {
+          window.print();
+          setTimeout(function() { window.close(); }, 500);
+        };
+      </script>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+}

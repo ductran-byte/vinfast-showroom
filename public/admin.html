@@ -114,10 +114,26 @@
 
     <!-- Tab 2: Yêu Cầu Báo Giá & Lái Thử -->
     <div id="tab-drives-content" style="display: none;">
-      <div class="admin-header">
+      <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <div>
           <h1 style="font-size: 32px; font-weight: 800;">Yêu Cầu Báo Giá & Lái Thử</h1>
           <p style="color: var(--text-secondary); margin-top: 6px;">Theo dõi thông tin liên hệ, yêu cầu nhận báo giá và lịch trình trải nghiệm xe của khách hàng.</p>
+        </div>
+        <div style="position: relative; display: inline-block;">
+          <button type="button" class="btn" id="btn-export-dropdown" onclick="toggleExportDropdown()" style="background: #0f53c5; color: white; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(15, 83, 197, 0.25); border: none; cursor: pointer; transition: all 0.2s;">
+            <i class="fa-solid fa-file-export"></i> Xuất dữ liệu <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
+          </button>
+          <div id="export-dropdown-menu" style="display: none; position: absolute; right: 0; top: 105%; background: white; min-width: 170px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.08); z-index: 1000; overflow: hidden;">
+            <a href="javascript:void(0)" onclick="triggerExport('excel')" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #2c3e50; text-decoration: none; font-size: 13px; font-weight: 600; transition: background 0.15s; border-bottom: 1px solid rgba(0,0,0,0.05);">
+              <i class="fa-solid fa-file-excel" style="color: #107c41; font-size: 16px;"></i> Xuất Excel (.xlsx)
+            </a>
+            <a href="javascript:void(0)" onclick="triggerExport('csv')" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #2c3e50; text-decoration: none; font-size: 13px; font-weight: 600; transition: background 0.15s; border-bottom: 1px solid rgba(0,0,0,0.05);">
+              <i class="fa-solid fa-file-csv" style="color: #1f77b4; font-size: 16px;"></i> Xuất CSV (.csv)
+            </a>
+            <a href="javascript:void(0)" onclick="triggerExport('pdf')" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: #2c3e50; text-decoration: none; font-size: 13px; font-weight: 600; transition: background 0.15s;">
+              <i class="fa-solid fa-file-pdf" style="color: #ef4444; font-size: 16px;"></i> Xuất PDF (.pdf)
+            </a>
+          </div>
         </div>
       </div>
 

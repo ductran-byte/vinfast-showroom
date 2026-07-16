@@ -3,6 +3,281 @@ let token = localStorage.getItem('adminToken');
 let adminUser = localStorage.getItem('adminUser');
 let quillEditor = null;
 
+// Reusable Custom Sleek Notification Popup
+function showAlert(message, isSuccess = true, callback = null) {
+  let modal = document.getElementById('custom-alert-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'custom-alert-modal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    `;
+    modal.innerHTML = `
+      <div id="custom-alert-card" style="
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 32px 24px;
+        width: 90%;
+        max-width: 380px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        transform: scale(0.85) translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      ">
+        <div id="custom-alert-icon" style="
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          margin: 0 auto 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 32px;
+          box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        "></div>
+        <h4 id="custom-alert-title" style="
+          margin: 0 0 8px;
+          font-family: 'Inter', sans-serif;
+          font-size: 19px;
+          font-weight: 800;
+          color: #0f172a;
+        "></h4>
+        <p id="custom-alert-message" style="
+          margin: 0 0 24px;
+          font-family: 'Inter', sans-serif;
+          font-size: 14px;
+          color: #64748b;
+          line-height: 1.5;
+          word-break: break-word;
+        "></p>
+        <button id="custom-alert-btn" style="
+          background: #0f53c5;
+          color: #ffffff;
+          border: none;
+          padding: 12px 28px;
+          border-radius: 10px;
+          font-family: 'Inter', sans-serif;
+          font-weight: 700;
+          font-size: 13.5px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 12px rgba(15, 83, 197, 0.3);
+          width: 100%;
+        ">Đồng ý</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Add hover effect
+    const btn = document.getElementById('custom-alert-btn');
+    btn.onmouseover = () => {
+      btn.style.background = '#0d46a5';
+      btn.style.transform = 'translateY(-1px)';
+    };
+    btn.onmouseout = () => {
+      btn.style.background = '#0f53c5';
+      btn.style.transform = 'translateY(0)';
+    };
+  }
+
+  const card = document.getElementById('custom-alert-card');
+  const icon = document.getElementById('custom-alert-icon');
+  const title = document.getElementById('custom-alert-title');
+  const msg = document.getElementById('custom-alert-message');
+  const btn = document.getElementById('custom-alert-btn');
+
+  if (isSuccess) {
+    icon.style.background = 'rgba(34, 197, 94, 0.12)';
+    icon.style.color = '#22c55e';
+    icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+    title.innerText = 'Thành Công';
+  } else {
+    icon.style.background = 'rgba(239, 68, 68, 0.12)';
+    icon.style.color = '#ef4444';
+    icon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+    title.innerText = 'Thông Báo';
+  }
+
+  msg.innerText = message;
+
+  const closeAlert = () => {
+    modal.style.opacity = '0';
+    modal.style.visibility = 'hidden';
+    card.style.transform = 'scale(0.85) translateY(-10px)';
+    if (callback) callback();
+  };
+
+  btn.onclick = closeAlert;
+  modal.onclick = (e) => {
+    if (e.target === modal) closeAlert();
+  };
+
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
+  setTimeout(() => {
+    card.style.transform = 'scale(1) translateY(0)';
+  }, 50);
+}
+
+// Reusable Custom Sleek Confirm Popup
+function showConfirm(message, callback) {
+  let modal = document.getElementById('custom-confirm-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'custom-confirm-modal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    `;
+    modal.innerHTML = `
+      <div id="custom-confirm-card" style="
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 32px 24px;
+        width: 90%;
+        max-width: 380px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        transform: scale(0.85) translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      ">
+        <div style="
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          margin: 0 auto 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 32px;
+          background: rgba(234, 179, 8, 0.12);
+          color: #eab308;
+          box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        ">
+          <i class="fa-solid fa-circle-exclamation"></i>
+        </div>
+        <h4 style="
+          margin: 0 0 8px;
+          font-family: 'Inter', sans-serif;
+          font-size: 19px;
+          font-weight: 800;
+          color: #0f172a;
+        ">Xác Nhận</h4>
+        <p id="custom-confirm-message" style="
+          margin: 0 0 24px;
+          font-family: 'Inter', sans-serif;
+          font-size: 14px;
+          color: #64748b;
+          line-height: 1.5;
+          word-break: break-word;
+        "></p>
+        <div style="display: flex; gap: 12px;">
+          <button id="custom-confirm-cancel-btn" style="
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+          ">Hủy bỏ</button>
+          <button id="custom-confirm-ok-btn" style="
+            background: #ef4444;
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+          ">Xác nhận</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const cancel = document.getElementById('custom-confirm-cancel-btn');
+    const ok = document.getElementById('custom-confirm-ok-btn');
+    cancel.onmouseover = () => cancel.style.background = '#e2e8f0';
+    cancel.onmouseout = () => cancel.style.background = '#f1f5f9';
+    ok.onmouseover = () => ok.style.background = '#dc2626';
+    ok.onmouseout = () => ok.style.background = '#ef4444';
+  }
+
+  const card = document.getElementById('custom-confirm-card');
+  const msg = document.getElementById('custom-confirm-message');
+  const okBtn = document.getElementById('custom-confirm-ok-btn');
+  const cancelBtn = document.getElementById('custom-confirm-cancel-btn');
+
+  msg.innerText = message;
+
+  const closeConfirm = () => {
+    modal.style.opacity = '0';
+    modal.style.visibility = 'hidden';
+    card.style.transform = 'scale(0.85) translateY(-10px)';
+  };
+
+  okBtn.onclick = () => {
+    closeConfirm();
+    callback();
+  };
+
+  cancelBtn.onclick = closeConfirm;
+  modal.onclick = (e) => {
+    if (e.target === modal) closeConfirm();
+  };
+
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
+  setTimeout(() => {
+    card.style.transform = 'scale(1) translateY(0)';
+  }, 50);
+}
+
+// Override window.alert globally to use custom beautiful popup
+window.alert = function(message) {
+  const lowercase = message.toLowerCase();
+  const isSuccess = lowercase.includes('thành công') || lowercase.includes('ok') || lowercase.includes('gửi thành công') || lowercase.includes('kết nối thành công');
+  showAlert(message, isSuccess);
+};
+
 // Initialize Quill Editor
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('editor-container');
@@ -670,7 +945,7 @@ carForm.addEventListener('submit', async (e) => {
 
 // Hàm xóa xe
 async function deleteCar(id) {
-  if (confirm('Bạn có chắc chắn muốn xóa mẫu xe này?')) {
+  showConfirm('Bạn có chắc chắn muốn xóa mẫu xe này?', async () => {
     try {
       const response = await fetch(`/api/cars/${id}`, {
         method: 'DELETE',
@@ -692,7 +967,7 @@ async function deleteCar(id) {
     } catch (error) {
       alert(error.message);
     }
-  }
+  });
 }
 window.deleteCar = deleteCar;
 
@@ -815,7 +1090,7 @@ window.updateDriveStatus = updateDriveStatus;
 
 // Hàm xóa yêu cầu báo giá
 async function deleteDrive(id) {
-  if (confirm('Bạn chắc chắn muốn xóa yêu cầu báo giá này?')) {
+  showConfirm('Bạn chắc chắn muốn xóa yêu cầu báo giá này?', async () => {
     try {
       const response = await fetch(`/api/test-drives/${id}`, {
         method: 'DELETE',
@@ -837,7 +1112,7 @@ async function deleteDrive(id) {
     } catch (error) {
       alert(error.message);
     }
-  }
+  });
 }
 window.deleteDrive = deleteDrive;
 
@@ -1002,7 +1277,7 @@ if (bannerForm) {
 
 // Xóa Banner
 window.deleteBanner = async function(id) {
-  if (confirm('Bạn có chắc chắn muốn xóa banner này?')) {
+  showConfirm('Bạn có chắc chắn muốn xóa banner này?', async () => {
     try {
       const response = await fetch(`/api/banners/${id}`, {
         method: 'DELETE',
@@ -1024,7 +1299,7 @@ window.deleteBanner = async function(id) {
     } catch (error) {
       alert(error.message);
     }
-  }
+  });
 };
 
 // --- Tab 4: Cấu Hình Hệ Thống (settings) ---

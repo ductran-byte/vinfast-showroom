@@ -24,7 +24,10 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Giới hạn kích thước file 5MB
+  limits: { 
+    fileSize: 5 * 1024 * 1024, // Giới hạn kích thước file file 5MB
+    fieldSize: 10 * 1024 * 1024 // Giới hạn kích thước các trường text (chứa ảnh base64) là 10MB
+  },
   fileFilter: fileFilter
 });
 

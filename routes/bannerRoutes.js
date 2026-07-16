@@ -24,7 +24,10 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { 
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fieldSize: 10 * 1024 * 1024 // 10MB field limit (for base64 text payload)
+  },
   fileFilter: fileFilter
 });
 

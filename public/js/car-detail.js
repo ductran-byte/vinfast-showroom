@@ -149,7 +149,7 @@ async function initCarDetailPage() {
 
       // Show/Hide premium headers depending on availability
       const premiumHeader = document.querySelector('.color-section-title:nth-of-type(2)');
-      const premiumDivider = document.querySelector('.color-selector-panel div');
+      const premiumDivider = document.getElementById('color-premium-divider');
       if (!hasPremium) {
         if (premiumHeader) premiumHeader.style.display = 'none';
         if (premiumDivider) premiumDivider.style.display = 'none';

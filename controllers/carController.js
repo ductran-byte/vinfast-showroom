@@ -2,6 +2,7 @@ const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
 const cache = require('../config/cache');
+const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudinary');
 
 // Lấy danh sách tất cả các xe (hỗ trợ lọc theo type và tìm kiếm theo tên)
 exports.getAllCars = async (req, res) => {
@@ -117,7 +118,7 @@ exports.createCar = async (req, res) => {
     if (req.files && req.files.length > 0) {
       const mainImage = req.files.find(f => f.fieldname === 'image');
       if (mainImage) {
-        imageUrl = `/uploads/${mainImage.filename}`;
+        imageUrl = await uploadToCloudinary(mainImage.buffer, 'vinfast/cars');
       }
     }
 
@@ -127,16 +128,15 @@ exports.createCar = async (req, res) => {
       try {
         let specs = typeof specifications === 'string' ? JSON.parse(specifications) : specifications;
         if (specs.colors && Array.isArray(specs.colors)) {
-          specs.colors = specs.colors.map(color => {
+          for (const color of specs.colors) {
             if (color.fileKey && req.files) {
               const file = req.files.find(f => f.fieldname === color.fileKey);
               if (file) {
-                color.image_url = `/uploads/${file.filename}`;
+                color.image_url = await uploadToCloudinary(file.buffer, 'vinfast/colors');
               }
               delete color.fileKey;
             }
-            return color;
-          });
+          }
         }
         specsJson = JSON.stringify(specs);
       } catch (e) {
@@ -202,16 +202,6 @@ exports.updateCar = async (req, res) => {
     // Kiểm tra xe có tồn tại không
     const [rows] = await db.query('SELECT * FROM cars WHERE id = ?', [id]);
     if (rows.length === 0) {
-      // Nếu có ảnh vừa tải lên, xóa đi để tránh rác
-      if (req.files && req.files.length > 0) {
-        req.files.forEach(file => {
-          try {
-            fs.unlinkSync(file.path);
-          } catch (err) {
-            console.error('Không thể xóa file rác:', err);
-          }
-        });
-      }
       return res.status(404).json({ message: 'Không tìm thấy thông tin xe cần cập nhật.' });
     }
 
@@ -236,20 +226,24 @@ exports.updateCar = async (req, res) => {
     // Nếu có file ảnh mới tải lên
     let mainImage = req.files ? req.files.find(f => f.fieldname === 'image') : null;
     if (mainImage) {
-      imageUrl = `/uploads/${mainImage.filename}`;
-      // Xóa ảnh cũ nếu nó không phải là ảnh mặc định và ảnh mẫu ban đầu (chỉ xóa các ảnh được upload sau này)
+      imageUrl = await uploadToCloudinary(mainImage.buffer, 'vinfast/cars');
+      // Xóa ảnh cũ nếu nó không phải là ảnh mặc định và ảnh mẫu ban đầu
       if (currentCar.image_url && 
           !currentCar.image_url.startsWith('/uploads/vf') && 
           !currentCar.image_url.includes('green') && 
           !currentCar.image_url.includes('van') && 
           !currentCar.image_url.includes('bus') && 
           currentCar.image_url !== '/uploads/default-car.jpg') {
-        const oldImagePath = path.join(__dirname, '../public', currentCar.image_url);
-        if (fs.existsSync(oldImagePath)) {
-          try {
-            fs.unlinkSync(oldImagePath);
-          } catch (err) {
-            console.error('Không thể xóa ảnh cũ:', err);
+        if (currentCar.image_url.startsWith('http')) {
+          await deleteFromCloudinary(currentCar.image_url);
+        } else {
+          const oldImagePath = path.join(__dirname, '../public', currentCar.image_url);
+          if (fs.existsSync(oldImagePath)) {
+            try {
+              fs.unlinkSync(oldImagePath);
+            } catch (err) {
+              console.error('Không thể xóa ảnh cũ:', err);
+            }
           }
         }
       }
@@ -260,16 +254,15 @@ exports.updateCar = async (req, res) => {
       try {
         let specs = typeof specifications === 'string' ? JSON.parse(specifications) : specifications;
         if (specs.colors && Array.isArray(specs.colors)) {
-          specs.colors = specs.colors.map(color => {
+          for (const color of specs.colors) {
             if (color.fileKey && req.files) {
               const file = req.files.find(f => f.fieldname === color.fileKey);
               if (file) {
-                color.image_url = `/uploads/${file.filename}`;
+                color.image_url = await uploadToCloudinary(file.buffer, 'vinfast/colors');
               }
               delete color.fileKey;
             }
-            return color;
-          });
+          }
         }
         specsJson = JSON.stringify(specs);
       } catch (e) {
@@ -342,19 +335,40 @@ exports.deleteCar = async (req, res) => {
     // Xóa xe khỏi database
     await db.query('DELETE FROM cars WHERE id = ?', [id]);
 
-    // Xóa file ảnh trên disk nếu không phải là ảnh mẫu ban đầu
+    // Xóa file ảnh trên disk hoặc Cloudinary nếu không phải là ảnh mẫu ban đầu
     if (car.image_url && 
         !car.image_url.startsWith('/uploads/vf') && 
         !car.image_url.includes('green') && 
         !car.image_url.includes('van') && 
         !car.image_url.includes('bus') && 
         car.image_url !== '/uploads/default-car.jpg') {
-      const imagePath = path.join(__dirname, '../public', car.image_url);
-      if (fs.existsSync(imagePath)) {
-        try {
-          fs.unlinkSync(imagePath);
-        } catch (err) {
-          console.error('Lỗi khi xóa file ảnh:', err);
+      if (car.image_url.startsWith('http')) {
+        await deleteFromCloudinary(car.image_url);
+      } else {
+        const imagePath = path.join(__dirname, '../public', car.image_url);
+        if (fs.existsSync(imagePath)) {
+          try {
+            fs.unlinkSync(imagePath);
+          } catch (err) {
+            console.error('Lỗi khi xóa file ảnh:', err);
+          }
+        }
+      }
+    }
+
+    // Xóa các ảnh phối màu trên Cloudinary (nếu có)
+    let specs = {};
+    if (car.specifications) {
+      try {
+        specs = typeof car.specifications === 'string' ? JSON.parse(car.specifications) : car.specifications;
+      } catch (e) {
+        specs = {};
+      }
+    }
+    if (specs && specs.colors && Array.isArray(specs.colors)) {
+      for (const color of specs.colors) {
+        if (color.image_url && color.image_url.startsWith('http')) {
+          await deleteFromCloudinary(color.image_url);
         }
       }
     }

@@ -6,21 +6,8 @@ const fs = require('fs');
 const carController = require('../controllers/carController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Cấu hình lưu trữ file ảnh bằng Multer
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, '../public/uploads');
-    // Tạo thư mục nếu chưa tồn tại
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'car-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Cấu hình lưu trữ file ảnh bằng Multer trong RAM
+const storage = multer.memoryStorage();
 
 // Bộ lọc định dạng file ảnh hợp lệ
 const fileFilter = (req, file, cb) => {

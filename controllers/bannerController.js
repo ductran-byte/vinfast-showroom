@@ -2,6 +2,7 @@ const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
 const cache = require('../config/cache');
+const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudinary');
 
 // Lấy danh sách tất cả các banner
 exports.getAllBanners = async (req, res) => {
@@ -27,10 +28,6 @@ exports.createBanner = async (req, res) => {
     const { title, subtitle, description, link_url } = req.body;
 
     if (!title || !subtitle) {
-      // Nếu có tải ảnh lên mà lỗi, xóa đi
-      if (req.file) {
-        fs.unlinkSync(path.join(__dirname, '../public/uploads', req.file.filename));
-      }
       return res.status(400).json({ message: 'Vui lòng cung cấp tiêu đề và phụ đề banner.' });
     }
 
@@ -38,7 +35,7 @@ exports.createBanner = async (req, res) => {
       return res.status(400).json({ message: 'Vui lòng tải lên hình ảnh cho banner.' });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const imageUrl = await uploadToCloudinary(req.file.buffer, 'vinfast/banners');
 
     const [result] = await db.query(
       `INSERT INTO banners (title, subtitle, description, image_url, link_url)
@@ -71,9 +68,6 @@ exports.updateBanner = async (req, res) => {
     // Kiểm tra banner có tồn tại không
     const [rows] = await db.query('SELECT * FROM banners WHERE id = ?', [id]);
     if (rows.length === 0) {
-      if (req.file) {
-        fs.unlinkSync(path.join(__dirname, '../public/uploads', req.file.filename));
-      }
       return res.status(404).json({ message: 'Không tìm thấy thông tin banner.' });
     }
 
@@ -82,17 +76,21 @@ exports.updateBanner = async (req, res) => {
 
     let imageUrl = currentBanner.image_url;
     if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
+      imageUrl = await uploadToCloudinary(req.file.buffer, 'vinfast/banners');
       // Xóa ảnh cũ nếu nó không phải là ảnh mẫu ban đầu
       if (currentBanner.image_url && 
           currentBanner.image_url !== '/uploads/banner_summer.png' && 
           currentBanner.image_url !== '/uploads/banner_eco.png') {
-        const oldImagePath = path.join(__dirname, '../public', currentBanner.image_url);
-        if (fs.existsSync(oldImagePath)) {
-          try {
-            fs.unlinkSync(oldImagePath);
-          } catch (err) {
-            console.error('Không thể xóa ảnh cũ:', err);
+        if (currentBanner.image_url.startsWith('http')) {
+          await deleteFromCloudinary(currentBanner.image_url);
+        } else {
+          const oldImagePath = path.join(__dirname, '../public', currentBanner.image_url);
+          if (fs.existsSync(oldImagePath)) {
+            try {
+              fs.unlinkSync(oldImagePath);
+            } catch (err) {
+              console.error('Không thể xóa ảnh cũ:', err);
+            }
           }
         }
       }
@@ -136,12 +134,16 @@ exports.deleteBanner = async (req, res) => {
     if (banner.image_url && 
         banner.image_url !== '/uploads/banner_summer.png' && 
         banner.image_url !== '/uploads/banner_eco.png') {
-      const imagePath = path.join(__dirname, '../public', banner.image_url);
-      if (fs.existsSync(imagePath)) {
-        try {
-          fs.unlinkSync(imagePath);
-        } catch (err) {
-          console.error('Lỗi khi xóa file ảnh banner:', err);
+      if (banner.image_url.startsWith('http')) {
+        await deleteFromCloudinary(banner.image_url);
+      } else {
+        const imagePath = path.join(__dirname, '../public', banner.image_url);
+        if (fs.existsSync(imagePath)) {
+          try {
+            fs.unlinkSync(imagePath);
+          } catch (err) {
+            console.error('Lỗi khi xóa file ảnh banner:', err);
+          }
         }
       }
     }

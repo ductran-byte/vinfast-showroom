@@ -6,20 +6,8 @@ const fs = require('fs');
 const bannerController = require('../controllers/bannerController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Cấu hình lưu trữ file ảnh banner bằng Multer
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, '../public/uploads');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'banner-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Cấu hình lưu trữ file ảnh banner bằng Multer trong RAM
+const storage = multer.memoryStorage();
 
 // Bộ lọc file ảnh
 const fileFilter = (req, file, cb) => {

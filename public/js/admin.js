@@ -103,10 +103,33 @@ function addColorRow(colorObj = null) {
     </select>
     <div style="display: flex; gap: 8px; align-items: center; overflow: hidden;">
       <input type="file" class="form-input color-file-input" accept="image/*" style="flex: 1; padding: 8px 10px; font-size: 12px; height: 42px;">
-      ${imgUrl ? `<img class="color-preview" src="${imgUrl}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl}">` : ''}
+      <div class="color-preview-container" style="display: flex; align-items: center;">
+        ${imgUrl ? `<img class="color-preview" src="${imgUrl}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl}">` : '<span class="no-preview" style="font-size: 11px; color: var(--text-muted);">Trống</span>'}
+      </div>
     </div>
     <button type="button" class="btn btn-danger btn-remove-color" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white;"><i class="fa-solid fa-trash"></i></button>
   `;
+
+  // Bind change listener for file input to show live preview
+  const fileInput = row.querySelector('.color-file-input');
+  const previewContainer = row.querySelector('.color-preview-container');
+  
+  fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewContainer.innerHTML = `<img class="color-preview" src="${e.target.result}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl || ''}">`;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      if (imgUrl) {
+        previewContainer.innerHTML = `<img class="color-preview" src="${imgUrl}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl}">`;
+      } else {
+        previewContainer.innerHTML = `<span class="no-preview" style="font-size: 11px; color: var(--text-muted);">Trống</span>`;
+      }
+    }
+  });
 
   // Bind remove button click
   row.querySelector('.btn-remove-color').onclick = function() {

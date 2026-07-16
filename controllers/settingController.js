@@ -23,10 +23,18 @@ exports.getSettings = async (req, res) => {
   }
 };
 
+const { uploadToCloudinary } = require('../config/cloudinary');
+
 // Cập nhật cấu hình (Chỉ Admin)
 exports.updateSettings = async (req, res) => {
   try {
-    const settings = req.body;
+    const settings = { ...req.body };
+    
+    // Nếu có file ảnh giới thiệu mới tải lên
+    if (req.file) {
+      const imageUrl = await uploadToCloudinary(req.file.buffer, 'vinfast/settings');
+      settings.intro_image = imageUrl;
+    }
     
     // settings là một object chứa các cặp key: value
     for (const [key, value] of Object.entries(settings)) {

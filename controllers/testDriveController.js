@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { sendTelegramAlert } = require('../utils/telegram');
 
 // Khách đăng ký nhận báo giá hoặc đăng ký lái thử
 exports.createTestDrive = async (req, res) => {
@@ -36,6 +37,35 @@ exports.createTestDrive = async (req, res) => {
     const successMessage = type === 'quote'
       ? 'Yêu cầu nhận báo giá thành công! Nhân viên VinFast sẽ liên hệ với bạn trong thời gian sớm nhất.'
       : 'Đăng ký lái thử thành công! Nhân viên VinFast sẽ liên hệ với bạn để xác nhận lịch hẹn trong thời gian sớm nhất.';
+
+    // Lấy tên xe tương ứng để hiển thị trong nội dung tin nhắn Telegram
+    let carName = 'Chưa xác định';
+    try {
+      const [carRows] = await db.query('SELECT name FROM cars WHERE id = ?', [parseInt(car_id)]);
+      if (carRows.length > 0) {
+        carName = carRows[0].name;
+      }
+    } catch (carErr) {
+      console.error('Không thể lấy tên xe để gửi thông báo Telegram:', carErr);
+    }
+
+    // Soạn thảo nội dung tin nhắn tiếng Việt có emoji định dạng HTML đẹp mắt
+    const telegramMsg = `
+<b>🔔 CÓ YÊU CẦU MỚI TỪ SHOWROOM</b>
+━━━━━━━━━━━━━━━━━━
+📋 <b>Loại yêu cầu:</b> ${type === 'quote' ? 'Nhận báo giá 💰' : 'Đăng ký lái thử 🚗'}
+👤 <b>Khách hàng:</b> ${fullname.trim()}
+📞 <b>Số điện thoại:</b> <code>${phone.trim()}</code>
+📧 <b>Email:</b> ${email ? email.trim() : 'Không cung cấp'}
+🚗 <b>Mẫu xe quan tâm:</b> <b>${carName}</b>
+${type === 'drive' ? `📅 <b>Ngày hẹn lái thử:</b> ${preferred_date}` : ''}
+📍 <b>Địa chỉ:</b> ${address.trim()}
+━━━━━━━━━━━━━━━━━━
+<i>Hệ thống Showroom VinFast Việt Nam</i>
+    `.trim();
+
+    // Gửi thông báo Telegram bất đồng bộ (không làm chậm phản hồi của client)
+    sendTelegramAlert(telegramMsg);
 
     res.status(201).json({
       message: successMessage,

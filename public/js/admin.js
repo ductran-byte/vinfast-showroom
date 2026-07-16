@@ -376,9 +376,15 @@ function addColorRow(colorObj = null) {
       <option value="basic" ${typeVal === 'basic' ? 'selected' : ''}>Màu cơ bản</option>
       <option value="premium" ${typeVal === 'premium' ? 'selected' : ''}>Màu nâng cao</option>
     </select>
-    <div style="display: flex; gap: 8px; align-items: center; overflow: hidden;">
-      <input type="file" class="form-input color-file-input" accept="image/*" style="flex: 1; padding: 8px 10px; font-size: 12px; height: 42px;">
-      <div class="color-preview-container" style="display: flex; align-items: center;">
+    <div style="display: flex; gap: 8px; align-items: center; overflow: hidden; flex: 1;">
+      <label class="btn btn-outline" style="margin: 0; padding: 0 12px; font-size: 12px; height: 42px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; white-space: nowrap; font-weight: 700; border-radius: 8px; border: 1.5px solid var(--slate-200); background: var(--slate-50); color: var(--slate-700); transition: all 0.2s;" onmouseover="this.style.background='var(--slate-100)'; this.style.borderColor='var(--slate-400)';" onmouseout="this.style.background='var(--slate-50)'; this.style.borderColor='var(--slate-200)';">
+        <i class="fa-solid fa-cloud-arrow-up" style="margin-right: 5px;"></i> Chọn ảnh
+        <input type="file" class="color-file-input" accept="image/*" style="display: none;">
+      </label>
+      <span class="color-filename" style="color: var(--text-secondary); font-size: 11px; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-grow: 1; max-width: 80px;">
+        ${imgUrl ? 'Ảnh hiện có' : 'Chưa chọn'}
+      </span>
+      <div class="color-preview-container" style="display: flex; align-items: center; flex-shrink: 0;">
         ${imgUrl ? `<img class="color-preview" src="${imgUrl}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl}">` : '<span class="no-preview" style="font-size: 11px; color: var(--text-muted);">Trống</span>'}
       </div>
     </div>
@@ -387,17 +393,20 @@ function addColorRow(colorObj = null) {
 
   // Bind change listener for file input to show live preview
   const fileInput = row.querySelector('.color-file-input');
+  const filenameSpan = row.querySelector('.color-filename');
   const previewContainer = row.querySelector('.color-preview-container');
   
   fileInput.addEventListener('change', function() {
     const file = this.files[0];
     if (file) {
+      if (filenameSpan) filenameSpan.textContent = file.name;
       const reader = new FileReader();
       reader.onload = function(e) {
         previewContainer.innerHTML = `<img class="color-preview" src="${e.target.result}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl || ''}">`;
       };
       reader.readAsDataURL(file);
     } else {
+      if (filenameSpan) filenameSpan.textContent = imgUrl ? 'Ảnh hiện có' : 'Chưa chọn';
       if (imgUrl) {
         previewContainer.innerHTML = `<img class="color-preview" src="${imgUrl}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl}">`;
       } else {
@@ -487,9 +496,9 @@ function checkAuth() {
     dashboardSection.style.display = 'block';
     adminHeaderActions.style.display = 'flex';
     adminWelcome.innerText = `Chào, ${adminUser || 'Admin'}`;
-    loadAdminCars();
-    loadAdminTestDrives();
-    loadAdminBanners();
+    
+    // Gọi switchTab để trỏ mặc định tới tab Dashboard Tổng Quan
+    switchTab('dashboard');
   } else {
     loginSection.style.display = 'block';
     dashboardSection.style.display = 'none';
@@ -573,43 +582,282 @@ document.addEventListener('click', (e) => {
 });
 
 // --- Quản Lý Tabs Điều Hướng ---
+// --- Quản Lý Tabs Điều Hướng ---
 function switchTab(tabName) {
+  const dashboardBtn = document.getElementById('tab-dashboard-btn');
   const carsBtn = document.getElementById('tab-cars-btn');
   const drivesBtn = document.getElementById('tab-drives-btn');
   const bannersBtn = document.getElementById('tab-banners-btn');
   const settingsBtn = document.getElementById('tab-settings-btn');
   
+  const dashboardContent = document.getElementById('tab-dashboard-content');
   const carsContent = document.getElementById('tab-cars-content');
   const drivesContent = document.getElementById('tab-drives-content');
   const bannersContent = document.getElementById('tab-banners-content');
   const settingsContent = document.getElementById('tab-settings-content');
 
+  const activeTitle = document.getElementById('active-tab-title');
+
+  if (dashboardContent) dashboardContent.style.display = 'none';
   carsContent.style.display = 'none';
   drivesContent.style.display = 'none';
   if (bannersContent) bannersContent.style.display = 'none';
   if (settingsContent) settingsContent.style.display = 'none';
 
-  carsBtn.classList.remove('btn-primary');
-  drivesBtn.classList.remove('btn-primary');
-  if (bannersBtn) bannersBtn.classList.remove('btn-primary');
-  if (settingsBtn) settingsBtn.classList.remove('btn-primary');
+  if (dashboardBtn) dashboardBtn.classList.remove('active');
+  carsBtn.classList.remove('active', 'btn-primary');
+  drivesBtn.classList.remove('active', 'btn-primary');
+  if (bannersBtn) bannersBtn.classList.remove('active', 'btn-primary');
+  if (settingsBtn) settingsBtn.classList.remove('active', 'btn-primary');
 
-  if (tabName === 'cars') {
+  if (tabName === 'dashboard') {
+    if (dashboardContent) dashboardContent.style.display = 'block';
+    if (dashboardBtn) dashboardBtn.classList.add('active');
+    if (activeTitle) activeTitle.innerText = 'Tổng Quan Hệ Thống';
+    updateDashboardData();
+  } else if (tabName === 'cars') {
     carsContent.style.display = 'block';
-    carsBtn.classList.add('btn-primary');
+    carsBtn.classList.add('active');
+    if (activeTitle) activeTitle.innerText = 'Quản Lý Danh Sách Xe';
+    loadAdminCars();
   } else if (tabName === 'drives') {
     drivesContent.style.display = 'block';
-    drivesBtn.classList.add('btn-primary');
+    drivesBtn.classList.add('active');
+    if (activeTitle) activeTitle.innerText = 'Yêu Cầu Báo Giá & Lái Thử';
     loadAdminTestDrives();
   } else if (tabName === 'banners') {
     if (bannersContent) bannersContent.style.display = 'block';
-    if (bannersBtn) bannersBtn.classList.add('btn-primary');
+    if (bannersBtn) bannersBtn.classList.add('active');
+    if (activeTitle) activeTitle.innerText = 'Quản Lý Banners Quảng Cáo';
     loadAdminBanners();
   } else if (tabName === 'settings') {
     if (settingsContent) settingsContent.style.display = 'block';
-    if (settingsBtn) settingsBtn.classList.add('btn-primary');
+    if (settingsBtn) settingsBtn.classList.add('active');
+    if (activeTitle) activeTitle.innerText = 'Cấu Hình Thông Tin Liên Hệ';
     loadAdminSettings();
   }
+
+  // Tự động đóng Sidebar trên Mobile/Tablet khi bấm chuyển Tab
+  const sidebar = document.getElementById('admin-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (sidebar && sidebar.classList.contains('active')) {
+    sidebar.classList.remove('active');
+    if (backdrop) backdrop.classList.remove('active');
+  }
+}
+window.switchTab = switchTab;
+
+// Hàm bật/tắt Sidebar trên thiết bị di động
+window.toggleMobileSidebar = function() {
+  const sidebar = document.getElementById('admin-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (sidebar) {
+    const isActive = sidebar.classList.contains('active');
+    if (isActive) {
+      sidebar.classList.remove('active');
+      if (backdrop) backdrop.classList.remove('active');
+    } else {
+      sidebar.classList.add('active');
+      if (backdrop) backdrop.classList.add('active');
+    }
+  }
+};
+
+// --- Dashboard Thống Kê & Biểu Đồ ---
+let requestTypeChart = null;
+let carSegmentChart = null;
+
+async function updateDashboardData() {
+  try {
+    const recentRequestsEl = document.getElementById('dashboard-recent-requests');
+    const recentCarsEl = document.getElementById('dashboard-recent-cars');
+    
+    if (recentRequestsEl) recentRequestsEl.innerHTML = '<div style="text-align: center; color: var(--slate-400); padding: 10px;">Đang tải...</div>';
+    if (recentCarsEl) recentCarsEl.innerHTML = '<div style="text-align: center; color: var(--slate-400); padding: 10px;">Đang tải...</div>';
+
+    // Đảm bảo dữ liệu được fetch
+    let cars = window.loadedCars;
+    if (!cars) {
+      const resCars = await fetch('/api/cars');
+      cars = await resCars.json();
+      window.loadedCars = cars;
+    }
+    
+    let drives = window.loadedDrives;
+    if (!drives) {
+      const resDrives = await fetch('/api/test-drives', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      drives = await resDrives.json();
+      window.loadedDrives = drives;
+    }
+
+    let banners = window.loadedBanners;
+    if (!banners) {
+      try {
+        const resBanners = await fetch('/api/banners');
+        banners = await resBanners.json();
+        window.loadedBanners = banners;
+      } catch (e) {
+        banners = [];
+      }
+    }
+
+    // Cập nhật chỉ số KPI
+    const kpiCars = document.getElementById('kpi-total-cars');
+    if (kpiCars) kpiCars.innerText = cars.length;
+    
+    const kpiDrives = document.getElementById('kpi-total-drives');
+    if (kpiDrives) kpiDrives.innerText = drives.length;
+    
+    const kpiPending = document.getElementById('kpi-pending-drives');
+    if (kpiPending) {
+      const pendingCount = drives.filter(d => d.status === 'Chờ liên hệ' || d.status === 'Đang xử lý' || d.status === 'Chờ xử lý').length;
+      kpiPending.innerText = pendingCount;
+    }
+
+    const kpiBanners = document.getElementById('kpi-total-banners');
+    if (kpiBanners) kpiBanners.innerText = banners ? banners.length : 0;
+
+    // 1. Hiển thị yêu cầu gần đây (Tối đa 5 yêu cầu)
+    if (recentRequestsEl) {
+      const recentDrives = [...drives].reverse().slice(0, 5);
+      if (recentDrives.length === 0) {
+        recentRequestsEl.innerHTML = '<div style="text-align: center; color: var(--slate-400); padding: 10px;">Chưa có yêu cầu nào</div>';
+      } else {
+        recentRequestsEl.innerHTML = recentDrives.map(d => {
+          const typeBadge = d.type === 'quote' 
+            ? `<span class="badge quote" style="background-color: #ebf3fc; color: #0f53c5; border: 1px solid #d0e1f9; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;">Báo Giá</span>`
+            : `<span class="badge drive" style="background-color: #eafaf1; color: #2ecc71; border: 1px solid #d4f5e3; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;">Lái Thử</span>`;
+          return `
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+              <div>
+                <span style="font-weight: 700; font-size: 13.5px; color: var(--slate-900);">${d.fullname}</span>
+                <span style="font-size: 11.5px; color: var(--slate-500); margin-left: 8px;">${d.phone}</span>
+                <div style="font-size: 12px; color: var(--slate-500); margin-top: 3px;">
+                  Quan tâm: <strong>${d.car_name || 'Chưa chọn'}</strong>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                ${typeBadge}
+                <div style="font-size: 11px; color: var(--slate-400); margin-top: 4px;">
+                  ${new Date(d.created_at).toLocaleDateString('vi-VN')}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 2. Hiển thị xe mới thêm (Tối đa 5 xe)
+    if (recentCarsEl) {
+      const recentCars = [...cars].reverse().slice(0, 5);
+      if (recentCars.length === 0) {
+        recentCarsEl.innerHTML = '<div style="text-align: center; color: var(--slate-400); padding: 10px;">Chưa có xe nào</div>';
+      } else {
+        recentCarsEl.innerHTML = recentCars.map(c => `
+          <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+            <img src="${c.image_url}" style="width: 50px; height: 35px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;" onerror="this.src='/uploads/default-car.jpg'">
+            <div style="flex-grow: 1;">
+              <span style="font-weight: 700; font-size: 13.5px; color: var(--slate-900);">${c.name}</span>
+              <div style="font-size: 12px; color: var(--slate-500); margin-top: 2px;">
+                Phân khúc: <strong>${c.segment}</strong> | Loại: <strong>${c.type}</strong>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-weight: 700; font-size: 13.5px; color: var(--primary-blue);">${formatVND(c.price)}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 3. Vẽ biểu đồ thống kê
+    renderCharts(drives, cars);
+
+  } catch (err) {
+    console.error('Lỗi khi cập nhật Dashboard:', err);
+  }
+}
+
+function renderCharts(drives, cars) {
+  if (typeof Chart === 'undefined') return; // Đề phòng chưa tải xong Chart.js
+
+  const canvas1 = document.getElementById('chart-request-types');
+  const canvas2 = document.getElementById('chart-car-segments');
+  if (!canvas1 || !canvas2) return;
+
+  // Hủy biểu đồ cũ nếu đã tồn tại để tránh xung đột render
+  if (requestTypeChart) requestTypeChart.destroy();
+  if (carSegmentChart) carSegmentChart.destroy();
+  
+  // Tính toán số lượng yêu cầu
+  const quoteCount = drives.filter(d => d.type === 'quote').length;
+  const driveCount = drives.filter(d => d.type === 'drive').length;
+  
+  const ctx1 = canvas1.getContext('2d');
+  requestTypeChart = new Chart(ctx1, {
+    type: 'pie',
+    data: {
+      labels: ['Nhận báo giá', 'Đăng ký lái thử'],
+      datasets: [{
+        data: [quoteCount, driveCount],
+        backgroundColor: ['#0f53c5', '#10b981'],
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Plus Jakarta Sans', weight: '600' } }
+        }
+      }
+    }
+  });
+  
+  // Tính toán phân khúc xe
+  const segments = { 'Mini': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'Khác': 0 };
+  cars.forEach(c => {
+    const s = c.segment || 'Khác';
+    if (segments[s] !== undefined) {
+      segments[s]++;
+    } else {
+      segments['Khác']++;
+    }
+  });
+  
+  const ctx2 = canvas2.getContext('2d');
+  carSegmentChart = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(segments),
+      datasets: [{
+        label: 'Số lượng xe',
+        data: Object.values(segments),
+        backgroundColor: '#0f53c5',
+        borderRadius: 6,
+        barPercentage: 0.6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 1 }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
 }
 window.switchTab = switchTab; // Gán global để sử dụng trong onclick html
 
@@ -619,6 +867,11 @@ async function loadAdminCars() {
     const response = await fetch('/api/cars');
     if (!response.ok) throw new Error('Không thể tải danh sách xe.');
     const cars = await response.json();
+    window.loadedCars = cars;
+    
+    // Cập nhật chỉ số KPI
+    const kpiCars = document.getElementById('kpi-total-cars');
+    if (kpiCars) kpiCars.innerText = cars.length;
 
     if (cars.length === 0) {
       adminCarList.innerHTML = `
@@ -666,13 +919,16 @@ async function loadAdminCars() {
 // Xử lý xem trước ảnh khi chọn file
 carImageInput.addEventListener('change', function() {
   const file = this.files[0];
+  const filenameSpan = document.getElementById('car-image-filename');
   if (file) {
+    if (filenameSpan) filenameSpan.textContent = file.name;
     const reader = new FileReader();
     reader.onload = function(e) {
       imagePreviewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview image">`;
     };
     reader.readAsDataURL(file);
   } else {
+    if (filenameSpan) filenameSpan.textContent = 'Chưa chọn tệp';
     imagePreviewContainer.innerHTML = `<span>Chưa có ảnh nào được chọn</span>`;
   }
 });
@@ -684,6 +940,10 @@ btnAddCar.addEventListener('click', () => {
   carForm.reset();
   document.getElementById('car-id').value = '';
   imagePreviewContainer.innerHTML = `<span>Chưa có ảnh nào được chọn</span>`;
+  
+  const carFilename = document.getElementById('car-image-filename');
+  if (carFilename) carFilename.textContent = 'Chưa chọn tệp';
+
   document.getElementById('spec-price-note').value = '';
   const specContactPhone = document.getElementById('spec-contact-phone');
   if (specContactPhone) specContactPhone.value = '';
@@ -809,6 +1069,14 @@ async function editCar(id) {
     }
 
     carImageInput.value = '';
+    const carFilename = document.getElementById('car-image-filename');
+    if (carFilename) {
+      if (car.image_url) {
+        carFilename.textContent = car.image_url.split('/').pop() || 'Đang sử dụng ảnh đã có';
+      } else {
+        carFilename.textContent = 'Chưa chọn tệp';
+      }
+    }
 
     carFormModal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -991,6 +1259,15 @@ async function loadAdminTestDrives() {
     window.loadedDrives = data;
     const drives = data;
 
+    // Cập nhật chỉ số KPI
+    const kpiDrives = document.getElementById('kpi-total-drives');
+    if (kpiDrives) kpiDrives.innerText = drives.length;
+    const kpiPending = document.getElementById('kpi-pending-drives');
+    if (kpiPending) {
+      const pendingCount = drives.filter(d => d.status === 'Chờ liên hệ' || d.status === 'Đang xử lý' || d.status === 'Chờ xử lý').length;
+      kpiPending.innerText = pendingCount;
+    }
+
     if (drives.length === 0) {
       adminDriveList.innerHTML = `
         <tr>
@@ -1130,6 +1407,19 @@ const bannerImagePreviewBox = document.getElementById('banner-image-preview-box'
 const bannerImagePreview = document.getElementById('banner-image-preview');
 const bannerModalFormTitle = document.getElementById('banner-modal-form-title');
 
+// Xử lý xem trước tên file ảnh banner khi chọn file
+if (bannerImageInput) {
+  bannerImageInput.addEventListener('change', function() {
+    const file = this.files[0];
+    const filenameSpan = document.getElementById('banner-image-filename');
+    if (file) {
+      if (filenameSpan) filenameSpan.textContent = file.name;
+    } else {
+      if (filenameSpan) filenameSpan.textContent = 'Chưa chọn tệp';
+    }
+  });
+}
+
 let isEditingBanner = false;
 
 async function loadAdminBanners() {
@@ -1138,6 +1428,11 @@ async function loadAdminBanners() {
     const response = await fetch('/api/banners');
     if (!response.ok) throw new Error('Không thể tải danh sách banner.');
     const banners = await response.json();
+    window.loadedBanners = banners;
+
+    // Cập nhật chỉ số KPI
+    const kpiBanners = document.getElementById('kpi-total-banners');
+    if (kpiBanners) kpiBanners.innerText = banners.length;
 
     if (banners.length === 0) {
       adminBannerList.innerHTML = `
@@ -1189,6 +1484,10 @@ if (btnAddBanner) {
     document.getElementById('banner-id').value = '';
     if (bannerImagePreviewBox) bannerImagePreviewBox.style.display = 'none';
     if (bannerImageInput) bannerImageInput.required = true;
+
+    const bannerFilename = document.getElementById('banner-image-filename');
+    if (bannerFilename) bannerFilename.textContent = 'Chưa chọn tệp';
+
     if (bannerFormModal) bannerFormModal.classList.add('active');
     document.body.style.overflow = 'hidden';
   });
@@ -1218,6 +1517,15 @@ window.openEditBannerModal = function(banner) {
   document.getElementById('banner-description').value = banner.description || '';
   document.getElementById('banner-link').value = banner.link_url || '#';
   
+  const bannerFilename = document.getElementById('banner-image-filename');
+  if (bannerFilename) {
+    if (banner.image_url) {
+      bannerFilename.textContent = banner.image_url.split('/').pop() || 'Đang sử dụng ảnh đã có';
+    } else {
+      bannerFilename.textContent = 'Chưa chọn tệp';
+    }
+  }
+
   if (bannerImagePreview) bannerImagePreview.src = banner.image_url;
   if (bannerImagePreviewBox) bannerImagePreviewBox.style.display = 'block';
   if (bannerImageInput) bannerImageInput.required = false;
@@ -1317,35 +1625,75 @@ async function loadAdminSettings() {
     document.getElementById('setting-contact-address').value = settings.contact_address || '';
     document.getElementById('setting-zalo-link').value = settings.zalo_link || '';
     document.getElementById('setting-messenger-link').value = settings.messenger_link || '';
+    
+    // Tải cấu hình Thẻ Giới Thiệu
+    document.getElementById('setting-intro-title').value = settings.intro_title || 'VINFAST VIỆT NAM';
+    document.getElementById('setting-intro-image').value = settings.intro_image || '/uploads/banner_eco.png';
+    document.getElementById('setting-intro-benefits').value = settings.intro_benefits || 
+      `Giá tốt nhất khi gọi Hotline\nKý hợp đồng và giao xe tận nhà\nHỗ trợ đăng ký xe mọi miền tổ quốc\nHỗ trợ vay lên đến 85%, lãi suất cực ưu đãi\nDuyệt vay trong ngày khi Quý khách bổ sung đủ hồ sơ, hỗ trợ hồ sơ nợ xấu\nThu mua xe cũ, đổi xe mới`;
+
+    // Tải cấu hình Telegram
+    document.getElementById('setting-telegram-token').value = settings.telegram_bot_token || '';
+    document.getElementById('setting-telegram-chat-id-private').value = settings.telegram_chat_id_private || '';
+    document.getElementById('setting-telegram-chat-id-group').value = settings.telegram_chat_id_group || '';
   } catch (error) {
     alert(error.message);
   }
 }
 window.loadAdminSettings = loadAdminSettings;
 
+// Lắng nghe thay đổi chọn file ảnh thẻ giới thiệu
+const introImageFileInput = document.getElementById('setting-intro-image-file');
+if (introImageFileInput) {
+  introImageFileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      document.getElementById('setting-intro-image').value = `[Tải lên file: ${file.name}]`;
+    }
+  });
+}
+
 const adminSettingsForm = document.getElementById('admin-settings-form');
 if (adminSettingsForm) {
   adminSettingsForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const settings = {
-      showroom_name: document.getElementById('setting-showroom-name').value.trim(),
-      contact_phone: document.getElementById('setting-contact-phone').value.trim(),
-      contact_email: document.getElementById('setting-contact-email').value.trim(),
-      contact_hours: document.getElementById('setting-contact-hours').value.trim(),
-      contact_address: document.getElementById('setting-contact-address').value.trim(),
-      zalo_link: document.getElementById('setting-zalo-link').value.trim(),
-      messenger_link: document.getElementById('setting-messenger-link').value.trim()
-    };
+    const formData = new FormData();
+    formData.append('showroom_name', document.getElementById('setting-showroom-name').value.trim());
+    formData.append('contact_phone', document.getElementById('setting-contact-phone').value.trim());
+    formData.append('contact_email', document.getElementById('setting-contact-email').value.trim());
+    formData.append('contact_hours', document.getElementById('setting-contact-hours').value.trim());
+    formData.append('contact_address', document.getElementById('setting-contact-address').value.trim());
+    formData.append('zalo_link', document.getElementById('setting-zalo-link').value.trim());
+    formData.append('messenger_link', document.getElementById('setting-messenger-link').value.trim());
+    
+    // Lưu cấu hình Thẻ Giới Thiệu
+    formData.append('intro_title', document.getElementById('setting-intro-title').value.trim());
+    formData.append('intro_benefits', document.getElementById('setting-intro-benefits').value.trim());
+
+    // Lưu cấu hình Telegram
+    formData.append('telegram_bot_token', document.getElementById('setting-telegram-token').value.trim());
+    formData.append('telegram_chat_id_private', document.getElementById('setting-telegram-chat-id-private').value.trim());
+    formData.append('telegram_chat_id_group', document.getElementById('setting-telegram-chat-id-group').value.trim());
+    
+    const introImageInput = document.getElementById('setting-intro-image');
+    // Nếu text input không bắt đầu bằng "[Tải lên file: " thì mới gửi URL text
+    if (!introImageInput.value.startsWith('[Tải lên file:')) {
+      formData.append('intro_image', introImageInput.value.trim());
+    }
+
+    const fileInput = document.getElementById('setting-intro-image-file');
+    if (fileInput && fileInput.files[0]) {
+      formData.append('intro_image_file', fileInput.files[0]);
+    }
 
     try {
       const response = await fetch('/api/settings', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(settings)
+        body: formData
       });
 
       if (response.status === 401 || response.status === 403) {
@@ -1357,6 +1705,7 @@ if (adminSettingsForm) {
       if (!response.ok) throw new Error(data.message || 'Lỗi khi lưu cấu hình.');
 
       alert('Đã lưu cấu hình hệ thống thành công!');
+      if (fileInput) fileInput.value = ''; // Reset file input
       loadAdminSettings();
     } catch (error) {
       alert(error.message);

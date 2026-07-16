@@ -304,6 +304,30 @@ async function loadSystemSettings() {
     if (floatingMessenger && settings.messenger_link) {
       floatingMessenger.href = settings.messenger_link;
     }
+
+    // Cập nhật động Thẻ Giới Thiệu (VINFAST VIỆT NAM)
+    const cardTitleEl = document.getElementById('vinfast-card-title');
+    if (cardTitleEl && settings.intro_title) {
+      cardTitleEl.innerText = settings.intro_title;
+    }
+    
+    const cardImageEl = document.getElementById('vinfast-card-image');
+    if (cardImageEl && settings.intro_image) {
+      cardImageEl.src = settings.intro_image;
+    }
+
+    const cardListEl = document.getElementById('vinfast-card-list');
+    if (cardListEl && settings.intro_benefits) {
+      const benefits = settings.intro_benefits.split('\n').map(item => item.trim()).filter(item => item.length > 0);
+      if (benefits.length > 0) {
+        cardListEl.innerHTML = benefits.map(b => `
+          <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 1.4;">
+            <span style="color: #ffdd59;">•</span>
+            <span>${b}</span>
+          </li>
+        `).join('');
+      }
+    }
   } catch (err) {
     console.error('Lỗi khi tải cấu hình hệ thống:', err);
   }

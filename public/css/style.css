@@ -2346,6 +2346,32 @@ footer a {
   display: block;
 }
 
-
-
-
+/* Custom Header Mobile Responsive Fixes */
+@media (max-width: 768px) {
+  #user-header-profile {
+    gap: 6px !important;
+  }
+  #user-welcome {
+    display: none !important;
+  }
+  .header-actions {
+    gap: 6px !important;
+  }
+  .header-actions .btn {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+  .header-actions #btn-login-trigger {
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+  }
+  .logo-text {
+    font-size: 18px !important;
+    letter-spacing: 1px !important;
+  }
+  .logo-badge {
+    font-size: 9px !important;
+    padding: 1px 4px !important;
+  }
+}

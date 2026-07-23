@@ -953,6 +953,10 @@ btnAddCar.addEventListener('click', () => {
   if (specMonths) specMonths.value = '';
   const specInterest = document.getElementById('spec-in-default-interest');
   if (specInterest) specInterest.value = '';
+  const specFeeHnHcm = document.getElementById('spec-in-fee-hanoi-hcm');
+  if (specFeeHnHcm) specFeeHnHcm.value = '';
+  const specFeeProvince = document.getElementById('spec-in-fee-province');
+  if (specFeeProvince) specFeeProvince.value = '';
 
   const specContactPhone = document.getElementById('spec-contact-phone');
   if (specContactPhone) specContactPhone.value = '';
@@ -1304,6 +1308,10 @@ async function editCar(id) {
     if (specDefaultMonths) specDefaultMonths.value = specs.default_months || '';
     const specDefaultInterest = document.getElementById('spec-in-default-interest');
     if (specDefaultInterest) specDefaultInterest.value = specs.default_interest || '';
+    const specFeeHnHcm = document.getElementById('spec-in-fee-hanoi-hcm');
+    if (specFeeHnHcm) specFeeHnHcm.value = specs.fee_hanoi_hcm || '';
+    const specFeeProvince = document.getElementById('spec-in-fee-province');
+    if (specFeeProvince) specFeeProvince.value = specs.fee_province || '';
     document.getElementById('spec-price-note').value = specs.price_note || '';
     const specContactPhone = document.getElementById('spec-contact-phone');
     if (specContactPhone) {
@@ -1433,6 +1441,8 @@ carForm.addEventListener('submit', async (e) => {
   const specDefaultPrepayEl = document.getElementById('spec-in-default-prepay');
   const specDefaultMonthsEl = document.getElementById('spec-in-default-months');
   const specDefaultInterestEl = document.getElementById('spec-in-default-interest');
+  const specFeeHnHcmEl = document.getElementById('spec-in-fee-hanoi-hcm');
+  const specFeeProvinceEl = document.getElementById('spec-in-fee-province');
 
   // Tạo specifications JSON
   const specifications = {
@@ -1446,6 +1456,8 @@ carForm.addEventListener('submit', async (e) => {
     default_prepay: specDefaultPrepayEl && specDefaultPrepayEl.value ? parseFloat(specDefaultPrepayEl.value) : null,
     default_months: specDefaultMonthsEl && specDefaultMonthsEl.value ? parseInt(specDefaultMonthsEl.value) : null,
     default_interest: specDefaultInterestEl && specDefaultInterestEl.value ? parseFloat(specDefaultInterestEl.value) : null,
+    fee_hanoi_hcm: specFeeHnHcmEl && specFeeHnHcmEl.value ? parseFloat(specFeeHnHcmEl.value) : null,
+    fee_province: specFeeProvinceEl && specFeeProvinceEl.value ? parseFloat(specFeeProvinceEl.value) : null,
     price_note: document.getElementById('spec-price-note').value.trim(),
     contact_phone: document.getElementById('spec-contact-phone') ? document.getElementById('spec-contact-phone').value.trim() : '',
     versions: versions,

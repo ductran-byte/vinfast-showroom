@@ -157,6 +157,7 @@ const stationProvinceFilter = document.getElementById('station-province-filter')
 
 // DOM cho Tính toán Tài chính
 const selectBatteryOpt = document.getElementById('finance-battery-option');
+const selectLocationOpt = document.getElementById('finance-location-option');
 const sliderPrepay = document.getElementById('finance-prepay');
 const sliderMonths = document.getElementById('finance-months');
 const sliderInterest = document.getElementById('finance-interest');
@@ -510,6 +511,16 @@ function updateSelectedCarFinanceOptions() {
     `;
   }
 
+  const feeHnHcm = specs.fee_hanoi_hcm || 18000000;
+  const feeProvince = specs.fee_province || 5000000;
+
+  if (selectLocationOpt) {
+    selectLocationOpt.innerHTML = `
+      <option value="${feeHnHcm}" data-fee="${feeHnHcm}">Hà Nội / Hồ Chí Minh (+ ${formatVND(feeHnHcm)})</option>
+      <option value="${feeProvince}" data-fee="${feeProvince}">Tỉnh Khác (+ ${formatVND(feeProvince)})</option>
+    `;
+  }
+
   if (sliderPrepay && specs.default_prepay) sliderPrepay.value = specs.default_prepay;
   if (sliderMonths && specs.default_months) sliderMonths.value = specs.default_months;
   if (sliderInterest && specs.default_interest) sliderInterest.value = specs.default_interest;
@@ -534,9 +545,15 @@ function calculateLoan() {
 
   const carPrice = basePrice + batteryPrice;
 
-  // Tính chi phí đăng ký lăn bánh thực tế tại Việt Nam cho xe điện
-  // Trước bạ = 0%
-  const plateFee = 20000000; // Hà Nội/HCM mặc định
+  // Chi phí biển số theo Khu vực chọn
+  let plateFee = 18000000;
+  if (selectLocationOpt && selectLocationOpt.options.length > 0) {
+    const selectedLoc = selectLocationOpt.options[selectLocationOpt.selectedIndex];
+    if (selectedLoc) {
+      plateFee = parseFloat(selectedLoc.dataset.fee || selectedLoc.value) || 18000000;
+    }
+  }
+
   const registrationInspection = 340000;
   const roadMaintenanceFee = 1560000; // 1 năm
   const insuranceMandatory = 480000; // 1 năm
@@ -575,9 +592,14 @@ function calculateLoan() {
   if (elMonthly) elMonthly.innerText = formatVND(totalFirstMonthPayment);
 }
 
-// Lắng nghe các thanh trượt thay đổi để tính lại tiền ngay lập tức
-[sliderPrepay, sliderMonths, sliderInterest, selectBatteryOpt].forEach(element => {
+// Lắng nghe các thanh trượt & dropdown thay đổi để tính lại tiền ngay lập tức
+[sliderPrepay, sliderMonths, sliderInterest, selectBatteryOpt, selectLocationOpt].forEach(element => {
+  if (!element) return;
   element.addEventListener('input', () => {
+    updateFinanceLabels();
+    calculateLoan();
+  });
+  element.addEventListener('change', () => {
     updateFinanceLabels();
     calculateLoan();
   });

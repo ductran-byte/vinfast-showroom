@@ -510,6 +510,7 @@ function checkUserLogin() {
 // Calculator Logic
 function initCalculator() {
   const selectBatteryOpt = document.getElementById('finance-battery-option');
+  const selectLocationOpt = document.getElementById('finance-location-option');
   const sliderPrepay = document.getElementById('finance-prepay');
   const sliderMonths = document.getElementById('finance-months');
   const sliderInterest = document.getElementById('finance-interest');
@@ -521,6 +522,17 @@ function initCalculator() {
   if (!selectBatteryOpt || !currentCar) return;
 
   const specs = currentCar.specifications || {};
+
+  // Hydrate custom location registration fees
+  const feeHnHcm = specs.fee_hanoi_hcm || 18000000;
+  const feeProvince = specs.fee_province || 5000000;
+
+  if (selectLocationOpt) {
+    selectLocationOpt.innerHTML = `
+      <option value="${feeHnHcm}" data-fee="${feeHnHcm}">Hà Nội / Hồ Chí Minh (+ ${formatVND(feeHnHcm)})</option>
+      <option value="${feeProvince}" data-fee="${feeProvince}">Tỉnh Khác (+ ${formatVND(feeProvince)})</option>
+    `;
+  }
 
   // Hydrate custom battery options if provided for this car
   const batOptRaw = specs.battery_options;
@@ -584,8 +596,15 @@ function initCalculator() {
 
     const carPrice = basePrice + batteryPrice;
 
-    // Rolling fees estimation in Vietnam (Registration fee = 0%)
-    const plateFee = 20000000;
+    // Rolling fees estimation in Vietnam
+    let plateFee = 18000000;
+    if (selectLocationOpt && selectLocationOpt.options.length > 0) {
+      const selectedLoc = selectLocationOpt.options[selectLocationOpt.selectedIndex];
+      if (selectedLoc) {
+        plateFee = parseFloat(selectedLoc.dataset.fee || selectedLoc.value) || 18000000;
+      }
+    }
+
     const registrationInspection = 340000;
     const roadMaintenanceFee = 1560000;
     const insuranceMandatory = 480000;
@@ -622,7 +641,7 @@ function initCalculator() {
   }
 
   // Bind Listeners
-  [selectBatteryOpt, sliderPrepay, sliderMonths, sliderInterest].forEach(el => {
+  [selectBatteryOpt, selectLocationOpt, sliderPrepay, sliderMonths, sliderInterest].forEach(el => {
     if (!el) return;
     el.addEventListener('input', () => {
       updateLabels();

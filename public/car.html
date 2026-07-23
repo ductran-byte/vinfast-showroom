@@ -660,15 +660,23 @@
         <!-- Right: Results display panel -->
         <div class="glass-panel" style="padding: 28px; background: rgba(15, 83, 197, 0.02); border-color: rgba(15, 83, 197, 0.15); display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
-              <span style="color: var(--text-secondary);">Giá lăn bánh ước tính:</span>
-              <span style="color: var(--accent-color); font-weight: 700;" id="calc-rolling-price">---</span>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+              <span style="color: var(--text-secondary);">Giá xe (kèm gói pin chọn):</span>
+              <span style="color: var(--text-primary); font-weight: 600;" id="calc-car-price-display">---</span>
             </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
-              <span style="color: var(--text-secondary);">Số tiền trả trước (20%):</span>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+              <span style="color: var(--text-secondary);">Phí biển số khu vực:</span>
+              <span style="color: #0f53c5; font-weight: 600;" id="calc-plate-fee-display">+ 0 đ</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px; border-top: 1px dashed var(--panel-border); padding-top: 12px;">
+              <span style="color: var(--text-primary); font-weight: 700;">Giá lăn bánh ước tính:</span>
+              <span style="color: var(--accent-color); font-weight: 800; font-size: 17px;" id="calc-rolling-price">---</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+              <span style="color: var(--text-secondary);" id="lbl-prepay-title">Số tiền trả trước:</span>
               <span style="color: var(--text-primary); font-weight: 600;" id="calc-prepay-amount">---</span>
             </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 15px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
               <span style="color: var(--text-secondary);">Số tiền vay ngân hàng:</span>
               <span style="color: var(--text-primary); font-weight: 600;" id="calc-loan-amount">---</span>
             </div>

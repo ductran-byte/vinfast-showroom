@@ -581,12 +581,18 @@ function calculateLoan() {
   const totalFirstMonthPayment = monthlyPrincipal + monthlyInterest;
 
   // Cập nhật lên UI
+  const elCarPrice = document.getElementById('calc-car-price-display');
+  const elPlateFee = document.getElementById('calc-plate-fee-display');
   const elRolling = document.getElementById('calc-rolling-price');
+  const elPrepayTitle = document.getElementById('lbl-prepay-title');
   const elPrepay = document.getElementById('calc-prepay-amount');
   const elLoan = document.getElementById('calc-loan-amount');
   const elMonthly = document.getElementById('calc-monthly-payment');
 
+  if (elCarPrice) elCarPrice.innerText = formatVND(carPrice);
+  if (elPlateFee) elPlateFee.innerText = `+ ${formatVND(plateFee)}`;
   if (elRolling) elRolling.innerText = formatVND(rollingPrice);
+  if (elPrepayTitle) elPrepayTitle.innerText = `Số tiền trả trước (${sliderPrepay.value}% + Phí):`;
   if (elPrepay) elPrepay.innerText = formatVND(totalPrepayNeeded);
   if (elLoan) elLoan.innerText = formatVND(loanAmount);
   if (elMonthly) elMonthly.innerText = formatVND(totalFirstMonthPayment);

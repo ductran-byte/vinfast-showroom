@@ -10,7 +10,7 @@ const bannerRoutes = require('./routes/bannerRoutes');
 const settingRoutes = require('./routes/settingRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(express.json());

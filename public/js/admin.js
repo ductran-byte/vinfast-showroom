@@ -957,6 +957,8 @@ btnAddCar.addEventListener('click', () => {
   const colorContainer = document.getElementById('colors-list-inputs');
   if (colorContainer) colorContainer.innerHTML = '';
 
+  populateCopyPromoCarSelect();
+
   carFormModal.classList.add('active');
   document.body.style.overflow = 'hidden';
 });
@@ -993,6 +995,249 @@ const btnAddPromo = document.getElementById('btn-add-promo-row');
 if (btnAddPromo) {
   btnAddPromo.onclick = function() {
     addPromoRow('');
+  };
+}
+
+// Helper to populate car options for copying promotions
+async function populateCopyPromoCarSelect() {
+  const select = document.getElementById('select-copy-promo-car');
+  if (!select) return;
+
+  select.innerHTML = '<option value="">-- Sao chép từ xe khác --</option>';
+
+  let cars = window.loadedCars;
+  if (!cars || !Array.isArray(cars) || cars.length === 0) {
+    try {
+      const res = await fetch('/api/cars');
+      if (res.ok) {
+        cars = await res.json();
+        window.loadedCars = cars;
+      }
+    } catch (e) {
+      console.error('Error fetching cars for promo select:', e);
+    }
+  }
+
+  const currentCarId = document.getElementById('car-id').value;
+
+  if (cars && Array.isArray(cars)) {
+    cars.forEach(car => {
+      // Exclude current car if editing
+      if (currentCarId && String(car.id) === String(currentCarId)) return;
+      
+      const count = Array.isArray(car.promotions) ? car.promotions.length : 0;
+      const opt = document.createElement('option');
+      opt.value = car.id;
+      opt.textContent = `${car.name} (${count} KM)`;
+      select.appendChild(opt);
+    });
+  }
+}
+
+// Custom Popup Modal cho việc Chọn Cách Sao Chép Khuyến Mãi
+function showPromoCopyModal(existingCount, targetCarName, targetCount, onChoice) {
+  let modal = document.getElementById('promo-copy-choice-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'promo-copy-choice-modal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    `;
+    modal.innerHTML = `
+      <div id="promo-copy-choice-card" style="
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 20px;
+        padding: 32px 28px;
+        width: 90%;
+        max-width: 440px;
+        text-align: center;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        transform: scale(0.85) translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      ">
+        <div style="
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          margin: 0 auto 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          background: rgba(15, 83, 197, 0.1);
+          color: #0f53c5;
+          box-shadow: 0 8px 16px rgba(15, 83, 197, 0.1);
+        ">
+          <i class="fa-solid fa-copy"></i>
+        </div>
+        <h4 style="
+          margin: 0 0 10px;
+          font-family: 'Inter', sans-serif;
+          font-size: 20px;
+          font-weight: 800;
+          color: #0f172a;
+        ">Tùy Chọn Sao Chép Khuyến Mãi</h4>
+        <p id="promo-copy-choice-msg" style="
+          margin: 0 0 24px;
+          font-family: 'Inter', sans-serif;
+          font-size: 14px;
+          color: #475569;
+          line-height: 1.6;
+        "></p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <button id="btn-promo-replace" style="
+            background: #ef4444;
+            color: #ffffff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+          ">
+            <i class="fa-solid fa-arrows-rotate"></i> Ghi Đè (Thay thế toàn bộ)
+          </button>
+          <button id="btn-promo-append" style="
+            background: #0f53c5;
+            color: #ffffff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(15, 83, 197, 0.25);
+          ">
+            <i class="fa-solid fa-plus"></i> Thêm Nối Tiếp Vào Bên Dưới
+          </button>
+          <button id="btn-promo-cancel" style="
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 4px;
+          ">Hủy bỏ</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  const card = document.getElementById('promo-copy-choice-card');
+  const msg = document.getElementById('promo-copy-choice-msg');
+  const btnReplace = document.getElementById('btn-promo-replace');
+  const btnAppend = document.getElementById('btn-promo-append');
+  const btnCancel = document.getElementById('btn-promo-cancel');
+
+  msg.innerHTML = `Đang có <strong>${existingCount}</strong> khuyến mãi trong danh sách hiện tại.<br>Bạn muốn sao chép <strong>${targetCount}</strong> khuyến mãi từ xe <strong>"${targetCarName}"</strong> theo hình thức nào?`;
+
+  const closeModal = (choice) => {
+    modal.style.opacity = '0';
+    modal.style.visibility = 'hidden';
+    card.style.transform = 'scale(0.85) translateY(-10px)';
+    if (onChoice) onChoice(choice);
+  };
+
+  btnReplace.onclick = () => closeModal('replace');
+  btnAppend.onclick = () => closeModal('append');
+  btnCancel.onclick = () => closeModal('cancel');
+
+  modal.onclick = (e) => {
+    if (e.target === modal) closeModal('cancel');
+  };
+
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
+  setTimeout(() => {
+    card.style.transform = 'scale(1) translateY(0)';
+  }, 50);
+}
+
+// Bind promo copy event
+const btnCopyPromo = document.getElementById('btn-copy-promo-from-car');
+if (btnCopyPromo) {
+  btnCopyPromo.onclick = async function() {
+    const select = document.getElementById('select-copy-promo-car');
+    const selectedCarId = select ? select.value : '';
+
+    if (!selectedCarId) {
+      showAlert('Vui lòng chọn 1 xe từ danh sách để sao chép khuyến mãi.', false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/cars/${selectedCarId}`);
+      if (!response.ok) throw new Error('Không thể tải thông tin xe đã chọn.');
+      const targetCar = await response.json();
+
+      const promotions = targetCar.promotions || [];
+      if (promotions.length === 0) {
+        showAlert(`Dòng xe "${targetCar.name}" hiện chưa có chương trình khuyến mãi nào.`, false);
+        return;
+      }
+
+      const promoContainer = document.getElementById('promo-list-inputs');
+      const currentRows = promoContainer ? promoContainer.querySelectorAll('.promo-row') : [];
+
+      const executeCopy = (shouldReplace) => {
+        if (shouldReplace && promoContainer) {
+          promoContainer.innerHTML = '';
+        }
+        promotions.forEach(p => {
+          addPromoRow(p);
+        });
+        showAlert(`Đã sao chép thành công ${promotions.length} khuyến mãi từ xe "${targetCar.name}"!`, true);
+        if (select) select.value = '';
+      };
+
+      if (currentRows.length > 0) {
+        showPromoCopyModal(currentRows.length, targetCar.name, promotions.length, (choice) => {
+          if (choice === 'replace') {
+            executeCopy(true);
+          } else if (choice === 'append') {
+            executeCopy(false);
+          }
+        });
+      } else {
+        executeCopy(true);
+      }
+    } catch (err) {
+      showAlert('Lỗi sao chép khuyến mãi: ' + err.message, false);
+    }
   };
 }
 
@@ -1077,6 +1322,8 @@ async function editCar(id) {
         carFilename.textContent = 'Chưa chọn tệp';
       }
     }
+
+    populateCopyPromoCarSelect();
 
     carFormModal.classList.add('active');
     document.body.style.overflow = 'hidden';

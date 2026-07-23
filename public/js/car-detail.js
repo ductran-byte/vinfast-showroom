@@ -101,7 +101,18 @@ async function initCarDetailPage() {
     document.getElementById('spec-clearance').innerText = specs.ground_clearance || 'Đang cập nhật';
     document.getElementById('spec-drive').innerText = specs.drive_type || 'Đang cập nhật';
     document.getElementById('spec-charging').innerText = specs.charging_time || 'Đang cập nhật';
-    document.getElementById('spec-safety').innerText = specs.safety || 'Hệ thống phanh ABS, EBD, Cân bằng điện tử';
+    const safetyEl = document.getElementById('spec-safety');
+    if (safetyEl) {
+      const safetyRaw = specs.safety || 'Hệ thống phanh ABS, EBD, Cân bằng điện tử';
+      const items = safetyRaw.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean);
+      if (items.length > 1) {
+        safetyEl.innerHTML = items.map(item => `<div style="line-height: 1.6; margin-bottom: 4px; display: flex; align-items: flex-start; gap: 6px;"><span style="color: var(--accent-color); font-weight: 700;">•</span><span>${item}</span></div>`).join('');
+      } else if (items.length === 1) {
+        safetyEl.innerText = items[0];
+      } else {
+        safetyEl.innerText = 'Đang cập nhật';
+      }
+    }
 
     // Build Visualizer Color Dots (Basic vs Premium)
     const basicContainer = document.getElementById('detail-color-dots-basic');

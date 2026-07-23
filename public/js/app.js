@@ -667,7 +667,13 @@ btnCompareNow.addEventListener('click', () => {
       </tr>
       <tr>
         <td class="spec-name-column">Hệ thống an toàn</td>
-        ${selectedCars.map(car => `<td style="font-size:12.5px; text-align:left; line-height:1.4;">${(car.specifications && car.specifications.safety) || 'Đang cập nhật'}</td>`).join('')}
+        ${selectedCars.map(car => {
+          const raw = car.specifications && car.specifications.safety;
+          if (!raw) return '<td style="font-size:12.5px; text-align:left; line-height:1.4;">Đang cập nhật</td>';
+          const items = raw.split(/\r?\n|,/).map(s => s.trim()).filter(Boolean);
+          const listHtml = items.map(item => `<div>• ${item}</div>`).join('');
+          return `<td style="font-size:12.5px; text-align:left; line-height:1.5;">${listHtml}</td>`;
+        }).join('')}
       </tr>
     </tbody>
   `;

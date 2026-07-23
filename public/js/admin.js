@@ -1276,7 +1276,11 @@ async function editCar(id) {
     document.getElementById('spec-in-clearance').value = specs.ground_clearance || '';
     document.getElementById('spec-in-drive').value = specs.drive_type || '';
     document.getElementById('spec-in-charging').value = specs.charging_time || '';
-    document.getElementById('spec-in-safety').value = specs.safety || '';
+    let safetyText = specs.safety || '';
+    if (safetyText && !safetyText.includes('\n')) {
+      safetyText = safetyText.split(',').map(s => s.trim()).filter(Boolean).join('\n');
+    }
+    document.getElementById('spec-in-safety').value = safetyText;
     document.getElementById('spec-price-note').value = specs.price_note || '';
     const specContactPhone = document.getElementById('spec-contact-phone');
     if (specContactPhone) {

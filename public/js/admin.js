@@ -971,6 +971,7 @@ btnAddCar.addEventListener('click', () => {
   if (colorContainer) colorContainer.innerHTML = '';
 
   populateCopyPromoCarSelect();
+  populateCopyFinanceCarSelect();
 
   carFormModal.classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -1045,6 +1046,94 @@ async function populateCopyPromoCarSelect() {
       select.appendChild(opt);
     });
   }
+}
+
+// Helper to populate car options for copying finance config
+async function populateCopyFinanceCarSelect() {
+  const select = document.getElementById('select-copy-finance-car');
+  if (!select) return;
+
+  select.innerHTML = '<option value="">-- Sao chép từ xe khác --</option>';
+
+  let cars = window.loadedCars;
+  if (!cars || !Array.isArray(cars) || cars.length === 0) {
+    try {
+      const res = await fetch('/api/cars');
+      if (res.ok) {
+        cars = await res.json();
+        window.loadedCars = cars;
+      }
+    } catch (e) {
+      console.error('Error fetching cars for finance select:', e);
+    }
+  }
+
+  const currentCarId = document.getElementById('car-id').value;
+
+  if (cars && Array.isArray(cars)) {
+    cars.forEach(car => {
+      if (currentCarId && String(car.id) === String(currentCarId)) return;
+      const opt = document.createElement('option');
+      opt.value = car.id;
+      opt.textContent = car.name;
+      select.appendChild(opt);
+    });
+  }
+}
+
+// Bind finance copy event listener
+const btnCopyFinance = document.getElementById('btn-copy-finance-from-car');
+if (btnCopyFinance) {
+  btnCopyFinance.onclick = async function() {
+    const select = document.getElementById('select-copy-finance-car');
+    const selectedCarId = select ? select.value : '';
+
+    if (!selectedCarId) {
+      showAlert('Vui lòng chọn 1 xe từ danh sách để sao chép cấu hình trả góp.', false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/cars/${selectedCarId}`);
+      if (!response.ok) throw new Error('Không thể tải thông tin xe đã chọn.');
+      const targetCar = await response.json();
+
+      const specs = targetCar.specifications || {};
+
+      // Populate finance fields
+      const specBatteryOptions = document.getElementById('spec-in-battery-options');
+      if (specBatteryOptions) {
+        let batOptVal = specs.battery_options || '';
+        if (Array.isArray(batOptVal)) {
+          batOptVal = batOptVal.map(o => `${o.name} | ${o.price || 0}`).join('\n');
+        }
+        specBatteryOptions.value = batOptVal;
+      }
+
+      const specDefaultPrepay = document.getElementById('spec-in-default-prepay');
+      if (specDefaultPrepay) specDefaultPrepay.value = specs.default_prepay || '';
+
+      const specDefaultMonths = document.getElementById('spec-in-default-months');
+      if (specDefaultMonths) specDefaultMonths.value = specs.default_months || '';
+
+      const specDefaultInterest = document.getElementById('spec-in-default-interest');
+      if (specDefaultInterest) specDefaultInterest.value = specs.default_interest || '';
+
+      const specFeeHnHcm = document.getElementById('spec-in-fee-hanoi-hcm');
+      if (specFeeHnHcm) specFeeHnHcm.value = specs.fee_hanoi_hcm || '';
+
+      const specFeeProvince = document.getElementById('spec-in-fee-province');
+      if (specFeeProvince) specFeeProvince.value = specs.fee_province || '';
+
+      const specPriceNote = document.getElementById('spec-price-note');
+      if (specPriceNote) specPriceNote.value = specs.price_note || '';
+
+      showAlert(`Đã sao chép thành công cấu hình Dự Toán Chi Phí & Trả Góp từ xe "${targetCar.name}"!`, true);
+      if (select) select.value = '';
+    } catch (err) {
+      showAlert('Lỗi sao chép cấu hình tài chính: ' + err.message, false);
+    }
+  };
 }
 
 // Custom Popup Modal cho việc Chọn Cách Sao Chép Khuyến Mãi
@@ -1359,6 +1448,7 @@ async function editCar(id) {
     }
 
     populateCopyPromoCarSelect();
+    populateCopyFinanceCarSelect();
 
     carFormModal.classList.add('active');
     document.body.style.overflow = 'hidden';

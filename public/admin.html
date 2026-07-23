@@ -1234,7 +1234,17 @@
           </div>
 
           <!-- Cấu hình Dự Toán Chi Phí & Trả Góp -->
-          <h3 class="spec-title" style="font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Cấu Hình Dự Toán Chi Phí & Trả Góp</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h3 class="spec-title" style="font-size: 16px; margin: 0;">Cấu Hình Dự Toán Chi Phí & Trả Góp</h3>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="select-copy-finance-car" class="form-input" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 240px;">
+                <option value="">-- Sao chép từ xe khác --</option>
+              </select>
+              <button type="button" class="btn btn-soft-primary" id="btn-copy-finance-from-car" style="padding: 6px 14px; font-size: 13px; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-copy"></i> Sao Chép
+              </button>
+            </div>
+          </div>
           <div id="finance-config-container" style="margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01);">
             <div class="specs-form-grid" style="margin-bottom: 0;">
               <div class="form-group" style="grid-column: span 2;">

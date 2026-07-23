@@ -518,10 +518,54 @@ function initCalculator() {
   const lblMonths = document.getElementById('lbl-loan-months');
   const lblInterest = document.getElementById('lbl-interest-rate');
 
+  if (!selectBatteryOpt || !currentCar) return;
+
+  const specs = currentCar.specifications || {};
+
+  // Hydrate custom battery options if provided for this car
+  const batOptRaw = specs.battery_options;
+  if (batOptRaw && typeof batOptRaw === 'string' && batOptRaw.trim()) {
+    selectBatteryOpt.innerHTML = '';
+    const lines = batOptRaw.split('\n').map(l => l.trim()).filter(Boolean);
+    lines.forEach(line => {
+      const parts = line.split('|');
+      const name = parts[0].trim();
+      const priceDiff = parts[1] ? parseFloat(parts[1].trim()) || 0 : 0;
+      const opt = document.createElement('option');
+      opt.value = priceDiff;
+      opt.dataset.price = priceDiff;
+      opt.textContent = name;
+      selectBatteryOpt.appendChild(opt);
+    });
+  } else {
+    // Default 2 options based on segment
+    let defaultBuyPrice = 110000000;
+    const seg = currentCar.segment;
+    if (seg === 'Mini' || seg === 'A') defaultBuyPrice = 80000000;
+    else if (seg === 'B' || seg === 'C') defaultBuyPrice = 110000000;
+    else defaultBuyPrice = 150000000;
+
+    selectBatteryOpt.innerHTML = `
+      <option value="0" data-price="0">Thuê Pin (Giá mua xe rẻ hơn)</option>
+      <option value="${defaultBuyPrice}" data-price="${defaultBuyPrice}">Mua Đứt Pin (Trọn gói kèm xe)</option>
+    `;
+  }
+
+  // Hydrate default slider values if configured
+  if (sliderPrepay && specs.default_prepay) {
+    sliderPrepay.value = specs.default_prepay;
+  }
+  if (sliderMonths && specs.default_months) {
+    sliderMonths.value = specs.default_months;
+  }
+  if (sliderInterest && specs.default_interest) {
+    sliderInterest.value = specs.default_interest;
+  }
+
   function updateLabels() {
-    lblPrepay.innerText = `${sliderPrepay.value}%`;
-    lblMonths.innerText = `${sliderMonths.value} tháng (${sliderMonths.value / 12} năm)`;
-    lblInterest.innerText = `${sliderInterest.value}%`;
+    if (lblPrepay && sliderPrepay) lblPrepay.innerText = `${sliderPrepay.value}%`;
+    if (lblMonths && sliderMonths) lblMonths.innerText = `${sliderMonths.value} tháng (${sliderMonths.value / 12} năm)`;
+    if (lblInterest && sliderInterest) lblInterest.innerText = `${sliderInterest.value}%`;
   }
 
   function calculate() {
@@ -529,13 +573,13 @@ function initCalculator() {
 
     const basePrice = parseFloat(currentCar.price);
     
-    // Estimate battery addition price
+    // Battery addition price from selected option
     let batteryPrice = 0;
-    if (selectBatteryOpt.value === 'buy') {
-      const seg = currentCar.segment;
-      if (seg === 'Mini' || seg === 'A') batteryPrice = 80000000;
-      else if (seg === 'B' || seg === 'C') batteryPrice = 110000000;
-      else batteryPrice = 150000000;
+    if (selectBatteryOpt && selectBatteryOpt.options.length > 0) {
+      const selectedOpt = selectBatteryOpt.options[selectBatteryOpt.selectedIndex];
+      if (selectedOpt) {
+        batteryPrice = parseFloat(selectedOpt.dataset.price || selectedOpt.value) || 0;
+      }
     }
 
     const carPrice = basePrice + batteryPrice;
@@ -549,14 +593,14 @@ function initCalculator() {
 
     const rollingPrice = carPrice + rollingFees;
 
-    // Prepayment amount based on car base price
+    // Prepayment amount
     const prepayPercent = parseInt(sliderPrepay.value) / 100;
     const prepayAmount = carPrice * prepayPercent + rollingFees;
     
     // Loan amount
     const loanAmount = carPrice * (1 - prepayPercent);
 
-    // Monthly payment calculation (first month installment: Principal + Interest)
+    // Monthly payment calculation
     const months = parseInt(sliderMonths.value);
     const yearlyInterest = parseFloat(sliderInterest.value) / 100;
     const monthlyInterest = yearlyInterest / 12;
@@ -566,14 +610,20 @@ function initCalculator() {
     const totalFirstMonth = monthlyPrincipal + monthlyInterestPayment;
 
     // Render results
-    document.getElementById('calc-rolling-price').innerText = formatVND(rollingPrice);
-    document.getElementById('calc-prepay-amount').innerText = `${formatVND(prepayAmount)} (${sliderPrepay.value}%)`;
-    document.getElementById('calc-loan-amount').innerText = formatVND(loanAmount);
-    document.getElementById('calc-monthly-payment').innerText = formatVND(totalFirstMonth);
+    const elRolling = document.getElementById('calc-rolling-price');
+    const elPrepay = document.getElementById('calc-prepay-amount');
+    const elLoan = document.getElementById('calc-loan-amount');
+    const elMonthly = document.getElementById('calc-monthly-payment');
+
+    if (elRolling) elRolling.innerText = formatVND(rollingPrice);
+    if (elPrepay) elPrepay.innerText = `${formatVND(prepayAmount)} (${sliderPrepay.value}%)`;
+    if (elLoan) elLoan.innerText = formatVND(loanAmount);
+    if (elMonthly) elMonthly.innerText = formatVND(totalFirstMonth);
   }
 
   // Bind Listeners
   [selectBatteryOpt, sliderPrepay, sliderMonths, sliderInterest].forEach(el => {
+    if (!el) return;
     el.addEventListener('input', () => {
       updateLabels();
       calculate();

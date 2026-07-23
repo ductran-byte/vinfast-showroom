@@ -479,19 +479,57 @@ function updateFinanceLabels() {
   lblInterest.innerText = `${sliderInterest.value}%`;
 }
 
+function updateSelectedCarFinanceOptions() {
+  if (!selectedCarForFinance || !selectBatteryOpt) return;
+  const specs = selectedCarForFinance.specifications || {};
+
+  const batOptRaw = specs.battery_options;
+  if (batOptRaw && typeof batOptRaw === 'string' && batOptRaw.trim()) {
+    selectBatteryOpt.innerHTML = '';
+    const lines = batOptRaw.split('\n').map(l => l.trim()).filter(Boolean);
+    lines.forEach(line => {
+      const parts = line.split('|');
+      const name = parts[0].trim();
+      const priceDiff = parts[1] ? parseFloat(parts[1].trim()) || 0 : 0;
+      const opt = document.createElement('option');
+      opt.value = priceDiff;
+      opt.dataset.price = priceDiff;
+      opt.textContent = name;
+      selectBatteryOpt.appendChild(opt);
+    });
+  } else {
+    let defaultBuyPrice = 110000000;
+    const seg = selectedCarForFinance.segment;
+    if (seg === 'Mini' || seg === 'A') defaultBuyPrice = 80000000;
+    else if (seg === 'B' || seg === 'C') defaultBuyPrice = 110000000;
+    else defaultBuyPrice = 150000000;
+
+    selectBatteryOpt.innerHTML = `
+      <option value="0" data-price="0">Thuê Pin (Giá mua xe rẻ hơn)</option>
+      <option value="${defaultBuyPrice}" data-price="${defaultBuyPrice}">Mua Đứt Pin (Trọn gói kèm xe)</option>
+    `;
+  }
+
+  if (sliderPrepay && specs.default_prepay) sliderPrepay.value = specs.default_prepay;
+  if (sliderMonths && specs.default_months) sliderMonths.value = specs.default_months;
+  if (sliderInterest && specs.default_interest) sliderInterest.value = specs.default_interest;
+
+  updateFinanceLabels();
+  calculateLoan();
+}
+
 function calculateLoan() {
   if (!selectedCarForFinance) return;
 
   const basePrice = parseFloat(selectedCarForFinance.price);
   
-  // Xác định chi phí Pin (Mua đứt pin cộng thêm tiền, ví dụ ước tính)
+  // Chi phí Pin từ phương án được chọn
   let batteryPrice = 0;
-  if (selectBatteryOpt.value === 'buy') {
-    // Phân khúc nhỏ cộng ít, lớn cộng nhiều
-    const seg = selectedCarForFinance.segment;
-    if (seg === 'Mini' || seg === 'A') batteryPrice = 80000000;
-    else if (seg === 'B' || seg === 'C') batteryPrice = 110000000;
-    else batteryPrice = 150000000; // D, E
+  if (selectBatteryOpt && selectBatteryOpt.options.length > 0) {
+    const selectedOpt = selectBatteryOpt.options[selectBatteryOpt.selectedIndex];
+    if (selectedOpt) {
+      batteryPrice = parseFloat(selectedOpt.dataset.price || selectedOpt.value) || 0;
+    }
   }
 
   const carPrice = basePrice + batteryPrice;
@@ -509,7 +547,7 @@ function calculateLoan() {
   // Tiền trả trước
   const prepayPercent = parseInt(sliderPrepay.value) / 100;
   const carPrepayAmount = carPrice * prepayPercent;
-  const totalPrepayNeeded = carPrepayAmount + rollingFees; // Khách phải trả trước tiền đối ứng xe + chi phí làm biển số
+  const totalPrepayNeeded = carPrepayAmount + rollingFees;
 
   // Khoản vay ngân hàng
   const loanAmount = carPrice - carPrepayAmount;
@@ -518,7 +556,7 @@ function calculateLoan() {
   const months = parseInt(sliderMonths.value);
   const monthlyPrincipal = loanAmount / months;
 
-  // Lãi tháng đầu tiên (Lãi suất giảm dần tính trên dư nợ gốc ban đầu)
+  // Lãi tháng đầu tiên
   const yearlyRate = parseFloat(sliderInterest.value) / 100;
   const monthlyRate = yearlyRate / 12;
   const monthlyInterest = loanAmount * monthlyRate;
@@ -526,10 +564,15 @@ function calculateLoan() {
   const totalFirstMonthPayment = monthlyPrincipal + monthlyInterest;
 
   // Cập nhật lên UI
-  document.getElementById('calc-rolling-price').innerText = formatVND(rollingPrice);
-  document.getElementById('calc-prepay-amount').innerText = formatVND(totalPrepayNeeded);
-  document.getElementById('calc-loan-amount').innerText = formatVND(loanAmount);
-  document.getElementById('calc-monthly-payment').innerText = formatVND(totalFirstMonthPayment);
+  const elRolling = document.getElementById('calc-rolling-price');
+  const elPrepay = document.getElementById('calc-prepay-amount');
+  const elLoan = document.getElementById('calc-loan-amount');
+  const elMonthly = document.getElementById('calc-monthly-payment');
+
+  if (elRolling) elRolling.innerText = formatVND(rollingPrice);
+  if (elPrepay) elPrepay.innerText = formatVND(totalPrepayNeeded);
+  if (elLoan) elLoan.innerText = formatVND(loanAmount);
+  if (elMonthly) elMonthly.innerText = formatVND(totalFirstMonthPayment);
 }
 
 // Lắng nghe các thanh trượt thay đổi để tính lại tiền ngay lập tức

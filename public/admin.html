@@ -1233,6 +1233,34 @@
             </div>
           </div>
 
+          <!-- Cấu hình Dự Toán Chi Phí & Trả Góp -->
+          <h3 class="spec-title" style="font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Cấu Hình Dự Toán Chi Phí & Trả Góp</h3>
+          <div id="finance-config-container" style="margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01);">
+            <div class="specs-form-grid" style="margin-bottom: 0;">
+              <div class="form-group" style="grid-column: span 2;">
+                <label class="form-label" for="spec-in-battery-options">Tùy chọn Phương án Pin (Mỗi phương án 1 dòng: Tên phương án | Giá pin cộng thêm)</label>
+                <textarea id="spec-in-battery-options" class="form-input" rows="3" style="resize: vertical; font-family: inherit; line-height: 1.5;" placeholder="Ví dụ:&#10;Thuê Pin (Giá mua xe rẻ hơn) | 0&#10;Mua Đứt Pin (Trọn gói kèm xe) | 110000000"></textarea>
+                <span style="font-size: 11.5px; color: var(--text-muted); display: block; margin-top: 4px;">* Để trống nếu muốn tự động dùng 2 gói mặc định: Thuê Pin (0đ) & Mua Đứt Pin theo phân khúc xe.</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="spec-in-default-prepay">Tỷ lệ trả trước mặc định (%)</label>
+                <input type="number" id="spec-in-default-prepay" class="form-input" min="10" max="80" placeholder="VD: 20">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="spec-in-default-months">Thời gian trả góp mặc định (Tháng)</label>
+                <input type="number" id="spec-in-default-months" class="form-input" min="12" max="96" step="12" placeholder="VD: 60">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="spec-in-default-interest">Lãi suất ngân hàng mặc định (% / năm)</label>
+                <input type="number" step="0.1" id="spec-in-default-interest" class="form-input" placeholder="VD: 7.5">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="spec-price-note">Ghi chú chi phí / Ưu đãi vay</label>
+                <input type="text" id="spec-price-note" class="form-input" placeholder="VD: Miễn 100% lệ phí trước bạ, hỗ trợ 0% lãi suất...">
+              </div>
+            </div>
+          </div>
+
           <!-- Cấu hình phiên bản xe -->
           <h3 class="spec-title" style="font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Cấu hình phiên bản xe (Tên phiên bản, Giá gốc, Giá ưu đãi)</h3>
           <div id="versions-container" style="margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01);">

@@ -945,6 +945,15 @@ btnAddCar.addEventListener('click', () => {
   if (carFilename) carFilename.textContent = 'Chưa chọn tệp';
 
   document.getElementById('spec-price-note').value = '';
+  const specBatteryOpt = document.getElementById('spec-in-battery-options');
+  if (specBatteryOpt) specBatteryOpt.value = '';
+  const specPrepay = document.getElementById('spec-in-default-prepay');
+  if (specPrepay) specPrepay.value = '';
+  const specMonths = document.getElementById('spec-in-default-months');
+  if (specMonths) specMonths.value = '';
+  const specInterest = document.getElementById('spec-in-default-interest');
+  if (specInterest) specInterest.value = '';
+
   const specContactPhone = document.getElementById('spec-contact-phone');
   if (specContactPhone) specContactPhone.value = '';
   if (quillEditor) quillEditor.root.innerHTML = '';
@@ -1281,6 +1290,20 @@ async function editCar(id) {
       safetyText = safetyText.split(',').map(s => s.trim()).filter(Boolean).join('\n');
     }
     document.getElementById('spec-in-safety').value = safetyText;
+    const specBatteryOptions = document.getElementById('spec-in-battery-options');
+    if (specBatteryOptions) {
+      let batOptVal = specs.battery_options || '';
+      if (Array.isArray(batOptVal)) {
+        batOptVal = batOptVal.map(o => `${o.name} | ${o.price || 0}`).join('\n');
+      }
+      specBatteryOptions.value = batOptVal;
+    }
+    const specDefaultPrepay = document.getElementById('spec-in-default-prepay');
+    if (specDefaultPrepay) specDefaultPrepay.value = specs.default_prepay || '';
+    const specDefaultMonths = document.getElementById('spec-in-default-months');
+    if (specDefaultMonths) specDefaultMonths.value = specs.default_months || '';
+    const specDefaultInterest = document.getElementById('spec-in-default-interest');
+    if (specDefaultInterest) specDefaultInterest.value = specs.default_interest || '';
     document.getElementById('spec-price-note').value = specs.price_note || '';
     const specContactPhone = document.getElementById('spec-contact-phone');
     if (specContactPhone) {
@@ -1406,6 +1429,11 @@ carForm.addEventListener('submit', async (e) => {
     }
   });
 
+  const specBatteryOptionsEl = document.getElementById('spec-in-battery-options');
+  const specDefaultPrepayEl = document.getElementById('spec-in-default-prepay');
+  const specDefaultMonthsEl = document.getElementById('spec-in-default-months');
+  const specDefaultInterestEl = document.getElementById('spec-in-default-interest');
+
   // Tạo specifications JSON
   const specifications = {
     dimensions: document.getElementById('spec-in-dimensions').value.trim(),
@@ -1414,6 +1442,10 @@ carForm.addEventListener('submit', async (e) => {
     drive_type: document.getElementById('spec-in-drive').value.trim(),
     charging_time: document.getElementById('spec-in-charging').value.trim(),
     safety: document.getElementById('spec-in-safety').value.trim(),
+    battery_options: specBatteryOptionsEl ? specBatteryOptionsEl.value.trim() : '',
+    default_prepay: specDefaultPrepayEl && specDefaultPrepayEl.value ? parseFloat(specDefaultPrepayEl.value) : null,
+    default_months: specDefaultMonthsEl && specDefaultMonthsEl.value ? parseInt(specDefaultMonthsEl.value) : null,
+    default_interest: specDefaultInterestEl && specDefaultInterestEl.value ? parseFloat(specDefaultInterestEl.value) : null,
     price_note: document.getElementById('spec-price-note').value.trim(),
     contact_phone: document.getElementById('spec-contact-phone') ? document.getElementById('spec-contact-phone').value.trim() : '',
     versions: versions,

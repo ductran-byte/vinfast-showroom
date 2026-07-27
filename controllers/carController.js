@@ -127,6 +127,15 @@ exports.createCar = async (req, res) => {
     if (specifications) {
       try {
         let specs = typeof specifications === 'string' ? JSON.parse(specifications) : specifications;
+
+        // Xử lý file PDF brochure nếu có
+        if (req.files) {
+          const pdfFile = req.files.find(f => f.fieldname === 'pdf' || f.fieldname === 'brochure_pdf');
+          if (pdfFile) {
+            specs.brochure_pdf = await uploadToCloudinary(pdfFile.buffer, 'vinfast/pdf', 'auto', pdfFile.originalname);
+          }
+        }
+
         if (specs.colors && Array.isArray(specs.colors)) {
           for (const color of specs.colors) {
             if (color.fileKey && req.files) {
@@ -253,6 +262,15 @@ exports.updateCar = async (req, res) => {
     if (specifications) {
       try {
         let specs = typeof specifications === 'string' ? JSON.parse(specifications) : specifications;
+
+        // Xử lý file PDF brochure mới nếu có
+        if (req.files) {
+          const pdfFile = req.files.find(f => f.fieldname === 'pdf' || f.fieldname === 'brochure_pdf');
+          if (pdfFile) {
+            specs.brochure_pdf = await uploadToCloudinary(pdfFile.buffer, 'vinfast/pdf', 'auto', pdfFile.originalname);
+          }
+        }
+
         if (specs.colors && Array.isArray(specs.colors)) {
           for (const color of specs.colors) {
             if (color.fileKey && req.files) {

@@ -1109,7 +1109,37 @@
         <form id="car-form" enctype="multipart/form-data">
           <input type="hidden" id="car-id">
           
-          <!-- Thông tin cơ bản -->
+          <!-- Thanh Sao Chép Toàn Bộ Dữ Liệu Xe -->
+          <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(99, 102, 241, 0.08)); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-clone" style="font-size: 20px; color: #2563eb;"></i>
+              <div>
+                <strong style="font-size: 14px; color: #1e293b; display: block;">Sao Chép Nhanh Dữ Liệu Từ Xe Khác</strong>
+                <span style="font-size: 12px; color: #64748b;">Tự động lấp đầy toàn bộ thông tin xe, hình ảnh, thông số, bài viết, trả góp, phiên bản, màu sắc &amp; KM</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="select-copy-all-car" class="form-input" style="padding: 7px 12px; font-size: 13px; width: auto; max-width: 240px; background: white; border-color: rgba(59, 130, 246, 0.3);">
+                <option value="">-- Chọn xe để sao chép tất cả --</option>
+              </select>
+              <button type="button" class="btn btn-primary" id="btn-copy-all-from-car" style="padding: 7px 16px; font-size: 13px; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);">
+                <i class="fa-solid fa-copy"></i> Sao Chép Tất Cả
+              </button>
+            </div>
+          </div>
+
+          <!-- Thông tin cơ bản & Thông số nhanh -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h3 class="spec-title" style="font-size: 16px; margin: 0;">Thông Tin Cơ Bản &amp; Thông Số Nhanh</h3>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="select-copy-basic-car" class="form-input" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 240px;">
+                <option value="">-- Sao chép từ xe khác --</option>
+              </select>
+              <button type="button" class="btn btn-soft-primary" id="btn-copy-basic-from-car" style="padding: 6px 14px; font-size: 13px; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-copy"></i> Sao Chép
+              </button>
+            </div>
+          </div>
           <div class="grid-2-col" style="gap: 16px; margin-bottom: 16px;">
             <div class="form-group">
               <label class="form-label" for="car-name">Tên xe *</label>
@@ -1199,13 +1229,33 @@
           </div>
 
           <!-- Bài viết mô tả -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h3 class="spec-title" style="font-size: 16px; margin: 0;">Giới Thiệu Bài Viết Chi Tiết Xe</h3>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="select-copy-desc-car" class="form-input" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 240px;">
+                <option value="">-- Sao chép từ xe khác --</option>
+              </select>
+              <button type="button" class="btn btn-soft-primary" id="btn-copy-desc-from-car" style="padding: 6px 14px; font-size: 13px; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-copy"></i> Sao Chép
+              </button>
+            </div>
+          </div>
           <div class="form-group">
-            <label class="form-label">Giới thiệu bài viết chi tiết xe (Có thể chèn chữ, định dạng, hình ảnh...)</label>
             <div id="editor-container" style="height: 300px; border-radius: var(--radius-md); border: 1px solid var(--panel-border); background: white; margin-bottom: 12px;"></div>
           </div>
 
           <!-- Thông số kỹ thuật chi tiết dạng JSON -->
-          <h3 class="spec-title" style="font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Thông số kỹ thuật mở rộng</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h3 class="spec-title" style="font-size: 16px; margin: 0;">Thông Số Kỹ Thuật Mở Rộng</h3>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="select-copy-specs-car" class="form-input" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 240px;">
+                <option value="">-- Sao chép từ xe khác --</option>
+              </select>
+              <button type="button" class="btn btn-soft-primary" id="btn-copy-specs-from-car" style="padding: 6px 14px; font-size: 13px; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-copy"></i> Sao Chép
+              </button>
+            </div>
+          </div>
           <div class="specs-form-grid" style="margin-bottom: 24px;">
             <div class="form-group">
               <label class="form-label" for="spec-in-dimensions">Kích thước dài x rộng x cao</label>
@@ -1230,6 +1280,17 @@
             <div class="form-group" style="grid-column: span 2;">
               <label class="form-label" for="spec-in-safety">Các tính năng an toàn nổi bật (Mỗi tính năng 1 dòng)</label>
               <textarea id="spec-in-safety" class="form-input" rows="4" style="resize: vertical; font-family: inherit; line-height: 1.5;" placeholder="Nhập mỗi tính năng trên 1 dòng. Ví dụ:&#10;4 túi khí&#10;Cân bằng điện tử ESC&#10;Hỗ trợ khởi hành ngang dốc"></textarea>
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label class="form-label">Tải lên File PDF Thông Số Kỹ Thuật / Catalogue Xe (Up trực tiếp lên Cloudinary)</label>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;">
+                <label for="car-pdf-file" class="btn btn-outline" style="margin: 0; padding: 0 16px; font-size: 13px; height: 42px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; white-space: nowrap; font-weight: 700; border-radius: 8px; border: 1.5px solid var(--slate-200); background: var(--slate-50); color: var(--slate-700); transition: all 0.2s;">
+                  <i class="fa-solid fa-file-pdf" style="margin-right: 6px; color: #ef4444;"></i> Chọn file PDF từ máy
+                </label>
+                <input type="file" id="car-pdf-file" accept=".pdf,application/pdf" style="display: none;">
+                <span id="car-pdf-filename" style="color: var(--text-secondary); font-size: 13px; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 350px;">Chưa chọn tệp PDF nào</span>
+              </div>
+              <input type="text" id="spec-brochure-pdf-url" class="form-input" placeholder="Hoặc dán đường dẫn file PDF (VD: https://.../brochure.pdf)">
             </div>
           </div>
 
@@ -1280,7 +1341,17 @@
           </div>
 
           <!-- Cấu hình phiên bản xe -->
-          <h3 class="spec-title" style="font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Cấu hình phiên bản xe (Tên phiên bản, Giá gốc, Giá ưu đãi)</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h3 class="spec-title" style="font-size: 16px; margin: 0;">Cấu Hình Phiên Bản Xe (Tên phiên bản, Giá gốc, Giá ưu đãi)</h3>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="select-copy-versions-car" class="form-input" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 240px;">
+                <option value="">-- Sao chép từ xe khác --</option>
+              </select>
+              <button type="button" class="btn btn-soft-primary" id="btn-copy-versions-from-car" style="padding: 6px 14px; font-size: 13px; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-copy"></i> Sao Chép
+              </button>
+            </div>
+          </div>
           <div id="versions-container" style="margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01);">
             <div id="versions-list-inputs">
               <!-- Render dynamically -->
@@ -1291,7 +1362,17 @@
           </div>
 
           <!-- Cấu hình màu sắc xe -->
-          <h3 class="spec-title" style="font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Cấu hình màu sắc xe (Chọn màu từ bảng màu, tên màu, ảnh màu tương ứng)</h3>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <h3 class="spec-title" style="font-size: 16px; margin: 0;">Cấu Hình Màu Sắc Xe (Chọn màu, Tên màu, Ảnh tương ứng)</h3>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="select-copy-colors-car" class="form-input" style="padding: 6px 12px; font-size: 13px; width: auto; max-width: 240px;">
+                <option value="">-- Sao chép từ xe khác --</option>
+              </select>
+              <button type="button" class="btn btn-soft-primary" id="btn-copy-colors-from-car" style="padding: 6px 14px; font-size: 13px; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-copy"></i> Sao Chép
+              </button>
+            </div>
+          </div>
           <div id="colors-container" style="margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01);">
             <div id="colors-list-inputs" style="display: flex; flex-direction: column; gap: 12px;">
               <!-- Render dynamically -->

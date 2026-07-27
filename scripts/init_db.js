@@ -210,7 +210,7 @@ async function initDB() {
         torque_nm: 110,
         battery_kwh: 18.64,
         seats: 4,
-        image_url: '/uploads/vf3.jpg',
+        image_url: '/uploads/vf3_white.jpg',
         description: 'VinFast VF 3 sở hữu thiết kế hình hộp cá tính, năng động và khoảng sáng gầm xe lớn. Đây là mẫu xe điện đô thị lý tưởng cực kỳ linh hoạt và phong cách.',
         specifications: JSON.stringify({
           dimensions: '3190 x 1679 x 1622 mm',
@@ -221,12 +221,12 @@ async function initDB() {
           safety: 'Phanh ABS, EBD, Hỗ trợ khởi hành ngang dốc, Cảm biến lùi, 1 túi khí',
           colors: [
             { name: 'Trắng Tinh Khôi', hex: '#F5F6F8', image_url: '/uploads/vf3_white.jpg', type: 'basic' },
-            { name: 'Xám Kim Loại', hex: '#7F8C8D', image_url: '/uploads/vf3.jpg', type: 'basic' },
-            { name: 'Đỏ Crimson', hex: '#C0392B', image_url: '/uploads/vf3.jpg', type: 'basic' },
-            { name: 'Vàng Dã Ngoại / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #EBC83C 50%)', image_url: '/uploads/vf3.jpg', type: 'premium' },
-            { name: 'Xanh Dương / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #3498db 50%)', image_url: '/uploads/vf3.jpg', type: 'premium' },
-            { name: 'Hồng Phấn / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #F3A3B8 50%)', image_url: '/uploads/vf3_pink.jpg', type: 'premium' },
-            { name: 'Xanh Lá / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #2ecc71 50%)', image_url: '/uploads/vf3.jpg', type: 'premium' }
+            { name: 'Xám Kim Loại', hex: '#7F8C8D', image_url: '/uploads/vf3_white.jpg', type: 'basic' },
+            { name: 'Đỏ Crimson', hex: '#C0392B', image_url: '/uploads/vf3_white.jpg', type: 'basic' },
+            { name: 'Vàng Dã Ngoại / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #EBC83C 50%)', image_url: '/uploads/vf3_white.jpg', type: 'premium' },
+            { name: 'Xanh Dương / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #3498db 50%)', image_url: '/uploads/vf3_white.jpg', type: 'premium' },
+            { name: 'Hồng Phấn / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #F3A3B8 50%)', image_url: '/uploads/vf3_white.jpg', type: 'premium' },
+            { name: 'Xanh Lá / Nóc Trắng', hex: 'linear-gradient(to bottom, #FFFFFF 50%, #2ecc71 50%)', image_url: '/uploads/vf3_white.jpg', type: 'premium' }
           ],
           versions: [
             { name: 'VinFast VF3 TC 1', base_price: 299000000, promo_price: 186110000 },

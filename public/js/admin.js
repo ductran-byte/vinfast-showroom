@@ -933,6 +933,20 @@ carImageInput.addEventListener('change', function() {
   }
 });
 
+// Xử lý xem trước tên file PDF khi chọn
+const carPdfInput = document.getElementById('car-pdf-file');
+if (carPdfInput) {
+  carPdfInput.addEventListener('change', function() {
+    const file = this.files[0];
+    const filenameSpan = document.getElementById('car-pdf-filename');
+    if (file) {
+      if (filenameSpan) filenameSpan.textContent = file.name;
+    } else {
+      if (filenameSpan) filenameSpan.textContent = 'Chưa chọn tệp PDF nào';
+    }
+  });
+}
+
 // Mở modal thêm xe mới
 btnAddCar.addEventListener('click', () => {
   isEditing = false;
@@ -943,6 +957,13 @@ btnAddCar.addEventListener('click', () => {
   
   const carFilename = document.getElementById('car-image-filename');
   if (carFilename) carFilename.textContent = 'Chưa chọn tệp';
+
+  const pdfFilenameSpan = document.getElementById('car-pdf-filename');
+  if (pdfFilenameSpan) pdfFilenameSpan.textContent = 'Chưa chọn tệp PDF nào';
+  const pdfFileInput = document.getElementById('car-pdf-file');
+  if (pdfFileInput) pdfFileInput.value = '';
+  const pdfUrlInput = document.getElementById('spec-brochure-pdf-url');
+  if (pdfUrlInput) pdfUrlInput.value = '';
 
   document.getElementById('spec-price-note').value = '';
   const specBatteryOpt = document.getElementById('spec-in-battery-options');
@@ -970,8 +991,7 @@ btnAddCar.addEventListener('click', () => {
   const colorContainer = document.getElementById('colors-list-inputs');
   if (colorContainer) colorContainer.innerHTML = '';
 
-  populateCopyPromoCarSelect();
-  populateCopyFinanceCarSelect();
+  populateAllCopyCarSelects();
 
   carFormModal.classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -988,36 +1008,150 @@ carFormModal.addEventListener('click', (e) => {
   if (e.target === carFormModal) closeFormModal();
 });
 
-// Bind add version row button click listener
-const btnAddVer = document.getElementById('btn-add-version-row');
-if (btnAddVer) {
-  btnAddVer.onclick = function() {
-    addVersionRow('', '', '');
-  };
+// Helper to fetch target car data for copy actions
+async function getTargetCarData(selectId) {
+  const select = document.getElementById(selectId);
+  const selectedCarId = select ? select.value : '';
+
+  if (!selectedCarId) {
+    showAlert('Vui lòng chọn 1 xe từ danh sách để sao chép.', false);
+    return null;
+  }
+
+  try {
+    const response = await fetch(`/api/cars/${selectedCarId}`);
+    if (!response.ok) throw new Error('Không thể tải thông tin xe đã chọn.');
+    const targetCar = await response.json();
+    return { targetCar, select };
+  } catch (err) {
+    showAlert('Lỗi khi lấy dữ liệu xe: ' + err.message, false);
+    return null;
+  }
 }
 
-// Bind add color row button click listener
-const btnAddColor = document.getElementById('btn-add-color-row');
-if (btnAddColor) {
-  btnAddColor.onclick = function() {
-    addColorRow();
-  };
+// Sub-copy field handlers
+function copyBasicInfoFields(targetCar) {
+  if (targetCar.type) document.getElementById('car-type').value = targetCar.type;
+  if (targetCar.segment) document.getElementById('car-segment').value = targetCar.segment;
+  if (targetCar.category) document.getElementById('car-category').value = targetCar.category;
+  if (targetCar.price) document.getElementById('car-price').value = parseInt(targetCar.price);
+  if (targetCar.range_km !== undefined && targetCar.range_km !== null) document.getElementById('car-range').value = targetCar.range_km;
+  if (targetCar.power_hp !== undefined && targetCar.power_hp !== null) document.getElementById('car-power').value = targetCar.power_hp;
+  if (targetCar.torque_nm !== undefined && targetCar.torque_nm !== null) document.getElementById('car-torque').value = targetCar.torque_nm;
+  if (targetCar.battery_kwh !== undefined && targetCar.battery_kwh !== null) document.getElementById('car-battery').value = targetCar.battery_kwh;
+  if (targetCar.seats !== undefined && targetCar.seats !== null) document.getElementById('car-seats').value = targetCar.seats;
+
+  const specs = targetCar.specifications || {};
+  const specContactPhone = document.getElementById('spec-contact-phone');
+  if (specContactPhone && specs.contact_phone) specContactPhone.value = specs.contact_phone;
+
+  if (targetCar.image_url) {
+    const preview = document.getElementById('image-preview-container');
+    if (preview) preview.innerHTML = `<img src="${targetCar.image_url}" alt="${targetCar.name}" onerror="this.src='/uploads/default-car.jpg'">`;
+    const carFilename = document.getElementById('car-image-filename');
+    if (carFilename) carFilename.textContent = targetCar.image_url.split('/').pop() || 'Đã chọn từ xe mẫu';
+  }
 }
 
-// Bind add promo row button click listener
-const btnAddPromo = document.getElementById('btn-add-promo-row');
-if (btnAddPromo) {
-  btnAddPromo.onclick = function() {
-    addPromoRow('');
-  };
+function copyDescFields(targetCar) {
+  if (quillEditor) {
+    quillEditor.root.innerHTML = targetCar.description || '';
+  }
 }
 
-// Helper to populate car options for copying promotions
-async function populateCopyPromoCarSelect() {
-  const select = document.getElementById('select-copy-promo-car');
-  if (!select) return;
+function copySpecsFields(targetCar) {
+  const specs = targetCar.specifications || {};
+  document.getElementById('spec-in-dimensions').value = specs.dimensions || '';
+  document.getElementById('spec-in-wheelbase').value = specs.wheelbase || '';
+  document.getElementById('spec-in-clearance').value = specs.ground_clearance || '';
+  document.getElementById('spec-in-drive').value = specs.drive_type || '';
+  document.getElementById('spec-in-charging').value = specs.charging_time || '';
 
-  select.innerHTML = '<option value="">-- Sao chép từ xe khác --</option>';
+  let safetyText = specs.safety || '';
+  if (safetyText && !safetyText.includes('\n')) {
+    safetyText = safetyText.split(',').map(s => s.trim()).filter(Boolean).join('\n');
+  }
+  document.getElementById('spec-in-safety').value = safetyText;
+
+  const brochurePdfUrlEl = document.getElementById('spec-brochure-pdf-url');
+  if (brochurePdfUrlEl) brochurePdfUrlEl.value = specs.brochure_pdf || '';
+  const carPdfFilename = document.getElementById('car-pdf-filename');
+  if (carPdfFilename && specs.brochure_pdf) {
+    carPdfFilename.textContent = specs.brochure_pdf.split('/').pop() || 'Đã chọn từ xe mẫu';
+  }
+}
+
+function copyFinanceFields(targetCar) {
+  const specs = targetCar.specifications || {};
+  const specBatteryOptions = document.getElementById('spec-in-battery-options');
+  if (specBatteryOptions) {
+    let batOptVal = specs.battery_options || '';
+    if (Array.isArray(batOptVal)) {
+      batOptVal = batOptVal.map(o => `${o.name} | ${o.price || 0}`).join('\n');
+    }
+    specBatteryOptions.value = batOptVal;
+  }
+  const specDefaultPrepay = document.getElementById('spec-in-default-prepay');
+  if (specDefaultPrepay) specDefaultPrepay.value = specs.default_prepay || '';
+  const specDefaultMonths = document.getElementById('spec-in-default-months');
+  if (specDefaultMonths) specDefaultMonths.value = specs.default_months || '';
+  const specDefaultInterest = document.getElementById('spec-in-default-interest');
+  if (specDefaultInterest) specDefaultInterest.value = specs.default_interest || '';
+  const specFeeHnHcm = document.getElementById('spec-in-fee-hanoi-hcm');
+  if (specFeeHnHcm) specFeeHnHcm.value = specs.fee_hanoi_hcm || '';
+  const specFeeProvince = document.getElementById('spec-in-fee-province');
+  if (specFeeProvince) specFeeProvince.value = specs.fee_province || '';
+  const specPriceNote = document.getElementById('spec-price-note');
+  if (specPriceNote) specPriceNote.value = specs.price_note || '';
+}
+
+function copyVersionsFields(targetCar) {
+  const specs = targetCar.specifications || {};
+  const container = document.getElementById('versions-list-inputs');
+  if (container) {
+    container.innerHTML = '';
+    const versions = specs.versions || [];
+    versions.forEach(v => {
+      addVersionRow(v.name, v.base_price, v.promo_price);
+    });
+  }
+}
+
+function copyColorsFields(targetCar) {
+  const specs = targetCar.specifications || {};
+  const colorContainer = document.getElementById('colors-list-inputs');
+  if (colorContainer) {
+    colorContainer.innerHTML = '';
+    const colors = specs.colors || [];
+    colors.forEach(c => {
+      addColorRow(c);
+    });
+  }
+}
+
+function copyPromoFields(targetCar, replace = true) {
+  const promotions = targetCar.promotions || [];
+  const promoContainer = document.getElementById('promo-list-inputs');
+  if (promoContainer) {
+    if (replace) promoContainer.innerHTML = '';
+    promotions.forEach(p => {
+      addPromoRow(p);
+    });
+  }
+}
+
+// Helper to populate all car copy selects in car form modal
+async function populateAllCopyCarSelects() {
+  const selectIds = [
+    'select-copy-all-car',
+    'select-copy-basic-car',
+    'select-copy-desc-car',
+    'select-copy-specs-car',
+    'select-copy-finance-car',
+    'select-copy-versions-car',
+    'select-copy-colors-car',
+    'select-copy-promo-car'
+  ];
 
   let cars = window.loadedCars;
   if (!cars || !Array.isArray(cars) || cars.length === 0) {
@@ -1028,111 +1162,132 @@ async function populateCopyPromoCarSelect() {
         window.loadedCars = cars;
       }
     } catch (e) {
-      console.error('Error fetching cars for promo select:', e);
+      console.error('Error fetching cars for copy selects:', e);
     }
   }
 
   const currentCarId = document.getElementById('car-id').value;
 
-  if (cars && Array.isArray(cars)) {
-    cars.forEach(car => {
-      // Exclude current car if editing
-      if (currentCarId && String(car.id) === String(currentCarId)) return;
-      
-      const count = Array.isArray(car.promotions) ? car.promotions.length : 0;
-      const opt = document.createElement('option');
-      opt.value = car.id;
-      opt.textContent = `${car.name} (${count} KM)`;
-      select.appendChild(opt);
-    });
-  }
-}
+  selectIds.forEach(id => {
+    const select = document.getElementById(id);
+    if (!select) return;
 
-// Helper to populate car options for copying finance config
-async function populateCopyFinanceCarSelect() {
-  const select = document.getElementById('select-copy-finance-car');
-  if (!select) return;
+    const isPromo = id === 'select-copy-promo-car';
+    const isAll = id === 'select-copy-all-car';
+    const defaultLabel = isAll ? '-- Chọn xe để sao chép tất cả --' : '-- Sao chép từ xe khác --';
 
-  select.innerHTML = '<option value="">-- Sao chép từ xe khác --</option>';
+    select.innerHTML = `<option value="">${defaultLabel}</option>`;
 
-  let cars = window.loadedCars;
-  if (!cars || !Array.isArray(cars) || cars.length === 0) {
-    try {
-      const res = await fetch('/api/cars');
-      if (res.ok) {
-        cars = await res.json();
-        window.loadedCars = cars;
-      }
-    } catch (e) {
-      console.error('Error fetching cars for finance select:', e);
+    if (cars && Array.isArray(cars)) {
+      cars.forEach(car => {
+        if (currentCarId && String(car.id) === String(currentCarId)) return;
+        const opt = document.createElement('option');
+        opt.value = car.id;
+        opt.textContent = isPromo 
+          ? `${car.name} (${Array.isArray(car.promotions) ? car.promotions.length : 0} KM)`
+          : car.name;
+        select.appendChild(opt);
+      });
     }
-  }
-
-  const currentCarId = document.getElementById('car-id').value;
-
-  if (cars && Array.isArray(cars)) {
-    cars.forEach(car => {
-      if (currentCarId && String(car.id) === String(currentCarId)) return;
-      const opt = document.createElement('option');
-      opt.value = car.id;
-      opt.textContent = car.name;
-      select.appendChild(opt);
-    });
-  }
+  });
 }
 
-// Bind finance copy event listener
+// Bind Master Copy All Event Listener
+const btnCopyAll = document.getElementById('btn-copy-all-from-car');
+if (btnCopyAll) {
+  btnCopyAll.onclick = async function() {
+    const res = await getTargetCarData('select-copy-all-car');
+    if (!res) return;
+    const { targetCar, select } = res;
+
+    copyBasicInfoFields(targetCar);
+    copyDescFields(targetCar);
+    copySpecsFields(targetCar);
+    copyFinanceFields(targetCar);
+    copyVersionsFields(targetCar);
+    copyColorsFields(targetCar);
+    copyPromoFields(targetCar, true);
+
+    showAlert(`Đã sao chép TOÀN BỘ thông tin từ xe "${targetCar.name}" thành công!`, true);
+    if (select) select.value = '';
+  };
+}
+
+// Bind Basic Info Copy Event
+const btnCopyBasic = document.getElementById('btn-copy-basic-from-car');
+if (btnCopyBasic) {
+  btnCopyBasic.onclick = async function() {
+    const res = await getTargetCarData('select-copy-basic-car');
+    if (!res) return;
+    const { targetCar, select } = res;
+    copyBasicInfoFields(targetCar);
+    showAlert(`Đã sao chép Thông Tin Cơ Bản & Thông Số Nhanh từ xe "${targetCar.name}"!`, true);
+    if (select) select.value = '';
+  };
+}
+
+// Bind Description Copy Event
+const btnCopyDesc = document.getElementById('btn-copy-desc-from-car');
+if (btnCopyDesc) {
+  btnCopyDesc.onclick = async function() {
+    const res = await getTargetCarData('select-copy-desc-car');
+    if (!res) return;
+    const { targetCar, select } = res;
+    copyDescFields(targetCar);
+    showAlert(`Đã sao chép Bài Viết Giới Thiệu từ xe "${targetCar.name}"!`, true);
+    if (select) select.value = '';
+  };
+}
+
+// Bind Extended Specs Copy Event
+const btnCopySpecs = document.getElementById('btn-copy-specs-from-car');
+if (btnCopySpecs) {
+  btnCopySpecs.onclick = async function() {
+    const res = await getTargetCarData('select-copy-specs-car');
+    if (!res) return;
+    const { targetCar, select } = res;
+    copySpecsFields(targetCar);
+    showAlert(`Đã sao chép Thông Số Kỹ Thuật Mở Rộng từ xe "${targetCar.name}"!`, true);
+    if (select) select.value = '';
+  };
+}
+
+// Bind Finance Copy Event
 const btnCopyFinance = document.getElementById('btn-copy-finance-from-car');
 if (btnCopyFinance) {
   btnCopyFinance.onclick = async function() {
-    const select = document.getElementById('select-copy-finance-car');
-    const selectedCarId = select ? select.value : '';
+    const res = await getTargetCarData('select-copy-finance-car');
+    if (!res) return;
+    const { targetCar, select } = res;
+    copyFinanceFields(targetCar);
+    showAlert(`Đã sao chép Cấu Hình Dự Toán Chi Phí & Trả Góp từ xe "${targetCar.name}"!`, true);
+    if (select) select.value = '';
+  };
+}
 
-    if (!selectedCarId) {
-      showAlert('Vui lòng chọn 1 xe từ danh sách để sao chép cấu hình trả góp.', false);
-      return;
-    }
+// Bind Versions Copy Event
+const btnCopyVersions = document.getElementById('btn-copy-versions-from-car');
+if (btnCopyVersions) {
+  btnCopyVersions.onclick = async function() {
+    const res = await getTargetCarData('select-copy-versions-car');
+    if (!res) return;
+    const { targetCar, select } = res;
+    copyVersionsFields(targetCar);
+    showAlert(`Đã sao chép Cấu Hình Phiên Bản Xe từ xe "${targetCar.name}"!`, true);
+    if (select) select.value = '';
+  };
+}
 
-    try {
-      const response = await fetch(`/api/cars/${selectedCarId}`);
-      if (!response.ok) throw new Error('Không thể tải thông tin xe đã chọn.');
-      const targetCar = await response.json();
-
-      const specs = targetCar.specifications || {};
-
-      // Populate finance fields
-      const specBatteryOptions = document.getElementById('spec-in-battery-options');
-      if (specBatteryOptions) {
-        let batOptVal = specs.battery_options || '';
-        if (Array.isArray(batOptVal)) {
-          batOptVal = batOptVal.map(o => `${o.name} | ${o.price || 0}`).join('\n');
-        }
-        specBatteryOptions.value = batOptVal;
-      }
-
-      const specDefaultPrepay = document.getElementById('spec-in-default-prepay');
-      if (specDefaultPrepay) specDefaultPrepay.value = specs.default_prepay || '';
-
-      const specDefaultMonths = document.getElementById('spec-in-default-months');
-      if (specDefaultMonths) specDefaultMonths.value = specs.default_months || '';
-
-      const specDefaultInterest = document.getElementById('spec-in-default-interest');
-      if (specDefaultInterest) specDefaultInterest.value = specs.default_interest || '';
-
-      const specFeeHnHcm = document.getElementById('spec-in-fee-hanoi-hcm');
-      if (specFeeHnHcm) specFeeHnHcm.value = specs.fee_hanoi_hcm || '';
-
-      const specFeeProvince = document.getElementById('spec-in-fee-province');
-      if (specFeeProvince) specFeeProvince.value = specs.fee_province || '';
-
-      const specPriceNote = document.getElementById('spec-price-note');
-      if (specPriceNote) specPriceNote.value = specs.price_note || '';
-
-      showAlert(`Đã sao chép thành công cấu hình Dự Toán Chi Phí & Trả Góp từ xe "${targetCar.name}"!`, true);
-      if (select) select.value = '';
-    } catch (err) {
-      showAlert('Lỗi sao chép cấu hình tài chính: ' + err.message, false);
-    }
+// Bind Colors Copy Event
+const btnCopyColors = document.getElementById('btn-copy-colors-from-car');
+if (btnCopyColors) {
+  btnCopyColors.onclick = async function() {
+    const res = await getTargetCarData('select-copy-colors-car');
+    if (!res) return;
+    const { targetCar, select } = res;
+    copyColorsFields(targetCar);
+    showAlert(`Đã sao chép Cấu Hình Màu Sắc Xe từ xe "${targetCar.name}"!`, true);
+    if (select) select.value = '';
   };
 }
 
@@ -1148,111 +1303,48 @@ function showPromoCopyModal(existingCount, targetCarName, targetCount, onChoice)
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(15, 23, 42, 0.5);
+      background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      z-index: 10000;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 999999;
       opacity: 0;
       visibility: hidden;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: all 0.25s ease;
     `;
     modal.innerHTML = `
       <div id="promo-copy-choice-card" style="
-        background: rgba(255, 255, 255, 0.98);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: #ffffff;
         border-radius: 20px;
-        padding: 32px 28px;
-        width: 90%;
+        padding: 32px;
         max-width: 440px;
-        text-align: center;
+        width: 90%;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         transform: scale(0.85) translateY(-10px);
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        text-align: center;
       ">
         <div style="
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          margin: 0 auto 16px;
+          width: 56px;
+          height: 56px;
+          border-radius: 16px;
+          margin: 0 auto 18px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-size: 28px;
           background: rgba(15, 83, 197, 0.1);
           color: #0f53c5;
-          box-shadow: 0 8px 16px rgba(15, 83, 197, 0.1);
         ">
           <i class="fa-solid fa-copy"></i>
         </div>
-        <h4 style="
-          margin: 0 0 10px;
-          font-family: 'Inter', sans-serif;
-          font-size: 20px;
-          font-weight: 800;
-          color: #0f172a;
-        ">Tùy Chọn Sao Chép Khuyến Mãi</h4>
-        <p id="promo-copy-choice-msg" style="
-          margin: 0 0 24px;
-          font-family: 'Inter', sans-serif;
-          font-size: 14px;
-          color: #475569;
-          line-height: 1.6;
-        "></p>
+        <h4 style="margin: 0 0 10px; font-size: 20px; font-weight: 800; color: #0f172a;">Tùy Chọn Sao Chép Khuyến Mãi</h4>
+        <p id="promo-copy-choice-msg" style="margin: 0 0 24px; font-size: 14px; color: #475569; line-height: 1.6;"></p>
         <div style="display: flex; flex-direction: column; gap: 10px;">
-          <button id="btn-promo-replace" style="
-            background: #ef4444;
-            color: #ffffff;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-          ">
-            <i class="fa-solid fa-arrows-rotate"></i> Ghi Đè (Thay thế toàn bộ)
-          </button>
-          <button id="btn-promo-append" style="
-            background: #0f53c5;
-            color: #ffffff;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(15, 83, 197, 0.25);
-          ">
-            <i class="fa-solid fa-plus"></i> Thêm Nối Tiếp Vào Bên Dưới
-          </button>
-          <button id="btn-promo-cancel" style="
-            background: #f1f5f9;
-            color: #64748b;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 13.5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 4px;
-          ">Hủy bỏ</button>
+          <button id="btn-promo-replace" style="background: #ef4444; color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer;">Ghi Đè (Thay thế toàn bộ)</button>
+          <button id="btn-promo-append" style="background: #0f53c5; color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer;">Thêm Nối Tiếp</button>
+          <button id="btn-promo-cancel" style="background: #f1f5f9; color: #64748b; border: none; padding: 10px; border-radius: 12px; font-weight: 600; cursor: pointer;">Hủy bỏ</button>
         </div>
       </div>
     `;
@@ -1265,7 +1357,7 @@ function showPromoCopyModal(existingCount, targetCarName, targetCount, onChoice)
   const btnAppend = document.getElementById('btn-promo-append');
   const btnCancel = document.getElementById('btn-promo-cancel');
 
-  msg.innerHTML = `Đang có <strong>${existingCount}</strong> khuyến mãi trong danh sách hiện tại.<br>Bạn muốn sao chép <strong>${targetCount}</strong> khuyến mãi từ xe <strong>"${targetCarName}"</strong> theo hình thức nào?`;
+  msg.innerHTML = `Đang có <strong>${existingCount}</strong> khuyến mãi hiện tại.<br>Bạn muốn sao chép <strong>${targetCount}</strong> khuyến mãi từ xe <strong>"${targetCarName}"</strong> theo cách nào?`;
 
   const closeModal = (choice) => {
     modal.style.opacity = '0';
@@ -1278,67 +1370,46 @@ function showPromoCopyModal(existingCount, targetCarName, targetCount, onChoice)
   btnAppend.onclick = () => closeModal('append');
   btnCancel.onclick = () => closeModal('cancel');
 
-  modal.onclick = (e) => {
-    if (e.target === modal) closeModal('cancel');
-  };
+  modal.onclick = (e) => { if (e.target === modal) closeModal('cancel'); };
 
   modal.style.visibility = 'visible';
   modal.style.opacity = '1';
-  setTimeout(() => {
-    card.style.transform = 'scale(1) translateY(0)';
-  }, 50);
+  setTimeout(() => { card.style.transform = 'scale(1) translateY(0)'; }, 50);
 }
 
 // Bind promo copy event
 const btnCopyPromo = document.getElementById('btn-copy-promo-from-car');
 if (btnCopyPromo) {
   btnCopyPromo.onclick = async function() {
-    const select = document.getElementById('select-copy-promo-car');
-    const selectedCarId = select ? select.value : '';
+    const res = await getTargetCarData('select-copy-promo-car');
+    if (!res) return;
+    const { targetCar, select } = res;
 
-    if (!selectedCarId) {
-      showAlert('Vui lòng chọn 1 xe từ danh sách để sao chép khuyến mãi.', false);
+    const promotions = targetCar.promotions || [];
+    if (promotions.length === 0) {
+      showAlert(`Dòng xe "${targetCar.name}" hiện chưa có chương trình khuyến mãi nào.`, false);
       return;
     }
 
-    try {
-      const response = await fetch(`/api/cars/${selectedCarId}`);
-      if (!response.ok) throw new Error('Không thể tải thông tin xe đã chọn.');
-      const targetCar = await response.json();
+    const promoContainer = document.getElementById('promo-list-inputs');
+    const currentRows = promoContainer ? promoContainer.querySelectorAll('.promo-row') : [];
 
-      const promotions = targetCar.promotions || [];
-      if (promotions.length === 0) {
-        showAlert(`Dòng xe "${targetCar.name}" hiện chưa có chương trình khuyến mãi nào.`, false);
-        return;
-      }
+    const executeCopy = (shouldReplace) => {
+      copyPromoFields(targetCar, shouldReplace);
+      showAlert(`Đã sao chép thành công ${promotions.length} khuyến mãi từ xe "${targetCar.name}"!`, true);
+      if (select) select.value = '';
+    };
 
-      const promoContainer = document.getElementById('promo-list-inputs');
-      const currentRows = promoContainer ? promoContainer.querySelectorAll('.promo-row') : [];
-
-      const executeCopy = (shouldReplace) => {
-        if (shouldReplace && promoContainer) {
-          promoContainer.innerHTML = '';
+    if (currentRows.length > 0) {
+      showPromoCopyModal(currentRows.length, targetCar.name, promotions.length, (choice) => {
+        if (choice === 'replace') {
+          executeCopy(true);
+        } else if (choice === 'append') {
+          executeCopy(false);
         }
-        promotions.forEach(p => {
-          addPromoRow(p);
-        });
-        showAlert(`Đã sao chép thành công ${promotions.length} khuyến mãi từ xe "${targetCar.name}"!`, true);
-        if (select) select.value = '';
-      };
-
-      if (currentRows.length > 0) {
-        showPromoCopyModal(currentRows.length, targetCar.name, promotions.length, (choice) => {
-          if (choice === 'replace') {
-            executeCopy(true);
-          } else if (choice === 'append') {
-            executeCopy(false);
-          }
-        });
-      } else {
-        executeCopy(true);
-      }
-    } catch (err) {
-      showAlert('Lỗi sao chép khuyến mãi: ' + err.message, false);
+      });
+    } else {
+      executeCopy(true);
     }
   };
 }
@@ -1407,6 +1478,19 @@ async function editCar(id) {
       specContactPhone.value = specs.contact_phone || '';
     }
 
+    const brochurePdfUrlInput = document.getElementById('spec-brochure-pdf-url');
+    if (brochurePdfUrlInput) brochurePdfUrlInput.value = specs.brochure_pdf || '';
+    const carPdfFilename = document.getElementById('car-pdf-filename');
+    const carPdfFileInput = document.getElementById('car-pdf-file');
+    if (carPdfFileInput) carPdfFileInput.value = '';
+    if (carPdfFilename) {
+      if (specs.brochure_pdf) {
+        carPdfFilename.textContent = specs.brochure_pdf.split('/').pop() || 'Đang sử dụng file PDF đã có';
+      } else {
+        carPdfFilename.textContent = 'Chưa chọn tệp PDF nào';
+      }
+    }
+
     // Clear and populate versions list
     const container = document.getElementById('versions-list-inputs');
     if (container) {
@@ -1447,8 +1531,7 @@ async function editCar(id) {
       }
     }
 
-    populateCopyPromoCarSelect();
-    populateCopyFinanceCarSelect();
+    populateAllCopyCarSelects();
 
     carFormModal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -1534,6 +1617,9 @@ carForm.addEventListener('submit', async (e) => {
   const specFeeHnHcmEl = document.getElementById('spec-in-fee-hanoi-hcm');
   const specFeeProvinceEl = document.getElementById('spec-in-fee-province');
 
+  const brochurePdfUrlInput = document.getElementById('spec-brochure-pdf-url');
+  const pdfFileInput = document.getElementById('car-pdf-file');
+
   // Tạo specifications JSON
   const specifications = {
     dimensions: document.getElementById('spec-in-dimensions').value.trim(),
@@ -1550,6 +1636,7 @@ carForm.addEventListener('submit', async (e) => {
     fee_province: specFeeProvinceEl && specFeeProvinceEl.value ? parseFloat(specFeeProvinceEl.value) : null,
     price_note: document.getElementById('spec-price-note').value.trim(),
     contact_phone: document.getElementById('spec-contact-phone') ? document.getElementById('spec-contact-phone').value.trim() : '',
+    brochure_pdf: brochurePdfUrlInput ? brochurePdfUrlInput.value.trim() : '',
     versions: versions,
     colors: colors
   };
@@ -1558,6 +1645,10 @@ carForm.addEventListener('submit', async (e) => {
 
   if (carImageInput.files[0]) {
     formData.append('image', carImageInput.files[0]);
+  }
+
+  if (pdfFileInput && pdfFileInput.files[0]) {
+    formData.append('pdf', pdfFileInput.files[0]);
   }
 
   try {

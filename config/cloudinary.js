@@ -8,29 +8,54 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+const fs = require('fs');
+const path = require('path');
+
 /**
- * Upload file từ Buffer lên Cloudinary
- * @param {Buffer} fileBuffer - Dữ liệu buffer của file ảnh tải lên
+ * Upload file từ Buffer lên Cloudinary (Hỗ trợ Ảnh, PDF, Video)
+ * @param {Buffer} fileBuffer - Dữ liệu buffer của file tải lên
  * @param {string} folder - Thư mục lưu trữ trên Cloudinary (mặc định: 'vinfast')
- * @returns {Promise<string>} - Trả về đường dẫn URL ảnh an toàn (secure_url)
+ * @param {string} resourceType - Loạt tài nguyên ('auto', 'image', 'raw', 'video')
+ * @param {string} originalName - Tên file gốc (cho fallback lưu local)
+ * @returns {Promise<string>} - Trả về đường dẫn URL an toàn (secure_url)
  */
-const uploadToCloudinary = (fileBuffer, folder = 'vinfast') => {
+const uploadToCloudinary = (fileBuffer, folder = 'vinfast', resourceType = 'auto', originalName = '') => {
   return new Promise((resolve, reject) => {
-    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-      return reject(new Error('Chưa cấu hình các khóa Cloudinary trong file .env'));
-    }
-
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: folder },
-      (error, result) => {
-        if (error) {
-          return reject(error);
+    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { 
+          folder: folder,
+          resource_type: resourceType
+        },
+        (error, result) => {
+          if (error) {
+            console.error('Cloudinary Upload Error:', error);
+            return reject(error);
+          }
+          resolve(result.secure_url);
         }
-        resolve(result.secure_url);
-      }
-    );
+      );
 
-    uploadStream.end(fileBuffer);
+      uploadStream.end(fileBuffer);
+    } else {
+      // Local fallback nếu chưa cài biến môi trường Cloudinary
+      try {
+        const isPdf = originalName.toLowerCase().endsWith('.pdf');
+        const targetSubDir = isPdf ? 'uploads/pdf' : 'uploads';
+        const uploadDir = path.join(__dirname, '../public', targetSubDir);
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        const ext = path.extname(originalName) || (isPdf ? '.pdf' : '.jpg');
+        const baseName = path.basename(originalName, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
+        const safeName = `${baseName}-${Date.now()}${ext}`;
+        const filePath = path.join(uploadDir, safeName);
+        fs.writeFileSync(filePath, fileBuffer);
+        resolve(`/${targetSubDir}/${safeName}`);
+      } catch (err) {
+        reject(err);
+      }
+    }
   });
 };
 
@@ -61,19 +86,23 @@ const extractPublicId = (url) => {
 };
 
 /**
- * Xóa ảnh trên Cloudinary theo URL
- * @param {string} url - URL của ảnh cần xóa
+ * Xóa file trên Cloudinary theo URL
+ * @param {string} url - URL của file cần xóa
+ * @param {string} resourceType - Loại tài nguyên ('image', 'raw', 'auto')
  * @returns {Promise<boolean>} - Trả về true nếu xóa thành công
  */
-const deleteFromCloudinary = async (url) => {
+const deleteFromCloudinary = async (url, resourceType = 'image') => {
   try {
     const publicId = extractPublicId(url);
     if (publicId) {
-      const result = await cloudinary.uploader.destroy(publicId);
+      let result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+      if (result.result !== 'ok' && resourceType === 'image') {
+        result = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' });
+      }
       return result.result === 'ok';
     }
   } catch (error) {
-    console.error('Lỗi khi xóa ảnh trên Cloudinary:', error);
+    console.error('Lỗi khi xóa file trên Cloudinary:', error);
   }
   return false;
 };

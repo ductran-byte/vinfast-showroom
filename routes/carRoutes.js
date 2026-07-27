@@ -9,24 +9,24 @@ const authMiddleware = require('../middleware/authMiddleware');
 // Cấu hình lưu trữ file ảnh bằng Multer trong RAM
 const storage = multer.memoryStorage();
 
-// Bộ lọc định dạng file ảnh hợp lệ
+// Bộ lọc định dạng file hợp lệ (Hình ảnh & File PDF)
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|webp|gif/;
+  const allowedTypes = /jpeg|jpg|png|webp|gif|pdf/;
   const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+  const mimetype = allowedTypes.test(file.mimetype) || file.mimetype === 'application/pdf';
 
   if (extname && mimetype) {
     cb(null, true);
   } else {
-    cb(new Error('Chỉ chấp nhận định dạng file hình ảnh (jpg, jpeg, png, webp, gif).'), false);
+    cb(new Error('Chỉ chấp nhận định dạng file hình ảnh (jpg, png, webp, gif) và file PDF (.pdf).'), false);
   }
 };
 
 const upload = multer({ 
   storage: storage,
   limits: { 
-    fileSize: 5 * 1024 * 1024, // Giới hạn kích thước file file 5MB
-    fieldSize: 10 * 1024 * 1024 // Giới hạn kích thước các trường text (chứa ảnh base64) là 10MB
+    fileSize: 15 * 1024 * 1024, // Giới hạn kích thước file 15MB
+    fieldSize: 10 * 1024 * 1024 // Giới hạn kích thước các trường text là 10MB
   },
   fileFilter: fileFilter
 });

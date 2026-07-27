@@ -114,6 +114,18 @@ async function initCarDetailPage() {
       }
     }
 
+    // Hydrate PDF Brochure Download Card
+    const pdfContainer = document.getElementById('pdf-brochure-container');
+    const pdfBtn = document.getElementById('pdf-brochure-download-btn');
+    if (pdfContainer && pdfBtn) {
+      if (specs.brochure_pdf) {
+        pdfBtn.href = specs.brochure_pdf;
+        pdfContainer.style.display = 'flex';
+      } else {
+        pdfContainer.style.display = 'none';
+      }
+    }
+
     // Build Visualizer Color Dots (Basic vs Premium)
     const basicContainer = document.getElementById('detail-color-dots-basic');
     const premiumContainer = document.getElementById('detail-color-dots-premium');
@@ -132,8 +144,8 @@ async function initCarDetailPage() {
       colors.forEach((color, index) => {
         const isPremium = color.type === 'premium' || (color.name && color.name.includes('/ Nóc')) || (color.name && color.name.toLowerCase().includes('nâng cao'));
         
-        const dot = document.createElement('div');
-        dot.className = `${isPremium ? 'color-dot-premium' : 'color-dot-new'} ${index === 0 ? 'active' : ''}`;
+        const dot = document.createElement('button');
+        dot.className = `mau-xe-button ${isPremium ? 'mau-xe-button-advanced' : 'mau-xe-button-basic'} ${index === 0 ? 'is-selected' : ''}`;
         
         // Use background for gradients, otherwise backgroundColor
         if (color.hex.startsWith('linear-gradient') || color.hex.startsWith('radial-gradient')) {
@@ -144,10 +156,10 @@ async function initCarDetailPage() {
         
         dot.title = color.name;
         dot.onclick = function() {
-          document.querySelectorAll('.color-dot-new, .color-dot-premium').forEach(d => d.classList.remove('active'));
-          dot.classList.add('active');
-          document.getElementById('detail-img').src = color.image_url;
+          document.querySelectorAll('.mau-xe-button').forEach(d => d.classList.remove('is-selected'));
+          dot.classList.add('is-selected');
           document.getElementById('selected-color-name').innerText = color.name;
+          applyColorSelection(color);
         };
 
         if (isPremium) {
@@ -157,6 +169,11 @@ async function initCarDetailPage() {
           basicContainer.appendChild(dot);
         }
       });
+
+      // Khởi tạo trạng thái màu đầu tiên
+      if (colors.length > 0) {
+        applyColorSelection(colors[0]);
+      }
 
       // Show/Hide premium headers depending on availability
       const premiumHeader = document.querySelector('.color-section-title:nth-of-type(2)');
@@ -1009,3 +1026,262 @@ document.addEventListener('click', (e) => {
 
 // Kiểm tra phiên đăng nhập khi tải trang
 checkUserSession();
+
+// --- Dynamic Car Painting Heuristics (Cách 1) ---
+let cachedMaskDataUrl = null;
+let baseImageForMask = '';
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) {
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return [h * 360, s, l];
+}
+
+function generateCarMask(imgElement, callback) {
+  const imgSrc = imgElement.src;
+  console.log("generateCarMask: Start for image:", imgSrc);
+  
+  if (cachedMaskDataUrl && baseImageForMask === imgSrc) {
+    console.log("generateCarMask: Using cached mask");
+    if (callback) callback(cachedMaskDataUrl);
+    return;
+  }
+  
+  const tempImg = new Image();
+  // REMOVE tempImg.crossOrigin = 'anonymous' to prevent CORS failures on same-origin localhost
+  tempImg.src = imgSrc;
+  tempImg.onload = function() {
+    console.log("generateCarMask: Base image loaded successfully to canvas.");
+    const canvas = document.createElement('canvas');
+    const width = tempImg.naturalWidth;
+    const height = tempImg.naturalHeight;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(tempImg, 0, 0);
+    
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const data = imgData.data;
+    
+    const maskData = ctx.createImageData(width, height);
+    const mask = maskData.data;
+    
+    const isWhiteCar = imgSrc.toLowerCase().includes('white');
+    console.log("generateCarMask: isWhiteCar =", isWhiteCar);
+    
+    if (isWhiteCar) {
+      const visited = new Uint8Array(width * height);
+      const queue = [];
+      
+      // More lenient threshold (> 220) to handle gradients/compression artifacts in white backgrounds
+      function isLightPixel(x, y) {
+        const idx = (y * width + x) * 4;
+        return data[idx] > 220 && data[idx+1] > 220 && data[idx+2] > 220;
+      }
+      
+      for (let x = 0; x < width; x++) {
+        if (isLightPixel(x, 0)) { queue.push(x, 0); visited[x] = 1; }
+        if (isLightPixel(x, height - 1)) { queue.push(x, height - 1); visited[(height - 1) * width + x] = 1; }
+      }
+      for (let y = 1; y < height - 1; y++) {
+        if (isLightPixel(0, y)) { queue.push(0, y); visited[y * width] = 1; }
+        if (isLightPixel(width - 1, y)) { queue.push(width - 1, y); visited[y * width + width - 1] = 1; }
+      }
+      
+      let head = 0;
+      const dx = [0, 0, 1, -1];
+      const dy = [1, -1, 0, 0];
+      
+      while (head < queue.length) {
+        const cx = queue[head++];
+        const cy = queue[head++];
+        
+        for (let i = 0; i < 4; i++) {
+          const nx = cx + dx[i];
+          const ny = cy + dy[i];
+          
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            const nidx = ny * width + nx;
+            if (visited[nidx] === 0 && isLightPixel(nx, ny)) {
+              visited[nidx] = 1;
+              queue.push(nx, ny);
+            }
+          }
+        }
+      }
+      
+      let paintCount = 0;
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = (y * width + x) * 4;
+          const isBg = visited[y * width + x] === 1;
+          
+          let isPaint = false;
+          if (!isBg) {
+            const r = data[idx];
+            const g = data[idx+1];
+            const b = data[idx+2];
+            
+            const [h, s, l] = rgbToHsl(r, g, b);
+            // Paint is light (l > 0.58) and low saturation
+            const isWhitePaint = (l > 0.58 && s < 0.15);
+            // Blue decorative brush strokes/splashes on the sides (Hue 180 to 260, Saturation > 0.15, Lightness > 0.3)
+            const isBlueStroke = (h >= 180 && h <= 260 && s > 0.15 && l > 0.3);
+            
+            if (isWhitePaint || isBlueStroke) {
+              isPaint = true;
+              paintCount++;
+            }
+          }
+          
+          if (isPaint) {
+            mask[idx] = 255;
+            mask[idx+1] = 255;
+            mask[idx+2] = 255;
+            mask[idx+3] = 255;
+          } else {
+            mask[idx] = 0;
+            mask[idx+1] = 0;
+            mask[idx+2] = 0;
+            mask[idx+3] = 0;
+          }
+        }
+      }
+      console.log(`generateCarMask: Generated white car mask, paint pixels = ${paintCount}`);
+    } else {
+      const minX = Math.floor(width * 0.15);
+      const maxX = Math.floor(width * 0.85);
+      const minY = Math.floor(height * 0.25);
+      const maxY = Math.floor(height * 0.90);
+      
+      let paintCount = 0;
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = (y * width + x) * 4;
+          const r = data[idx];
+          const g = data[idx+1];
+          const b = data[idx+2];
+          
+          let isPaint = false;
+          if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+            const [h, s, l] = rgbToHsl(r, g, b);
+            if (h >= 35 && h <= 65 && s > 0.28 && l > 0.15 && l < 0.85) {
+              isPaint = true;
+              paintCount++;
+            }
+          }
+          
+          if (isPaint) {
+            mask[idx] = 255;
+            mask[idx+1] = 255;
+            mask[idx+2] = 255;
+            mask[idx+3] = 255;
+          } else {
+            mask[idx] = 0;
+            mask[idx+1] = 0;
+            mask[idx+2] = 0;
+            mask[idx+3] = 0;
+          }
+        }
+      }
+      console.log(`generateCarMask: Generated yellow car mask, paint pixels = ${paintCount}`);
+    }
+    
+    ctx.putImageData(maskData, 0, 0);
+    cachedMaskDataUrl = canvas.toDataURL('image/png');
+    baseImageForMask = imgSrc;
+    if (callback) callback(cachedMaskDataUrl);
+  };
+  tempImg.onerror = function(err) {
+    console.error('generateCarMask: Error loading image for mask generation:', err);
+    if (callback) callback(null);
+  };
+}
+
+function updateOverlayPosition() {
+  const img = document.getElementById('detail-img');
+  const overlay = document.getElementById('car-color-overlay');
+  if (!img || !overlay || overlay.style.display === 'none') return;
+  
+  setTimeout(() => {
+    const rect = img.getBoundingClientRect();
+    const parentRect = img.parentElement.getBoundingClientRect();
+    overlay.style.width = `${rect.width}px`;
+    overlay.style.height = `${rect.height}px`;
+    overlay.style.left = `${rect.left - parentRect.left}px`;
+    overlay.style.top = `${rect.top - parentRect.top}px`;
+    console.log(`updateOverlayPosition: Positioned overlay at ${rect.left - parentRect.left}, ${rect.top - parentRect.top} dimensions ${rect.width}x${rect.height}`);
+  }, 20);
+}
+
+function applyColorSelection(color) {
+  const img = document.getElementById('detail-img');
+  const overlay = document.getElementById('car-color-overlay');
+  if (!img || !overlay) return;
+  
+  console.log("applyColorSelection: Target Color:", color.name, "Hex:", color.hex, "Image:", color.image_url);
+  
+  // More robust URL matching (checks if paths match, ignoring origin or slashes)
+  const cleanColorUrl = color.image_url.replace(/^https?:\/\/[^\/]+/, '').replace(/^\//, '');
+  const cleanBaseUrl = currentCar.image_url.replace(/^https?:\/\/[^\/]+/, '').replace(/^\//, '');
+  const isBaseImage = cleanColorUrl === cleanBaseUrl;
+  
+  const isWhiteColor = color.hex.toLowerCase() === '#f5f6f8' || color.name === 'Trắng Tinh Khôi';
+  
+  console.log("applyColorSelection: isBaseImage =", isBaseImage, "isWhiteColor =", isWhiteColor);
+  
+  if (isBaseImage && !isWhiteColor) {
+    img.src = currentCar.image_url;
+    generateCarMask(img, function(maskDataUrl) {
+      if (maskDataUrl) {
+        overlay.style.webkitMaskImage = `url(${maskDataUrl})`;
+        overlay.style.maskImage = `url(${maskDataUrl})`;
+        overlay.style.webkitMaskSize = '100% 100%';
+        overlay.style.maskSize = '100% 100%';
+        
+        if (color.hex.startsWith('linear-gradient') || color.hex.startsWith('radial-gradient')) {
+          overlay.style.background = color.hex;
+        } else {
+          overlay.style.backgroundColor = color.hex;
+          overlay.style.background = '';
+        }
+        
+        overlay.style.mixBlendMode = 'multiply';
+        overlay.style.opacity = '1';
+        overlay.style.display = 'block';
+        updateOverlayPosition();
+        console.log("applyColorSelection: Applied color overlay successfully");
+      } else {
+        console.warn("applyColorSelection: Failed to generate mask, falling back to image swapping");
+        img.src = color.image_url;
+        overlay.style.display = 'none';
+      }
+    });
+  } else {
+    console.log("applyColorSelection: Hiding overlay, showing direct image");
+    img.src = color.image_url;
+    overlay.style.display = 'none';
+  }
+}
+
+// Bind resize and load events to keep overlay positioned correctly
+window.addEventListener('resize', updateOverlayPosition);
+document.addEventListener('DOMContentLoaded', () => {
+  const img = document.getElementById('detail-img');
+  if (img) {
+    img.addEventListener('load', updateOverlayPosition);
+  }
+});

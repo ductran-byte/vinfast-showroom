@@ -713,7 +713,7 @@
   <!-- Login Card (Hiển thị khi chưa đăng nhập) -->
   <section class="container" id="login-section">
     <div class="auth-card glass-panel">
-      <div style="text-align: center; margin-bottom: 30px;">
+      <div class="section-header-box">
         <i class="fa-solid fa-user-shield" style="font-size: 48px; color: var(--accent-color); margin-bottom: 12px; filter: drop-shadow(var(--accent-glow));"></i>
         <h2 style="font-weight: 700; font-size: 24px;">Đăng Nhập Admin</h2>
         <p style="color: var(--text-secondary); font-size: 14px; margin-top: 6px;">Hệ thống quản lý nội dung xe VinFast</p>
@@ -786,7 +786,7 @@
       <div class="top-nav-bar">
         <div class="page-indicator" style="display: flex; align-items: center;">
           <!-- Hamburger Button on Mobile -->
-          <button id="admin-hamburger-btn" onclick="toggleMobileSidebar()" style="background: none; border: none; font-size: 18px; color: var(--slate-700); cursor: pointer; display: none; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--slate-200); margin-right: 12px;">
+          <button id="admin-hamburger-btn" onclick="toggleMobileSidebar()" aria-label="Mở thanh điều hướng quản trị" style="background: none; border: none; font-size: 18px; color: var(--slate-700); cursor: pointer; display: none; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--slate-200); margin-right: 12px;">
             <i class="fa-solid fa-bars"></i>
           </button>
           <span class="indicator-category">Hệ Thống</span>
@@ -805,8 +805,8 @@
         <div id="tab-dashboard-content">
           <div class="admin-header">
             <div>
-              <h1 style="font-size: 32px; font-weight: 800;">Tổng Quan Hệ Thống</h1>
-              <p style="color: var(--text-secondary); margin-top: 6px;">Báo cáo hoạt động showroom, danh sách yêu cầu mới và phân tích dữ liệu trực quan.</p>
+              <h1 class="section-main-title">Tổng Quan Hệ Thống</h1>
+              <p class="section-desc">Báo cáo hoạt động showroom, danh sách yêu cầu mới và phân tích dữ liệu trực quan.</p>
             </div>
           </div>
 
@@ -845,7 +845,7 @@
           <!-- Row 2: Recent Lists (2 columns) -->
           <div class="grid-2-col" style="margin-bottom: 32px;">
             <!-- Column 1: Recent Requests -->
-            <div class="glass-panel" style="padding: 24px;">
+            <div class="glass-panel admin-card-inner">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 style="font-size: 16px; font-weight: 700; color: var(--slate-900);">Yêu Cầu Khách Hàng Gần Đây</h3>
                 <a href="javascript:void(0)" onclick="switchTab('drives')" style="font-size: 12.5px; color: var(--primary-blue); font-weight: 700; text-decoration: none;">Xem tất cả</a>
@@ -856,7 +856,7 @@
             </div>
 
             <!-- Column 2: Recent Cars -->
-            <div class="glass-panel" style="padding: 24px;">
+            <div class="glass-panel admin-card-inner">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 style="font-size: 16px; font-weight: 700; color: var(--slate-900);">Mẫu Xe Mới Thêm</h3>
                 <a href="javascript:void(0)" onclick="switchTab('cars')" style="font-size: 12.5px; color: var(--primary-blue); font-weight: 700; text-decoration: none;">Xem tất cả</a>
@@ -868,7 +868,7 @@
           </div>
 
           <!-- Row 3: Charts (2 columns) -->
-          <div class="grid-2-col" style="margin-bottom: 16px;">
+          <div class="grid-2-col mb-16">
             <!-- Chart 1: Request Types -->
             <div class="glass-panel" style="padding: 24px; display: flex; flex-direction: column; align-items: center; overflow: hidden;">
               <h3 style="font-size: 16px; font-weight: 700; color: var(--slate-900); width: 100%; text-align: left; margin-bottom: 20px;">Phân Loại Yêu Cầu Gửi Đến</h3>
@@ -891,15 +891,15 @@
     <div id="tab-cars-content">
       <div class="admin-header">
         <div>
-          <h1 style="font-size: 32px; font-weight: 800;">Quản Lý Danh Sách Xe</h1>
-          <p style="color: var(--text-secondary); margin-top: 6px;">Thêm mới bài viết giới thiệu, cập nhật thông số và hình ảnh cho các loại xe.</p>
+          <h1 class="section-main-title">Quản Lý Danh Sách Xe</h1>
+          <p class="section-desc">Thêm mới bài viết giới thiệu, cập nhật thông số và hình ảnh cho các loại xe.</p>
         </div>
         <button class="btn btn-primary" id="btn-add-car">
           <i class="fa-solid fa-plus"></i> Đăng Xe Mới
         </button>
       </div>
 
-      <div class="glass-panel" style="padding: 24px;">
+      <div class="glass-panel admin-card-inner">
         <div class="data-table-wrapper">
           <table class="data-table" id="admin-car-table">
             <thead>
@@ -925,8 +925,8 @@
     <div id="tab-drives-content" style="display: none;">
       <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <div>
-          <h1 style="font-size: 32px; font-weight: 800;">Yêu Cầu Báo Giá & Lái Thử</h1>
-          <p style="color: var(--text-secondary); margin-top: 6px;">Theo dõi thông tin liên hệ, yêu cầu nhận báo giá và lịch trình trải nghiệm xe của khách hàng.</p>
+          <h1 class="section-main-title">Yêu Cầu Báo Giá & Lái Thử</h1>
+          <p class="section-desc">Theo dõi thông tin liên hệ, yêu cầu nhận báo giá và lịch trình trải nghiệm xe của khách hàng.</p>
         </div>
         <div style="position: relative; display: inline-block;">
           <button type="button" class="btn" id="btn-export-dropdown" onclick="toggleExportDropdown()" style="background: #0f53c5; color: white; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(15, 83, 197, 0.25); border: none; cursor: pointer; transition: all 0.2s;">
@@ -946,7 +946,7 @@
         </div>
       </div>
 
-      <div class="glass-panel" style="padding: 24px;">
+      <div class="glass-panel admin-card-inner">
         <div class="data-table-wrapper">
           <table class="data-table">
             <thead>
@@ -972,15 +972,15 @@
     <div id="tab-banners-content" style="display: none;">
       <div class="admin-header">
         <div>
-          <h1 style="font-size: 32px; font-weight: 800;">Quản Lý Banners Quảng Cáo</h1>
-          <p style="color: var(--text-secondary); margin-top: 6px;">Quản lý nội dung tiêu đề, mô tả và hình ảnh hiển thị trên thanh trượt Hero đầu trang chủ.</p>
+          <h1 class="section-main-title">Quản Lý Banners Quảng Cáo</h1>
+          <p class="section-desc">Quản lý nội dung tiêu đề, mô tả và hình ảnh hiển thị trên thanh trượt Hero đầu trang chủ.</p>
         </div>
         <button class="btn btn-primary" id="btn-add-banner">
           <i class="fa-solid fa-plus"></i> Thêm Banner Mới
         </button>
       </div>
 
-      <div class="glass-panel" style="padding: 24px;">
+      <div class="glass-panel admin-card-inner">
         <div class="data-table-wrapper">
           <table class="data-table">
             <thead>
@@ -1003,8 +1003,8 @@
     <div id="tab-settings-content" style="display: none;">
       <div class="admin-header">
         <div>
-          <h1 style="font-size: 32px; font-weight: 800;">Cấu Hình Thông Tin Liên Hệ</h1>
-          <p style="color: var(--text-secondary); margin-top: 6px;">Cấu hình số điện thoại hotline, email, địa chỉ showroom và các mạng xã hội hiển thị công khai trên website.</p>
+          <h1 class="section-main-title">Cấu Hình Thông Tin Liên Hệ</h1>
+          <p class="section-desc">Cấu hình số điện thoại hotline, email, địa chỉ showroom và các mạng xã hội hiển thị công khai trên website.</p>
         </div>
       </div>
 
@@ -1029,7 +1029,7 @@
             </div>
           </div>
 
-          <div class="form-group" style="margin-bottom: 20px;">
+          <div class="form-group mb-20">
             <label class="form-label" for="setting-contact-address">Địa Chỉ Showroom *</label>
             <input type="text" id="setting-contact-address" class="form-input" required>
           </div>
@@ -1063,14 +1063,14 @@
               </div>
             </div>
           </div>
-          <div class="form-group" style="margin-bottom: 24px;">
+          <div class="form-group mb-24">
             <label class="form-label" for="setting-intro-benefits">Danh Sách Tiện Ích (Mỗi dòng tương ứng 1 gạch đầu dòng) *</label>
             <textarea id="setting-intro-benefits" class="form-input" style="height: 120px; resize: vertical;" placeholder="Nhập các tiện ích, mỗi tiện ích viết ở một dòng mới..." required></textarea>
           </div>
 
           <!-- Cấu hình Thông Báo Telegram -->
           <h3 class="spec-title" style="font-size: 16px; margin-top: 30px; margin-bottom: 16px; padding-top: 20px; border-top: 1px solid var(--slate-200); color: var(--slate-900);">Cấu Hình Thông Báo Telegram (Nhận Báo Giá / Lái Thử)</h3>
-          <div class="form-group" style="margin-bottom: 20px;">
+          <div class="form-group mb-20">
             <label class="form-label" for="setting-telegram-token">Telegram Bot Token (Nếu dùng)</label>
             <input type="text" id="setting-telegram-token" class="form-input" placeholder="VD: 123456789:ABCdefGhIjkLmNoPQRsTuvWxYz">
           </div>
@@ -1101,7 +1101,7 @@
   <!-- Form Add/Edit Car Modal -->
   <div class="modal-overlay" id="car-form-modal">
     <div class="modal-content glass-panel" style="max-width: 800px;">
-      <button class="modal-close-btn" id="form-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <button class="modal-close-btn" id="form-modal-close" aria-label="Đóng form thông tin xe"><i class="fa-solid fa-xmark"></i></button>
       
       <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 32px;">
         <h2 id="modal-form-title" class="spec-title" style="margin-bottom: 24px; font-size: 24px;">Thêm Xe Ô Tô Mới</h2>
@@ -1183,7 +1183,7 @@
           </div>
 
           <!-- Thông số kỹ thuật nhanh -->
-          <div class="grid-4-col" style="margin-bottom: 16px;">
+          <div class="grid-4-col mb-16">
             <div class="form-group">
               <label class="form-label" for="car-range">Quãng đường (km)</label>
               <input type="number" id="car-range" class="form-input" placeholder="VD: 431">
@@ -1203,7 +1203,7 @@
           </div>
 
           <!-- Số chỗ ngồi & Hình ảnh -->
-          <div class="grid-1-2-col" style="margin-bottom: 16px;">
+          <div class="grid-1-2-col mb-16">
             <div class="form-group">
               <label class="form-label" for="car-seats">Số chỗ ngồi</label>
               <input type="number" id="car-seats" class="form-input" value="5" placeholder="VD: 5">
@@ -1256,7 +1256,7 @@
               </button>
             </div>
           </div>
-          <div class="specs-form-grid" style="margin-bottom: 24px;">
+          <div class="specs-form-grid mb-24">
             <div class="form-group">
               <label class="form-label" for="spec-in-dimensions">Kích thước dài x rộng x cao</label>
               <input type="text" id="spec-in-dimensions" class="form-input" placeholder="VD: 4545 x 1890 x 1635 mm">
@@ -1306,7 +1306,7 @@
               </button>
             </div>
           </div>
-          <div id="finance-config-container" style="margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01);">
+          <div id="finance-config-container" class="admin-boxed-setting">
             <div class="specs-form-grid" style="margin-bottom: 0;">
               <div class="form-group" style="grid-column: span 2;">
                 <label class="form-label" for="spec-in-battery-options">Tùy chọn Phương án Pin (Mỗi phương án 1 dòng: Tên phương án | Giá pin cộng thêm)</label>
@@ -1352,7 +1352,7 @@
               </button>
             </div>
           </div>
-          <div id="versions-container" style="margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01);">
+          <div id="versions-container" class="admin-boxed-setting">
             <div id="versions-list-inputs">
               <!-- Render dynamically -->
             </div>
@@ -1373,7 +1373,7 @@
               </button>
             </div>
           </div>
-          <div id="colors-container" style="margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01);">
+          <div id="colors-container" class="admin-boxed-setting">
             <div id="colors-list-inputs" style="display: flex; flex-direction: column; gap: 12px;">
               <!-- Render dynamically -->
             </div>
@@ -1394,7 +1394,7 @@
               </button>
             </div>
           </div>
-          <div id="promotions-container" style="margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01);">
+          <div id="promotions-container" class="admin-boxed-setting">
             <div id="promo-list-inputs">
               <!-- Render dynamically -->
             </div>
@@ -1416,7 +1416,7 @@
   <!-- Form Add/Edit Banner Modal -->
   <div class="modal-overlay" id="banner-form-modal">
     <div class="modal-content glass-panel" style="max-width: 600px;">
-      <button class="modal-close-btn" id="banner-form-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <button class="modal-close-btn" id="banner-form-modal-close" aria-label="Đóng form thông tin banner"><i class="fa-solid fa-xmark"></i></button>
       
       <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 32px;">
         <h2 id="banner-modal-form-title" class="spec-title" style="margin-bottom: 24px; font-size: 24px;">Thêm Banner Mới</h2>
@@ -1424,17 +1424,17 @@
         <form id="banner-form" enctype="multipart/form-data">
           <input type="hidden" id="banner-id">
           
-          <div class="form-group" style="margin-bottom: 16px;">
+          <div class="form-group mb-16">
             <label class="form-label" for="banner-title">Tiêu đề (Title) *</label>
             <input type="text" id="banner-title" class="form-input" placeholder="VD: TƯƠNG LAI XANH KIẾN TẠO PHONG CÁCH" required>
           </div>
           
-          <div class="form-group" style="margin-bottom: 16px;">
+          <div class="form-group mb-16">
             <label class="form-label" for="banner-subtitle">Phụ đề (Subtitle) *</label>
             <input type="text" id="banner-subtitle" class="form-input" placeholder="VD: HỆ SINH THÁI XE ĐIỆN" required>
           </div>
           
-          <div class="form-group" style="margin-bottom: 16px;">
+          <div class="form-group mb-16">
             <label class="form-label" for="banner-description">Mô tả chi tiết</label>
             <textarea id="banner-description" class="form-input" style="height: 80px; resize: vertical;" placeholder="Nhập nội dung quảng cáo đi kèm..."></textarea>
           </div>
@@ -1479,8 +1479,8 @@
         <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Xác Nhận Đăng Xuất</h3>
         <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;">Bạn có chắc chắn muốn đăng xuất tài khoản Quản Trị?</p>
         <div style="display: flex; gap: 12px; justify-content: center;">
-          <button class="btn" id="btn-logout-cancel" style="flex: 1; padding: 10px;">Hủy</button>
-          <button class="btn btn-danger" id="btn-logout-confirm" style="flex: 1; padding: 10px;">Đăng Xuất</button>
+          <button class="btn flex-item-equal" id="btn-logout-cancel">Hủy</button>
+          <button class="btn btn-danger flex-item-equal" id="btn-logout-confirm">Đăng Xuất</button>
         </div>
       </div>
     </div>

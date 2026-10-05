@@ -1,0 +1,307 @@
+/**
+ * ============================================================================
+ * VINFAST LUXURY EV SHOWROOM - UI/UX DESIGN SYSTEM TOKENS & UTILITIES
+ * ============================================================================
+ */
+
+:root {
+  /* --- Brand & Automotive Electric Accents --- */
+  --vf-blue-primary: #1464F4;
+  --vf-blue-hover: #0F53C5;
+  --vf-blue-active: #0A3EA1;
+  --vf-blue-light: #EBF2FE;
+  --vf-blue-glow: 0 4px 20px rgba(20, 100, 244, 0.35);
+
+  --vf-navy-900: #051026;
+  --vf-navy-800: #0A1C3E;
+  --vf-navy-700: #102A5C;
+
+  --vf-cyan-accent: #00D2FF;
+  --vf-cyan-glow: 0 4px 20px rgba(0, 210, 255, 0.35);
+
+  /* --- Gradients --- */
+  --vf-grad-primary: linear-gradient(135deg, #1464F4 0%, #00368A 100%);
+  --vf-grad-electric: linear-gradient(135deg, #00D2FF 0%, #1464F4 100%);
+  --vf-grad-dark: linear-gradient(180deg, #0A1C3E 0%, #051026 100%);
+  --vf-grad-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%);
+
+  /* --- Surface & Glassmorphism --- */
+  --vf-surface-white: #FFFFFF;
+  --vf-surface-muted: #F8FAFC;
+  --vf-surface-card: #FFFFFF;
+  --vf-glass-bg: rgba(255, 255, 255, 0.85);
+  --vf-glass-border: rgba(255, 255, 255, 0.7);
+  --vf-glass-blur: blur(16px);
+
+  /* --- Typography Colors --- */
+  --vf-text-title: #0F172A;
+  --vf-text-body: #334155;
+  --vf-text-muted: #64748B;
+  --vf-text-light: #94A3B8;
+
+  /* --- Shadows & Elevation --- */
+  --vf-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --vf-shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.07);
+  --vf-shadow-md: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+  --vf-shadow-lg: 0 20px 30px -10px rgba(15, 23, 42, 0.12);
+  --vf-shadow-hover: 0 25px 40px -12px rgba(10, 37, 64, 0.18);
+
+  /* --- Radius --- */
+  --vf-radius-sm: 8px;
+  --vf-radius-md: 12px;
+  --vf-radius-lg: 18px;
+  --vf-radius-xl: 24px;
+  --vf-radius-full: 9999px;
+
+  /* --- Transitions --- */
+  --vf-ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --vf-transition-base: all 0.3s var(--vf-ease-spring);
+  --vf-transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================================================
+   MICRO-INTERACTION UTILITIES
+   ============================================================================ */
+
+/* Hover Lift Effect */
+.vf-hover-lift {
+  transition: transform 0.35s var(--vf-ease-spring), box-shadow 0.35s ease;
+  will-change: transform, box-shadow;
+}
+.vf-hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--vf-shadow-hover);
+}
+
+/* Electric Glow Button */
+.btn-vf-electric {
+  background: var(--vf-grad-primary);
+  color: #FFFFFF !important;
+  font-weight: 600;
+  border-radius: var(--vf-radius-md);
+  border: none;
+  box-shadow: var(--vf-blue-glow);
+  transition: var(--vf-transition-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.btn-vf-electric:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(20, 100, 244, 0.45);
+}
+.btn-vf-electric:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Luxury Glass Card */
+.vf-glass-card {
+  background: var(--vf-glass-bg);
+  backdrop-filter: var(--vf-glass-blur);
+  -webkit-backdrop-filter: var(--vf-glass-blur);
+  border: 1px solid var(--vf-glass-border);
+  border-radius: var(--vf-radius-lg);
+  box-shadow: var(--vf-shadow-md);
+}
+
+/* Skeleton Loading Shimmer */
+@keyframes vfShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.vf-skeleton {
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  animation: vfShimmer 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+  border-radius: var(--vf-radius-sm);
+}
+
+/* Status & EV Badges */
+.vf-badge-ev {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(20, 100, 244, 0.1);
+  color: var(--vf-blue-primary);
+  border: 1px solid rgba(20, 100, 244, 0.2);
+  padding: 4px 10px;
+  border-radius: var(--vf-radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Touch Ergonomics Helper */
+.vf-touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================================
+   TOAST NOTIFICATION COMPONENT
+   ============================================================================ */
+#vf-toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  max-width: 90vw;
+  width: 380px;
+}
+
+@media (max-width: 640px) {
+  #vf-toast-container {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+.vf-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--vf-radius-md);
+  box-shadow: 0 10px 30px -5px rgba(5, 16, 38, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--vf-text-title);
+  line-height: 1.4;
+  animation: vfToastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.vf-toast::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.vf-toast.toast-success::before { background: #10B981; }
+.vf-toast.toast-success .vf-toast-icon { color: #10B981; }
+
+.vf-toast.toast-error::before { background: #EF4444; }
+.vf-toast.toast-error .vf-toast-icon { color: #EF4444; }
+
+.vf-toast.toast-warning::before { background: #F59E0B; }
+.vf-toast.toast-warning .vf-toast-icon { color: #F59E0B; }
+
+.vf-toast.toast-info::before { background: var(--vf-blue-primary); }
+.vf-toast.toast-info .vf-toast-icon { color: var(--vf-blue-primary); }
+
+.vf-toast-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.vf-toast-msg {
+  flex: 1;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.vf-toast-close {
+  background: none;
+  border: none;
+  color: var(--vf-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+.vf-toast-close:hover {
+  color: var(--vf-text-title);
+}
+
+@keyframes vfToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes vfToastOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+  }
+}
+
+/* ============================================================================
+   COMMON UTILITY CLASSES (REPLACING INLINE STYLES)
+   ============================================================================ */
+.text-center { text-align: center; }
+.text-accent { color: var(--accent-color) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.fw-bold { font-weight: 700; }
+.fw-extrabold { font-weight: 800; }
+
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mt-20 { margin-top: 20px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-24 { margin-bottom: 24px; }
+.mb-30 { margin-bottom: 30px; }
+.mb-40 { margin-bottom: 40px; }
+
+.d-none { display: none !important; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+
+.section-header-box { text-align: center; margin-bottom: 30px; }
+.section-main-title { font-size: 32px; font-weight: 800; }
+.section-desc { color: var(--text-secondary); margin-top: 8px; }
+
+.pt-60 { padding-top: 60px; }
+.pb-60 { padding-bottom: 60px; }
+.py-60 { padding-top: 60px; padding-bottom: 60px; }
+.section-bordered { border-top: 1px solid var(--panel-border); }
+.icon-accent-fixed { color: var(--accent-color); margin-right: 8px; width: 16px; display: inline-block; text-align: center; }
+.icon-accent { color: var(--accent-color); margin-right: 8px; }
+.input-block-rounded { width: 100%; border-radius: var(--radius-md); border: 1px solid var(--panel-border); padding: 10px 12px; }
+.flex-item-equal { flex: 1; padding: 10px; }
+.row-spec-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px; }
+.row-spec-item-lg { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
+.admin-card-inner { padding: 24px; }
+.admin-boxed-setting { margin-bottom: 24px; border: 1px solid var(--panel-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0,0,0,0.01); }
+.car-feature-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px dashed rgba(15, 83, 197, 0.15); font-size: 13px; font-weight: 500; color: #1e272e; }
+.form-label-bold { font-weight: 600; display: block; margin-bottom: 6px; }
+
+

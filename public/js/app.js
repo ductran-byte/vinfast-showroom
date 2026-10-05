@@ -40,6 +40,46 @@ function showNotification(message, isSuccess = true) {
 }
 window.showNotification = showNotification;
 
+// Toast Notification siêu mượt chuẩn UX/UI
+function showToast(message, type = 'info', duration = 3500) {
+  let container = document.getElementById('vf-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'vf-toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `vf-toast toast-${type}`;
+
+  let iconClass = 'fa-circle-info';
+  if (type === 'success') iconClass = 'fa-circle-check';
+  else if (type === 'error') iconClass = 'fa-circle-xmark';
+  else if (type === 'warning') iconClass = 'fa-triangle-exclamation';
+
+  toast.innerHTML = `
+    <i class="fa-solid ${iconClass} vf-toast-icon"></i>
+    <span class="vf-toast-msg">${message}</span>
+    <button class="vf-toast-close" aria-label="Đóng thông báo"><i class="fa-solid fa-xmark"></i></button>
+  `;
+
+  const closeBtn = toast.querySelector('.vf-toast-close');
+  closeBtn.onclick = () => {
+    toast.style.animation = 'vfToastOut 0.25s forwards';
+    setTimeout(() => toast.remove(), 250);
+  };
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.style.animation = 'vfToastOut 0.25s forwards';
+      setTimeout(() => toast.remove(), 250);
+    }
+  }, duration);
+}
+window.showToast = showToast;
+
 // Hiệu ứng thay đổi kiểu Header khi cuộn trang
 window.addEventListener('scroll', () => {
   const header = document.getElementById('header');
@@ -171,8 +211,8 @@ async function fetchHotCars() {
     const response = await fetch('/api/cars');
     if (!response.ok) throw new Error('Không thể tải xe nổi bật.');
     const allCars = await response.json();
-    // Lấy 6 xe mới nhất đưa vào Slider
-    hotCars = allCars.slice(0, 6);
+    // Lấy tất cả các xe đưa vào Slider
+    hotCars = allCars;
     renderHotCarsSlider();
   } catch (error) {
     console.error('Lỗi khi tải xe nổi bật:', error);
@@ -208,18 +248,51 @@ async function fetchShowroomCars() {
   }
 }
 
+let allCarsData = [];
+
+function updateColorOptionsForSelect(carSelectEl, colorSelectEl) {
+  if (!carSelectEl || !colorSelectEl) return;
+  const carId = parseInt(carSelectEl.value);
+  if (!carId || !allCarsData || allCarsData.length === 0) {
+    colorSelectEl.innerHTML = '<option value="">-- Chọn màu xe (Tùy chọn) --</option>';
+    return;
+  }
+  const car = allCarsData.find(c => c.id === carId);
+  if (!car) {
+    colorSelectEl.innerHTML = '<option value="">-- Chọn màu xe (Tùy chọn) --</option>';
+    return;
+  }
+
+  let colorList = [];
+  if (car.specifications) {
+    let specs = typeof car.specifications === 'string' ? JSON.parse(car.specifications) : car.specifications;
+    if (specs && Array.isArray(specs.colors)) {
+      colorList = specs.colors.map(c => typeof c === 'string' ? c : c.name).filter(Boolean);
+    }
+  }
+
+  if (colorList.length === 0) {
+    colorList = ['Trắng Tinh Khôi', 'Đen Huyền Bí', 'Xám Kim Loại', 'Đỏ Crimson', 'Xanh Dương', 'Hồng Phấn'];
+  }
+
+  colorSelectEl.innerHTML = '<option value="">-- Chọn màu xe (Tùy chọn) --</option>' +
+    colorList.map(colorName => `<option value="${colorName}">${colorName}</option>`).join('');
+}
+
 // Tải toàn bộ danh sách xe phục vụ Form Đăng ký lái thử
 async function loadAllCarsForTestDrive() {
   try {
     const response = await fetch('/api/cars'); // Không lọc tham số để lấy toàn bộ xe
     if (!response.ok) throw new Error('Không thể tải danh sách xe lái thử.');
     const allCars = await response.json();
+    allCarsData = allCars;
     
     if (tdCarSelect) {
       const currentVal = tdCarSelect.value;
       tdCarSelect.innerHTML = '<option value="">-- Chọn dòng xe --</option>' + 
         allCars.map(car => `<option value="${car.id}">${car.name}</option>`).join('');
       if (currentVal) tdCarSelect.value = currentVal;
+      updateColorOptionsForSelect(tdCarSelect, document.getElementById('td-color-select'));
     }
 
     const homeTdCarSelect = document.getElementById('home-td-car-select');
@@ -228,6 +301,7 @@ async function loadAllCarsForTestDrive() {
       homeTdCarSelect.innerHTML = '<option value="">-- Chọn dòng xe --</option>' + 
         allCars.map(car => `<option value="${car.id}">${car.name}</option>`).join('');
       if (currentValHome) homeTdCarSelect.value = currentValHome;
+      updateColorOptionsForSelect(homeTdCarSelect, document.getElementById('home-td-color-select'));
     }
   } catch (error) {
     console.error('Lỗi khi tải danh sách xe lái thử:', error);
@@ -413,6 +487,7 @@ const testDriveModalClose = document.getElementById('test-drive-modal-close');
 function openTestDriveModal(carId) {
   if (carId && tdCarSelect) {
     tdCarSelect.value = carId;
+    updateColorOptionsForSelect(tdCarSelect, document.getElementById('td-color-select'));
   }
   if (testDriveModal) {
     testDriveModal.classList.add('active');
@@ -428,6 +503,18 @@ function openTestDriveModal(carId) {
   }
 }
 window.openTestDriveModal = openTestDriveModal;
+
+if (tdCarSelect) {
+  tdCarSelect.addEventListener('change', () => {
+    updateColorOptionsForSelect(tdCarSelect, document.getElementById('td-color-select'));
+  });
+}
+const homeTdSelectEl = document.getElementById('home-td-car-select');
+if (homeTdSelectEl) {
+  homeTdSelectEl.addEventListener('change', () => {
+    updateColorOptionsForSelect(homeTdSelectEl, document.getElementById('home-td-color-select'));
+  });
+}
 
 function closeTestDriveModal() {
   if (testDriveModal) {
@@ -621,7 +708,7 @@ function toggleCompare(id) {
   } else {
     // Chưa có thì thêm mới (giới hạn tối đa 3 xe)
     if (compareList.length >= 3) {
-      alert('Bạn chỉ có thể so sánh tối đa 3 xe điện cùng lúc.');
+      showToast('Bạn chỉ có thể so sánh tối đa 3 xe điện cùng lúc.', 'warning');
       return;
     }
     compareList.push(id);
@@ -774,6 +861,7 @@ if (testDriveForm) {
     e.preventDefault();
 
     const car_id = document.getElementById('td-car-select').value;
+    const selected_color = document.getElementById('td-color-select') ? document.getElementById('td-color-select').value : '';
     const fullname = document.getElementById('td-name').value.trim();
     const phone = document.getElementById('td-phone').value.trim();
     const address = document.getElementById('td-address').value.trim();
@@ -784,7 +872,7 @@ if (testDriveForm) {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ type: 'quote', car_id, fullname, phone, address })
+        body: JSON.stringify({ type: 'quote', car_id, selected_color, fullname, phone, address })
       });
 
       const data = await response.json();
@@ -873,6 +961,7 @@ if (homeTestDriveForm) {
     e.preventDefault();
 
     const car_id = document.getElementById('home-td-car-select').value;
+    const selected_color = document.getElementById('home-td-color-select') ? document.getElementById('home-td-color-select').value : '';
     const fullname = document.getElementById('home-td-name').value.trim();
     const phone = document.getElementById('home-td-phone').value.trim();
     const email = document.getElementById('home-td-email').value.trim();
@@ -885,7 +974,7 @@ if (homeTestDriveForm) {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ type: 'drive', car_id, fullname, phone, email, address, preferred_date })
+        body: JSON.stringify({ type: 'drive', car_id, selected_color, fullname, phone, email, address, preferred_date })
       });
 
       const data = await response.json();

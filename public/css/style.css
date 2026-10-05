@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import url('ui-tokens.css');
 
 :root {
   --bg-color: #f8fafc;
@@ -492,6 +493,42 @@ nav ul li a:hover::after, nav ul li a.active::after {
   pointer-events: none;
   transition: var(--transition-smooth);
   padding: 20px;
+}
+
+/* Slider Controls */
+.slider-arrow-btn {
+  position: absolute;
+  top: 36%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--panel-border);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+.slider-arrow-btn:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: #fff;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.slider-arrow-prev {
+  left: 20px;
+}
+
+.slider-arrow-next {
+  right: 20px;
 }
 
 .modal-overlay.active {
@@ -1577,7 +1614,7 @@ footer a {
 .slider-container-box {
   position: relative;
   width: 100%;
-  min-height: 480px;
+  min-height: 560px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1585,7 +1622,7 @@ footer a {
 
 .slider-bg-text-wrapper {
   position: absolute;
-  top: 32%;
+  top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
@@ -1597,7 +1634,7 @@ footer a {
 }
 
 .slider-bg-text {
-  font-size: 180px;
+  font-size: 220px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 5px;
@@ -1623,17 +1660,21 @@ footer a {
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 1000px;
-  height: 380px;
+  max-width: 900px;
+  aspect-ratio: 16 / 9;
+  height: auto;
   position: relative;
   background: transparent;
-  overflow: visible;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
 }
 
 .slider-car-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: var(--radius-lg);
   transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
@@ -1643,7 +1684,7 @@ footer a {
 
 .slider-car-details {
   width: 100%;
-  max-width: 1000px;
+  max-width: 100%;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -2017,10 +2058,21 @@ footer a {
 /* Responsive Redesign Adjustments */
 @media (max-width: 992px) {
   .hero-carousel {
-    height: 420px;
+    height: 380px;
   }
   .carousel-caption h2 {
     font-size: 32px;
+  }
+  .slider-car-display {
+    height: 360px;
+  }
+  .slider-arrow-btn {
+    top: 180px;
+    width: 42px;
+    height: 42px;
+  }
+  .slider-container-box {
+    min-height: 440px;
   }
   .slider-bg-text {
     font-size: 110px;
@@ -2034,7 +2086,7 @@ footer a {
   }
   .slider-spec-item {
     border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     padding-bottom: 8px;
   }
   .slider-spec-item:nth-child(even) {
@@ -2048,34 +2100,64 @@ footer a {
 
 @media (max-width: 768px) {
   .hero-carousel {
-    height: 360px;
+    height: 320px;
     margin-top: 75px;
-    margin-left: 16px;
-    margin-right: 16px;
+    margin-left: 12px;
+    margin-right: 12px;
   }
   .carousel-caption h2 {
-    font-size: 26px;
+    font-size: 24px;
   }
   .carousel-caption p {
-    font-size: 14px;
+    font-size: 13px;
+  }
+  .slider-car-display {
+    height: 280px;
+    border-radius: var(--radius-md);
+  }
+  .slider-arrow-btn {
+    top: 140px;
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+  .slider-arrow-prev {
+    left: 12px;
+  }
+  .slider-arrow-next {
+    right: 12px;
+  }
+  .slider-container-box {
+    min-height: 380px;
   }
   .slider-bg-text {
-    font-size: 80px;
+    font-size: 70px;
+    top: 25%;
   }
   .slider-car-title {
-    font-size: 22px;
+    font-size: 20px;
   }
   .slider-spec-val {
-    font-size: 15px;
+    font-size: 14px;
   }
   .slider-spec-lbl {
-    font-size: 10px;
+    font-size: 11px;
   }
   .vietnam-left h3 {
     font-size: 28px;
   }
   .vietnam-left h3 span {
     font-size: 20px;
+  }
+  .floating-contact {
+    bottom: 16px;
+    right: 14px;
+    gap: 10px;
+  }
+  .contact-item {
+    width: 44px;
+    height: 44px;
+    font-size: 17px;
   }
 }
 
@@ -2113,6 +2195,45 @@ footer a {
 }
 
 @media (max-width: 576px) {
+  .hero-carousel {
+    height: 260px;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 0;
+  }
+  .slider-car-display {
+    height: 220px;
+    border-radius: var(--radius-md);
+  }
+  .slider-arrow-btn {
+    top: 110px;
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+  .slider-arrow-prev {
+    left: 8px;
+  }
+  .slider-arrow-next {
+    right: 8px;
+  }
+  .slider-container-box {
+    min-height: auto;
+  }
+  .slider-bg-text {
+    font-size: 45px;
+    top: 20%;
+  }
+  .slider-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  .btn-slider-order, .btn-slider-details {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 12px;
+  }
   .card-btn-row {
     flex-direction: column;
   }
@@ -2121,7 +2242,7 @@ footer a {
     gap: 8px;
   }
   #home-test-drive-form {
-    padding: 20px !important;
+    padding: 16px !important;
   }
 }
 

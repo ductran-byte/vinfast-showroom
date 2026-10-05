@@ -271,12 +271,53 @@ function showConfirm(message, callback) {
   }, 50);
 }
 
-// Override window.alert globally to use custom beautiful popup
+// Toast Notification siêu mượt chuẩn UX/UI
+function showToast(message, type = 'info', duration = 3500) {
+  let container = document.getElementById('vf-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'vf-toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `vf-toast toast-${type}`;
+
+  let iconClass = 'fa-circle-info';
+  if (type === 'success') iconClass = 'fa-circle-check';
+  else if (type === 'error') iconClass = 'fa-circle-xmark';
+  else if (type === 'warning') iconClass = 'fa-triangle-exclamation';
+
+  toast.innerHTML = `
+    <i class="fa-solid ${iconClass} vf-toast-icon"></i>
+    <span class="vf-toast-msg">${message}</span>
+    <button class="vf-toast-close" aria-label="Đóng thông báo"><i class="fa-solid fa-xmark"></i></button>
+  `;
+
+  const closeBtn = toast.querySelector('.vf-toast-close');
+  closeBtn.onclick = () => {
+    toast.style.animation = 'vfToastOut 0.25s forwards';
+    setTimeout(() => toast.remove(), 250);
+  };
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.style.animation = 'vfToastOut 0.25s forwards';
+      setTimeout(() => toast.remove(), 250);
+    }
+  }, duration);
+}
+window.showToast = showToast;
+
+// Chuyển hướng window.alert sang Toast notification mượt mà
 window.alert = function(message) {
-  const lowercase = message.toLowerCase();
-  const isSuccess = lowercase.includes('thành công') || lowercase.includes('ok') || lowercase.includes('gửi thành công') || lowercase.includes('kết nối thành công');
-  showAlert(message, isSuccess);
+  const lowercase = String(message).toLowerCase();
+  const isSuccess = lowercase.includes('thành công') || lowercase.includes('ok');
+  showToast(message, isSuccess ? 'success' : 'error');
 };
+
 
 // Initialize Quill Editor
 document.addEventListener('DOMContentLoaded', () => {
@@ -485,7 +526,7 @@ function handleAuthError() {
   localStorage.removeItem('adminUser');
   token = null;
   adminUser = null;
-  alert('Phiên làm việc của bạn đã hết hạn hoặc bạn không có quyền truy cập quản trị. Vui lòng đăng nhập lại.');
+  showAlert('Phiên làm việc của bạn đã hết hạn hoặc bạn không có quyền truy cập quản trị. Vui lòng đăng nhập lại.', false);
   checkAuth();
 }
 
@@ -540,7 +581,7 @@ loginForm.addEventListener('submit', async (e) => {
 
     checkAuth();
   } catch (error) {
-    alert(error.message);
+    showToast(error.message, 'error');
   }
 });
 
@@ -1536,7 +1577,7 @@ async function editCar(id) {
     carFormModal.classList.add('active');
     document.body.style.overflow = 'hidden';
   } catch (error) {
-    alert('Lỗi tải thông tin xe: ' + error.message);
+    showToast('Lỗi tải thông tin xe: ' + error.message, 'error');
   }
 }
 window.editCar = editCar;
@@ -1679,11 +1720,11 @@ carForm.addEventListener('submit', async (e) => {
       throw new Error(data.message || 'Lỗi xử lý yêu cầu.');
     }
 
-    alert(isEditing ? 'Cập nhật thông tin xe thành công!' : 'Đăng bán xe mới thành công!');
+    showToast(isEditing ? 'Cập nhật thông tin xe thành công!' : 'Đăng bán xe mới thành công!', 'success');
     closeFormModal();
     loadAdminCars();
   } catch (error) {
-    alert(error.message);
+    showToast(error.message, 'error');
   }
 });
 
@@ -1706,10 +1747,10 @@ async function deleteCar(id) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Lỗi khi xóa.');
 
-      alert('Đã xóa xe thành công!');
+      showToast('Đã xóa xe thành công!', 'success');
       loadAdminCars();
     } catch (error) {
-      alert(error.message);
+      showToast(error.message, 'error');
     }
   });
 }
@@ -1784,6 +1825,7 @@ async function loadAdminTestDrives() {
             <span class="logo-badge" style="background: rgba(15, 83, 197, 0.08); color: var(--accent-color); border: 1px solid rgba(15, 83, 197, 0.15);">
               ${drive.car_name || 'Xe đã bị xóa'}
             </span>
+            ${drive.selected_color ? `<div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 4px;"><i class="fa-solid fa-palette" style="color: var(--accent-color); margin-right: 4px;"></i> Màu: <strong>${drive.selected_color}</strong></div>` : ''}
           </td>
           <td>
             ${typeBadge}
@@ -1834,10 +1876,10 @@ async function updateDriveStatus(id, newStatus) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Lỗi khi cập nhật.');
 
-    alert('Đã cập nhật trạng thái yêu cầu báo giá!');
+    showToast('Đã cập nhật trạng thái yêu cầu báo giá!', 'success');
     loadAdminTestDrives();
   } catch (error) {
-    alert(error.message);
+    showToast(error.message, 'error');
   }
 }
 window.updateDriveStatus = updateDriveStatus;
@@ -1861,10 +1903,10 @@ async function deleteDrive(id) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Lỗi khi xóa.');
 
-      alert('Đã xóa yêu cầu báo giá thành công!');
+      showToast('Đã xóa yêu cầu báo giá thành công!', 'success');
       loadAdminTestDrives();
     } catch (error) {
-      alert(error.message);
+      showToast(error.message, 'error');
     }
   });
 }
@@ -2051,11 +2093,11 @@ if (bannerForm) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Lỗi khi lưu banner.');
 
-      alert(isEditingBanner ? 'Cập nhật banner thành công!' : 'Thêm banner mới thành công!');
+      showToast(isEditingBanner ? 'Cập nhật banner thành công!' : 'Thêm banner mới thành công!', 'success');
       closeBannerModal();
       loadAdminBanners();
     } catch (error) {
-      alert(error.message);
+      showToast(error.message, 'error');
     }
   });
 }
@@ -2079,10 +2121,10 @@ window.deleteBanner = async function(id) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Lỗi khi xóa banner.');
 
-      alert('Đã xóa banner thành công!');
+      showToast('Đã xóa banner thành công!', 'success');
       loadAdminBanners();
     } catch (error) {
-      alert(error.message);
+      showToast(error.message, 'error');
     }
   });
 };
@@ -2113,7 +2155,7 @@ async function loadAdminSettings() {
     document.getElementById('setting-telegram-chat-id-private').value = settings.telegram_chat_id_private || '';
     document.getElementById('setting-telegram-chat-id-group').value = settings.telegram_chat_id_group || '';
   } catch (error) {
-    alert(error.message);
+    showToast(error.message, 'error');
   }
 }
 window.loadAdminSettings = loadAdminSettings;
@@ -2180,11 +2222,11 @@ if (adminSettingsForm) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Lỗi khi lưu cấu hình.');
 
-      alert('Đã lưu cấu hình hệ thống thành công!');
+      showToast('Đã lưu cấu hình hệ thống thành công!', 'success');
       if (fileInput) fileInput.value = ''; // Reset file input
       loadAdminSettings();
     } catch (error) {
-      alert(error.message);
+      showToast(error.message, 'error');
     }
   });
 }
@@ -2216,7 +2258,7 @@ document.addEventListener('click', (e) => {
 window.triggerExport = function(format) {
   const drives = window.loadedDrives || [];
   if (drives.length === 0) {
-    alert('Không có dữ liệu để xuất!');
+    showToast('Không có dữ liệu để xuất!', 'warning');
     return;
   }
 

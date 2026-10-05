@@ -364,10 +364,43 @@ async function loadSystemSettings() {
 // CTA Trigger Functions & Quote Modal Logic
 let allCarsList = null;
 
+function updateQuoteColorOptions() {
+  const selectCarEl = document.getElementById('quote-car-select');
+  const selectColorEl = document.getElementById('quote-color-select');
+  if (!selectCarEl || !selectColorEl) return;
+  const carId = parseInt(selectCarEl.value);
+  
+  if (!carId) {
+    selectColorEl.innerHTML = '<option value="">-- Chọn màu xe (Tùy chọn) --</option>';
+    return;
+  }
+  
+  let targetCar = (currentCar && currentCar.id === carId) ? currentCar : (allCarsList ? allCarsList.find(c => c.id === carId) : null);
+  let colorList = [];
+  if (targetCar && targetCar.specifications) {
+    let specs = typeof targetCar.specifications === 'string' ? JSON.parse(targetCar.specifications) : targetCar.specifications;
+    if (specs && Array.isArray(specs.colors)) {
+      colorList = specs.colors.map(c => typeof c === 'string' ? c : c.name).filter(Boolean);
+    }
+  }
+  
+  if (colorList.length === 0) {
+    colorList = ['Trắng Tinh Khôi', 'Đen Huyền Bí', 'Xám Kim Loại', 'Đỏ Crimson', 'Xanh Dương', 'Hồng Phấn'];
+  }
+  
+  selectColorEl.innerHTML = '<option value="">-- Chọn màu xe (Tùy chọn) --</option>' +
+    colorList.map(name => `<option value="${name}">${name}</option>`).join('');
+}
+
 async function populateQuoteCarSelect() {
   const selectEl = document.getElementById('quote-car-select');
   if (!selectEl) return;
   
+  if (!selectEl.getAttribute('data-listener-attached')) {
+    selectEl.setAttribute('data-listener-attached', 'true');
+    selectEl.addEventListener('change', updateQuoteColorOptions);
+  }
+
   if (!allCarsList) {
     try {
       const response = await fetch('/api/cars');
@@ -397,6 +430,7 @@ async function openQuoteModal() {
     if (selectEl && currentCar) {
       selectEl.value = currentCar.id;
     }
+    updateQuoteColorOptions();
     
     // Autofill user profile if logged in
     const profileStr = localStorage.getItem('userProfile');
@@ -459,6 +493,7 @@ if (quoteForm) {
     e.preventDefault();
     
     const car_id = document.getElementById('quote-car-select').value;
+    const selected_color = document.getElementById('quote-color-select') ? document.getElementById('quote-color-select').value : '';
     const fullname = document.getElementById('quote-name').value.trim();
     const phone = document.getElementById('quote-phone').value.trim();
     const address = document.getElementById('quote-address').value.trim();
@@ -469,7 +504,7 @@ if (quoteForm) {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ type: 'quote', car_id, fullname, phone, address })
+        body: JSON.stringify({ type: 'quote', car_id, selected_color, fullname, phone, address })
       });
       
       const data = await response.json();

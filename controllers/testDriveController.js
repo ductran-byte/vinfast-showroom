@@ -3,7 +3,8 @@ const { sendTelegramAlert } = require('../utils/telegram');
 
 // Khách đăng ký nhận báo giá hoặc đăng ký lái thử
 exports.createTestDrive = async (req, res) => {
-  const { type = 'drive', car_id, fullname, phone, email, preferred_date, address } = req.body;
+  const { type = 'drive', car_id, fullname, phone, email, preferred_date, address, color, selected_color } = req.body;
+  const chosenColor = (selected_color || color || '').trim();
 
   if (!car_id || !fullname || !phone) {
     return res.status(400).json({ message: 'Vui lòng cung cấp đầy đủ thông tin: Mẫu xe, Họ tên và Số điện thoại.' });
@@ -21,10 +22,11 @@ exports.createTestDrive = async (req, res) => {
 
   try {
     const [result] = await db.query(
-      `INSERT INTO test_drives (car_id, fullname, phone, email, address, preferred_date, type) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO test_drives (car_id, selected_color, fullname, phone, email, address, preferred_date, type) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         parseInt(car_id),
+        chosenColor || null,
         fullname.trim(),
         phone.trim(),
         email ? email.trim() : null,
@@ -58,6 +60,7 @@ exports.createTestDrive = async (req, res) => {
 📞 <b>Số điện thoại:</b> <code>${phone.trim()}</code>
 📧 <b>Email:</b> ${email ? email.trim() : 'Không cung cấp'}
 🚗 <b>Mẫu xe quan tâm:</b> <b>${carName}</b>
+${chosenColor ? `🎨 <b>Màu sắc chọn:</b> ${chosenColor}` : ''}
 ${type === 'drive' ? `📅 <b>Ngày hẹn lái thử:</b> ${preferred_date}` : ''}
 📍 <b>Địa chỉ:</b> ${address.trim()}
 ━━━━━━━━━━━━━━━━━━

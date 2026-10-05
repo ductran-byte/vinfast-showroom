@@ -75,19 +75,19 @@
 
   <!-- Hot Models Slider Section -->
   <section id="hot-models" class="showcase container" style="padding-top: 60px;">
-    <div style="text-align: center; margin-bottom: 30px;">
+    <div class="section-header-box">
       <span class="hero-subtitle">Mẫu xe nổi bật</span>
-      <h2 style="font-size: 32px; font-weight: 800;">Xe Mới & Nổi Bật</h2>
-      <p style="color: var(--text-secondary); margin-top: 8px;">Khám phá các mẫu xe mới ra mắt và được quan tâm nhiều nhất hiện nay.</p>
+      <h2 class="section-main-title">Xe Mới & Nổi Bật</h2>
+      <p class="section-desc">Khám phá các mẫu xe mới ra mắt và được quan tâm nhiều nhất hiện nay.</p>
     </div>
 
     <!-- Premium Interactive Slider -->
     <div class="showcase-slider-section">
       <!-- Arrow Controls -->
-      <button class="slider-arrow-btn slider-arrow-prev" id="car-slider-prev">
+      <button class="slider-arrow-btn slider-arrow-prev" id="car-slider-prev" aria-label="Xem xe trước">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <button class="slider-arrow-btn slider-arrow-next" id="car-slider-next">
+      <button class="slider-arrow-btn slider-arrow-next" id="car-slider-next" aria-label="Xem xe tiếp theo">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
 
@@ -116,10 +116,10 @@
 
   <!-- Showroom Products Section (Full Grid) -->
   <section id="showroom" class="showcase container" style="padding-top: 60px; padding-bottom: 60px; border-top: 1px solid var(--panel-border);">
-    <div style="text-align: center; margin-bottom: 40px;">
+    <div class="section-header-box mb-40">
       <span class="hero-subtitle">Danh mục sản phẩm</span>
-      <h2 style="font-size: 32px; font-weight: 800;">Khám Phá Các Dòng Xe</h2>
-      <p style="color: var(--text-secondary); margin-top: 8px;">Tìm kiếm và so sánh đầy đủ tất cả các dòng xe ô tô điện và xe dịch vụ VinFast.</p>
+      <h2 class="section-main-title">Khám Phá Các Dòng Xe</h2>
+      <p class="section-desc">Tìm kiếm và so sánh đầy đủ tất cả các dòng xe ô tô điện và xe dịch vụ VinFast.</p>
     </div>
 
     <!-- Filter and Search Bar -->
@@ -156,18 +156,18 @@
             Hãy là người tiếp theo cảm nhận khả năng tăng tốc tức thì, vận hành êm ái và hệ thống hỗ trợ lái thông minh ADAS trên các dòng xe ô tô điện VinFast. Chọn ngày hẹn và địa chỉ của bạn để chúng tôi liên hệ chuẩn bị xe sẵn sàng đón tiếp.
           </p>
           <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;">
-            <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Lái thử hoàn toàn miễn phí tại tất cả Showroom VinFast</div>
-            <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Chuyên viên hướng dẫn các tính năng lái thông minh ADAS</div>
-            <div><i class="fa-solid fa-circle-check" style="color: var(--accent-color); margin-right: 8px;"></i> Nhận ngay các phần quà lưu niệm ý nghĩa khi lái thử xe</div>
+            <div><i class="fa-solid fa-circle-check icon-accent"></i> Lái thử hoàn toàn miễn phí tại tất cả Showroom VinFast</div>
+            <div><i class="fa-solid fa-circle-check icon-accent"></i> Chuyên viên hướng dẫn các tính năng lái thông minh ADAS</div>
+            <div><i class="fa-solid fa-circle-check icon-accent"></i> Nhận ngay các phần quà lưu niệm ý nghĩa khi lái thử xe</div>
           </div>
           
           <div class="glass-panel" style="padding: 20px; background: rgba(15, 83, 197, 0.02); border: 1px solid rgba(15, 83, 197, 0.1); border-radius: var(--radius-md); box-shadow: none;">
             <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Thông tin liên hệ tư vấn:</h4>
             <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13.5px;">
-              <div><i class="fa-solid fa-store" style="color: var(--accent-color); margin-right: 8px; width: 16px;"></i> <strong>Showroom:</strong> <span id="td-info-showroom">VinFast HTA Văn Phú</span></div>
-              <div><i class="fa-solid fa-phone" style="color: var(--accent-color); margin-right: 8px; width: 16px;"></i> <strong>Hotline:</strong> <span id="td-info-phone">1900 232389</span></div>
-              <div><i class="fa-solid fa-envelope" style="color: var(--accent-color); margin-right: 8px; width: 16px;"></i> <strong>Email:</strong> <span id="td-info-email">support@vinfast.vn</span></div>
-              <div><i class="fa-solid fa-location-dot" style="color: var(--accent-color); margin-right: 8px; width: 16px;"></i> <strong>Địa chỉ:</strong> <span id="td-info-address">Toà K3, KĐT The K Park, Kiến Hưng, Hà Đông, Hà Nội</span></div>
+              <div><i class="fa-solid fa-store icon-accent-fixed"></i> <strong>Showroom:</strong> <span id="td-info-showroom">VinFast HTA Văn Phú</span></div>
+              <div><i class="fa-solid fa-phone icon-accent-fixed"></i> <strong>Hotline:</strong> <span id="td-info-phone">1900 232389</span></div>
+              <div><i class="fa-solid fa-envelope icon-accent-fixed"></i> <strong>Email:</strong> <span id="td-info-email">support@vinfast.vn</span></div>
+              <div><i class="fa-solid fa-location-dot icon-accent-fixed"></i> <strong>Địa chỉ:</strong> <span id="td-info-address">Toà K3, KĐT The K Park, Kiến Hưng, Hà Đông, Hà Nội</span></div>
             </div>
           </div>
         </div>
@@ -178,6 +178,13 @@
             <select id="home-td-car-select" class="form-input" required>
               <option value="">-- Chọn dòng xe --</option>
               <!-- Tải động bằng JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="home-td-color-select">Màu sắc bạn chọn</label>
+            <select id="home-td-color-select" class="form-input">
+              <option value="">-- Chọn màu xe (Tùy chọn) --</option>
             </select>
           </div>
           
@@ -219,8 +226,8 @@
   <section id="services" class="services-section container">
     <div style="text-align: center; margin-bottom: 45px;">
       <span class="hero-subtitle">Đồng Hành Suốt Mọi Hành Trình</span>
-      <h2 style="font-size: 32px; font-weight: 800;">Dịch Vụ & Giải Pháp Sạc</h2>
-      <p style="color: var(--text-secondary); margin-top: 8px;">Dịch vụ hậu mãi đẳng cấp kết hợp giải pháp sạc toàn diện, giúp bạn an tâm trên mọi nẻo đường.</p>
+      <h2 class="section-main-title">Dịch Vụ & Giải Pháp Sạc</h2>
+      <p class="section-desc">Dịch vụ hậu mãi đẳng cấp kết hợp giải pháp sạc toàn diện, giúp bạn an tâm trên mọi nẻo đường.</p>
     </div>
     
     <div class="services-layout">
@@ -276,7 +283,7 @@
   <!-- Detail Car Modal -->
   <div class="modal-overlay" id="car-modal">
     <div class="modal-content glass-panel">
-      <button class="modal-close-btn" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <button class="modal-close-btn" id="modal-close" aria-label="Đóng chi tiết xe"><i class="fa-solid fa-xmark"></i></button>
       
       <!-- Hình ảnh đầu Modal -->
       <div class="modal-header-img">
@@ -300,7 +307,7 @@
 
         <!-- Trình đổi màu ngoại thất xe (Visualizer) -->
         <div class="color-visualizer-section" style="margin-bottom: 24px; padding: 12px 0;">
-          <span class="form-label" style="margin-bottom: 10px; display: block; font-size: 13px;">Màu ngoại thất: <span id="selected-color-name" style="color: var(--accent-color); font-weight: 700;">Mặc định</span></span>
+          <span class="form-label" style="margin-bottom: 10px; display: block; font-size: 13px;">Màu ngoại thất: <span id="selected-color-name" class="text-accent fw-bold">Mặc định</span></span>
           <div class="color-dots" id="modal-color-dots" style="display: flex; gap: 12px; align-items: center;">
             <!-- Load động từ JS -->
           </div>
@@ -371,31 +378,31 @@
                 <option value="buy">Mua Đứt Pin (Trọn gói kèm xe)</option>
               </select>
             </div>
-            <div class="form-group" style="margin-top: 16px;">
+            <div class="form-group mt-16">
               <label class="form-label" style="font-size: 11px;">Khu vực đăng ký (Phí biển số)</label>
               <select id="finance-location-option" class="form-input">
                 <option value="18000000" data-fee="18000000">Hà Nội / Hồ Chí Minh (+ 18.000.000 đ)</option>
                 <option value="5000000" data-fee="5000000">Tỉnh Khác (+ 5.000.000 đ)</option>
               </select>
             </div>
-            <div class="form-group" style="margin-top: 16px;">
+            <div class="form-group mt-16">
               <label class="form-label" style="font-size: 11px; display: flex; justify-content: space-between;">
                 <span>Tỷ lệ trả trước</span>
-                <span id="lbl-prepay-percent" style="color: var(--accent-color); font-weight: 700;">20%</span>
+                <span id="lbl-prepay-percent" class="text-accent fw-bold">20%</span>
               </label>
               <input type="range" id="finance-prepay" min="10" max="80" step="5" value="20" class="form-slider" style="width: 100%; accent-color: var(--accent-color);">
             </div>
-            <div class="form-group" style="margin-top: 16px;">
+            <div class="form-group mt-16">
               <label class="form-label" style="font-size: 11px; display: flex; justify-content: space-between;">
                 <span>Thời gian trả góp</span>
-                <span id="lbl-loan-months" style="color: var(--accent-color); font-weight: 700;">60 tháng (5 năm)</span>
+                <span id="lbl-loan-months" class="text-accent fw-bold">60 tháng (5 năm)</span>
               </label>
               <input type="range" id="finance-months" min="12" max="96" step="12" value="60" class="form-slider" style="width: 100%; accent-color: var(--accent-color);">
             </div>
-            <div class="form-group" style="margin-top: 16px;">
+            <div class="form-group mt-16">
               <label class="form-label" style="font-size: 11px; display: flex; justify-content: space-between;">
                 <span>Lãi suất ngân hàng (% / năm)</span>
-                <span id="lbl-interest-rate" style="color: var(--accent-color); font-weight: 700;">7.5%</span>
+                <span id="lbl-interest-rate" class="text-accent fw-bold">7.5%</span>
               </label>
               <input type="range" id="finance-interest" min="4" max="12" step="0.5" value="7.5" class="form-slider" style="width: 100%; accent-color: var(--accent-color);">
             </div>
@@ -403,24 +410,24 @@
           <!-- Cột kết quả -->
           <div class="glass-panel" style="padding: 20px; background: rgba(15, 83, 197, 0.02); border-color: rgba(15, 83, 197, 0.15); display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px;">
-                <span style="color: var(--text-secondary);">Giá xe (kèm gói pin chọn):</span>
+              <div class="row-spec-item">
+                <span class="text-secondary">Giá xe (kèm gói pin chọn):</span>
                 <span style="color: var(--text-primary); font-weight: 600;" id="calc-car-price-display">---</span>
               </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px;">
-                <span style="color: var(--text-secondary);">Phí biển số khu vực:</span>
+              <div class="row-spec-item">
+                <span class="text-secondary">Phí biển số khu vực:</span>
                 <span style="color: #0f53c5; font-weight: 600;" id="calc-plate-fee-display">+ 0 đ</span>
               </div>
               <div style="display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 14.5px; border-top: 1px dashed var(--panel-border); padding-top: 10px;">
                 <span style="color: var(--text-primary); font-weight: 700;">Giá lăn bánh ước tính:</span>
                 <span style="color: var(--accent-color); font-weight: 800; font-size: 16px;" id="calc-rolling-price">---</span>
               </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px;">
-                <span style="color: var(--text-secondary);" id="lbl-prepay-title">Số tiền trả trước:</span>
+              <div class="row-spec-item">
+                <span class="text-secondary" id="lbl-prepay-title">Số tiền trả trước:</span>
                 <span style="color: var(--text-primary); font-weight: 600;" id="calc-prepay-amount">---</span>
               </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13.5px;">
-                <span style="color: var(--text-secondary);">Số tiền vay ngân hàng:</span>
+              <div class="row-spec-item">
+                <span class="text-secondary">Số tiền vay ngân hàng:</span>
                 <span style="color: var(--text-primary); font-weight: 600;" id="calc-loan-amount">---</span>
               </div>
             </div>
@@ -442,13 +449,13 @@
   <!-- Khách hàng Đăng Nhập / Đăng Ký Modal -->
   <div class="modal-overlay" id="auth-modal">
     <div class="modal-content glass-panel" style="max-width: 450px;">
-      <button class="modal-close-btn" id="auth-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <button class="modal-close-btn" id="auth-modal-close" aria-label="Đóng cửa sổ tài khoản"><i class="fa-solid fa-xmark"></i></button>
       <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg);">
         
         <!-- Tab Headers -->
         <div class="auth-tabs" style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--panel-border); padding-bottom: 12px;">
-          <button class="btn btn-primary tab-btn" id="tab-login-btn" onclick="switchAuthTab('login')" style="flex: 1; padding: 10px;">Đăng Nhập</button>
-          <button class="btn tab-btn" id="tab-register-btn" onclick="switchAuthTab('register')" style="flex: 1; padding: 10px;">Đăng Ký</button>
+          <button class="btn btn-primary tab-btn flex-item-equal" id="tab-login-btn" onclick="switchAuthTab('login')">Đăng Nhập</button>
+          <button class="btn tab-btn flex-item-equal" id="tab-register-btn" onclick="switchAuthTab('register')">Đăng Ký</button>
         </div>
 
         <!-- Hộp thông báo trạng thái -->
@@ -510,8 +517,8 @@
         <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary);">Xác Nhận Đăng Xuất</h3>
         <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;">Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?</p>
         <div style="display: flex; gap: 12px; justify-content: center;">
-          <button class="btn" id="btn-logout-cancel" style="flex: 1; padding: 10px;">Hủy</button>
-          <button class="btn btn-danger" id="btn-logout-confirm" style="flex: 1; padding: 10px;">Đăng Xuất</button>
+          <button class="btn flex-item-equal" id="btn-logout-cancel">Hủy</button>
+          <button class="btn btn-danger flex-item-equal" id="btn-logout-confirm">Đăng Xuất</button>
         </div>
       </div>
     </div>
@@ -521,7 +528,7 @@
   <div class="compare-drawer" id="compare-drawer" style="display: none !important;">
     <div class="container compare-drawer-content">
       <div class="compare-info">
-        <span class="compare-title">So Sánh Xe Điện (<span id="compare-count" style="color: var(--accent-color); font-weight: 700;">0</span>/3)</span>
+        <span class="compare-title">So Sánh Xe Điện (<span id="compare-count" class="text-accent fw-bold">0</span>/3)</span>
         <p class="compare-desc" style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Chọn tối đa 3 xe để đối chiếu song song thông số kỹ thuật.</p>
       </div>
       <div class="compare-slots" id="compare-slots">
@@ -537,7 +544,7 @@
   <!-- So Sánh Xe Chi Tiết Modal -->
   <div class="modal-overlay" id="compare-modal" style="display: none !important;">
     <div class="modal-content glass-panel" style="max-width: 1000px;">
-      <button class="modal-close-btn" id="compare-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <button class="modal-close-btn" id="compare-modal-close" aria-label="Đóng bảng so sánh xe"><i class="fa-solid fa-xmark"></i></button>
       
       <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 36px;">
         <h2 class="spec-title" style="font-size: 24px; margin-bottom: 24px;">Bảng So Sánh Thông Số Xe Chi Tiết</h2>
@@ -553,7 +560,7 @@
   <!-- Đăng Ký Nhận Báo Giá Modal -->
   <div class="modal-overlay" id="test-drive-modal">
     <div class="modal-content glass-panel" style="max-width: 600px;">
-      <button class="modal-close-btn" id="test-drive-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <button class="modal-close-btn" id="test-drive-modal-close" aria-label="Đóng form đăng ký lái thử"><i class="fa-solid fa-xmark"></i></button>
       
       <div class="modal-body" style="background: #ffffff; border-radius: var(--radius-lg); padding: 36px;">
         <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); text-align: center;">Yêu Cầu Báo Giá Lăn Bánh</h2>
@@ -567,6 +574,13 @@
             <select id="td-car-select" class="form-input" required>
               <option value="">-- Chọn dòng xe --</option>
               <!-- Tải động bằng JS -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="td-color-select">Màu sắc bạn chọn</label>
+            <select id="td-color-select" class="form-input">
+              <option value="">-- Chọn màu xe (Tùy chọn) --</option>
             </select>
           </div>
           
@@ -596,10 +610,10 @@
 
   <!-- Showroom Location Section -->
   <section id="stations" class="container" style="padding-top: 60px; padding-bottom: 100px; border-top: 1px solid var(--panel-border);">
-    <div style="text-align: center; margin-bottom: 40px;">
+    <div class="section-header-box mb-40">
       <span class="hero-subtitle">Liên hệ & Ghé thăm</span>
-      <h2 style="font-size: 32px; font-weight: 800;">Vị Trí Showroom</h2>
-      <p style="color: var(--text-secondary); margin-top: 8px;">Ghé thăm showroom VinFast HTA Văn Phú để được tư vấn trực tiếp và trải nghiệm lái thử các dòng xe mới nhất.</p>
+      <h2 class="section-main-title">Vị Trí Showroom</h2>
+      <p class="section-desc">Ghé thăm showroom VinFast HTA Văn Phú để được tư vấn trực tiếp và trải nghiệm lái thử các dòng xe mới nhất.</p>
     </div>
     
     <div class="showroom-wrapper glass-panel" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; padding: 30px; align-items: stretch; min-height: 450px;">

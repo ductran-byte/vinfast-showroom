@@ -355,7 +355,7 @@ function addVersionRow(name = '', basePrice = '', promoPrice = '') {
     <input type="text" class="form-input ver-name" value="${name}" placeholder="Tên phiên bản (VD: VinFast VF3 ECO)" required>
     <input type="number" class="form-input ver-base-price" value="${basePrice}" placeholder="Giá gốc (VNĐ)" required>
     <input type="number" class="form-input ver-promo-price" value="${promoPrice}" placeholder="Giá ưu đãi (VNĐ)" required>
-    <button type="button" class="btn btn-danger btn-remove-version" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white;"><i class="fa-solid fa-trash"></i></button>
+    <button type="button" class="btn btn-danger btn-remove-version" title="Xóa phiên bản này" aria-label="Xóa phiên bản này" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white; border-radius: 8px; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-trash"></i></button>
   `;
 
   // Bind remove button click
@@ -364,6 +364,12 @@ function addVersionRow(name = '', basePrice = '', promoPrice = '') {
   };
 
   container.appendChild(row);
+
+  // Tự động focus vào ô nhập tên nếu tạo mới dòng trống
+  if (!name) {
+    const nameInput = row.querySelector('.ver-name');
+    if (nameInput) nameInput.focus();
+  }
 }
 
 // Helper to add promo rows dynamically
@@ -381,7 +387,7 @@ function addPromoRow(content = '') {
 
   row.innerHTML = `
     <input type="text" class="form-input promo-content" value="${content}" placeholder="Nội dung khuyến mãi (VD: Đặt cọc 10 - 30 triệu)" required>
-    <button type="button" class="btn btn-danger btn-remove-promo" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white;"><i class="fa-solid fa-trash"></i></button>
+    <button type="button" class="btn btn-danger btn-remove-promo" title="Xóa khuyến mãi này" aria-label="Xóa khuyến mãi này" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white; border-radius: 8px; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-trash"></i></button>
   `;
 
   // Bind remove button click
@@ -390,6 +396,12 @@ function addPromoRow(content = '') {
   };
 
   container.appendChild(row);
+
+  // Tự động focus vào ô nhập nếu tạo mới dòng trống
+  if (!content) {
+    const promoInput = row.querySelector('.promo-content');
+    if (promoInput) promoInput.focus();
+  }
 }
 
 // Helper to add color rows dynamically
@@ -405,13 +417,13 @@ function addColorRow(colorObj = null) {
   row.style.marginBottom = '10px';
   row.style.alignItems = 'center';
 
-  const hexVal = colorObj ? colorObj.hex : '#000000';
+  const hexVal = colorObj ? colorObj.hex : '#1464F4';
   const nameVal = colorObj ? colorObj.name : '';
   const imgUrl = colorObj ? colorObj.image_url : '';
   const typeVal = colorObj ? colorObj.type : 'basic';
 
   row.innerHTML = `
-    <input type="color" class="color-hex" value="${hexVal}" style="width: 100%; height: 42px; padding: 2px; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); cursor: pointer;">
+    <input type="color" class="color-hex" value="${hexVal}" title="Chọn mã màu" style="width: 100%; height: 42px; padding: 2px; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); cursor: pointer;">
     <input type="text" class="form-input color-name" value="${nameVal}" placeholder="Tên màu (VD: Đỏ Năng Động)" required style="height: 42px;">
     <select class="form-input color-type" style="height: 42px; background: #fff;">
       <option value="basic" ${typeVal === 'basic' ? 'selected' : ''}>Màu cơ bản</option>
@@ -429,7 +441,7 @@ function addColorRow(colorObj = null) {
         ${imgUrl ? `<img class="color-preview" src="${imgUrl}" style="width: 38px; height: 38px; object-fit: contain; border-radius: 4px; border: 1px solid var(--panel-border);" data-url="${imgUrl}">` : '<span class="no-preview" style="font-size: 11px; color: var(--text-muted);">Trống</span>'}
       </div>
     </div>
-    <button type="button" class="btn btn-danger btn-remove-color" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white;"><i class="fa-solid fa-trash"></i></button>
+    <button type="button" class="btn btn-danger btn-remove-color" title="Xóa màu này" aria-label="Xóa màu này" style="padding: 0; height: 42px; width: 42px; display: flex; align-items: center; justify-content: center; background: #b91c1c; border-color: #b91c1c; color: white; border-radius: 8px; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-trash"></i></button>
   `;
 
   // Bind change listener for file input to show live preview
@@ -462,6 +474,28 @@ function addColorRow(colorObj = null) {
   };
 
   container.appendChild(row);
+
+  // Tự động focus vào ô nhập tên màu nếu tạo mới dòng trống
+  if (!nameVal) {
+    const nameInput = row.querySelector('.color-name');
+    if (nameInput) nameInput.focus();
+  }
+}
+
+// Gán sự kiện click cho các nút thêm hàng động (Phiên bản, Màu sắc, Khuyến mãi)
+const btnAddVersion = document.getElementById('btn-add-version-row');
+if (btnAddVersion) {
+  btnAddVersion.addEventListener('click', () => addVersionRow());
+}
+
+const btnAddColor = document.getElementById('btn-add-color-row');
+if (btnAddColor) {
+  btnAddColor.addEventListener('click', () => addColorRow());
+}
+
+const btnAddPromo = document.getElementById('btn-add-promo-row');
+if (btnAddPromo) {
+  btnAddPromo.addEventListener('click', () => addPromoRow());
 }
 // DOM Elements
 const loginSection = document.getElementById('login-section');
